@@ -1,5 +1,5 @@
-import { pool } from "../../config/db";
 import { NextResponse } from "next/server";
+import { pool } from "../../config/db";
 
 export async function GET() {
   try {
@@ -12,7 +12,6 @@ export async function GET() {
 export async function POST(request) {
   try {
     const { name, description, price } = await request.json();
-    console.log(name, description, price);
 
     const result = await pool.query("INSERT INTO products SET ?", {
       name,

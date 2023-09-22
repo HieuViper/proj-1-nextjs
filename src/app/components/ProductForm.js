@@ -17,6 +17,10 @@ export function ProductForm() {
     const fetchProduct = async (id) => {
       try {
         const { data } = await axios.get("/api/products/" + id);
+        console.log(
+          "🚀 ~ file: ProductForm.js:20 ~ fetchProduct ~ data:",
+          data
+        );
         setProduct(data);
       } catch (error) {
         console.error(error);

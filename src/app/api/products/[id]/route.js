@@ -1,10 +1,9 @@
-import { pool } from "../../../config/db";
 import { NextResponse } from "next/server";
+import { pool } from "../../../config/db";
 
 export async function GET(request, { params }) {
-  console.log("🚀 ~ file: route.js:5 ~ GET ~ params:", params);
   try {
-    const result = await pool.query("SELECT * FROM product WHERE id = ?", [
+    const result = await pool.query("SELECT * FROM products WHERE id = ?", [
       params.id,
     ]);
     return NextResponse.json(result[0]);

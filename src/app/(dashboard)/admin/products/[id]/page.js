@@ -10,7 +10,6 @@ async function loadProduct(productId) {
   const { data } = await axios.get(
     "http://localhost:3000/api/products/" + productId
   );
-  console.log("🚀 ~ file: page.jsx:11 ~ loadProduct ~ data:", data);
   return data;
 }
 

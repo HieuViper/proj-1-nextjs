@@ -1,59 +1,81 @@
-"use client"
+/* eslint-disable @next/next/no-async-client-component */
+"use client";
+import { Button, Space, Table } from "antd";
 import axios from "axios";
 import Link from "next/link";
-import React from 'react';
-import { Button, Space, Table, Tag } from 'antd';
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
-async function loadProduct() {
-  const { data } = await axios.get("http://localhost:3000/api/products");
-  return data;
-}
+function ProductsPage() {
+  const router = useRouter();
+  const columns = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Short",
+      dataIndex: "short",
+      key: "short",
+    },
+    {
+      title: "Content",
+      dataIndex: "content",
+      key: "content",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space size="middle">
+          <Button>
+            <Link href={`/admin/products/edit/${record.id}`}>Edit</Link>
+          </Button>
+          <Button
+            danger
+            onClick={() => {
+              axios.delete("/api/products/" + record.id).then((res) => {
+                setProducts((prevItem) =>
+                  prevItem.filter((item) => item.id !== record.id)
+                );
+              });
+              toast.success("Task deleted");
+              router.push("/admin/products");
+              router.refresh();
+            }}
+          >
+            <a>Delete</a>
+          </Button>
+        </Space>
+      ),
+    },
+  ];
 
+  const [products, setProducts] = useState();
 
-const columns = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const { data } = await axios.get("/api/products");
+        console.log(
+          "🚀 ~ file: ProductForm.js:20 ~ fetchProduct ~ data:",
+          data
+        );
+        setProducts(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-  },
-  {
-    title: 'Short',
-    dataIndex: 'short',
-    key: 'short',
-  },
-  {
-    title: 'Content',
-    dataIndex: 'content',
-    key: 'content',
-  },
-  {
-    title: 'Action',
-    key: 'action',
-    render: (_, record) => (
-      <Space size="middle">
-        <Button >
-          <Link href={`/admin/products/edit/${record.id}`}>Edit</Link>
-        </Button>
-        <Button danger>
-          <a>Delete</a>
-        </Button>
-      </Space>
-    ),
-  },
-];
-
-
-async function ProductsPage() {
-  const products = await loadProduct();
-  console.log("🚀 ~ file: page.js:11 ~ ProductsPage ~ products:", products);
-
-  if (products.length === 0) return <h1 className="text-white">No Products</h1>;
+    fetchProduct();
+  }, []);
 
   return (
     <>
       <div className="flex justify-end mb-4">
-        <Button >
+        <Button>
           <Link href={`/admin/products/add`}>Add product</Link>
         </Button>
       </div>

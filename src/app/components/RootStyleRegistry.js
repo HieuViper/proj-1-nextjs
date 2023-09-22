@@ -1,9 +1,9 @@
 // located at src/modules/shared/components/root-style-registry/index.tsx in my case
 
 "use client";
-import { useState, PropsWithChildren } from "react";
+import { StyleProvider, createCache, extractStyle } from "@ant-design/cssinjs";
 import { useServerInsertedHTML } from "next/navigation";
-import { createCache, extractStyle, StyleProvider } from "@ant-design/cssinjs";
+import { useState } from "react";
 
 export const RootStyleRegistry = ({ children }) => {
   const [cache] = useState(() => createCache());

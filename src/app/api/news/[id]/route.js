@@ -3,7 +3,7 @@ import { pool } from "../../../config/db";
 
 export async function GET(request, { params }) {
     try {
-        const result = await pool.query("SELECT * FROM categories WHERE id = ?", [
+        const result = await pool.query("SELECT * FROM news WHERE id = ?", [
             params.id,
         ]);
         return NextResponse.json(result[0]);
@@ -14,7 +14,7 @@ export async function GET(request, { params }) {
 
 export async function DELETE(request, { params }) {
     try {
-        await pool.query("DELETE FROM categories WHERE id = ?", [params.id]);
+        await pool.query("DELETE FROM news WHERE id = ?", [params.id]);
         return NextResponse.json({}, { status: 204 });
     } catch (error) {
         return NextResponse.json({ message: error.message });
@@ -25,7 +25,7 @@ export async function PUT(request, { params }) {
     const data = await request.json();
 
     try {
-        await pool.query("UPDATE categories SET ? WHERE id = ?", [data, params.id]);
+        await pool.query("UPDATE news SET ? WHERE id = ?", [data, params.id]);
         return NextResponse.json({
             ...data,
             id: params.id,

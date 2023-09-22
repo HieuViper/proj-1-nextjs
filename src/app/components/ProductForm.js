@@ -52,8 +52,8 @@ export function ProductForm() {
         });
       }
 
-      router.refresh();
       router.push("/admin/products");
+      router.refresh();
     } catch (error) {
       toast.error(error.response.data.message);
     }

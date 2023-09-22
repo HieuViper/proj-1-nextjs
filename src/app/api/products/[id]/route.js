@@ -1,4 +1,4 @@
-import { pool } from "@/app/config/db";
+import { pool } from "../../../config/db";
 import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
@@ -15,7 +15,7 @@ export async function GET(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    await pool.query("DELETE FROM product WHERE id = ?", [params.id]);
+    await pool.query("DELETE FROM products WHERE id = ?", [params.id]);
     return NextResponse.json({}, { status: 204 });
   } catch (error) {
     return NextResponse.json({ message: error.message });
@@ -26,7 +26,7 @@ export async function PUT(request, { params }) {
   const data = await request.json();
 
   try {
-    await pool.query("UPDATE product SET ? WHERE id = ?", [data, params.id]);
+    await pool.query("UPDATE products SET ? WHERE id = ?", [data, params.id]);
     return NextResponse.json({
       ...data,
       id: params.id,

@@ -3,7 +3,7 @@ import { pool } from "../../config/db";
 
 export async function GET() {
     try {
-        const results = await pool.query("SELECT * FROM categories");
+        const results = await pool.query("SELECT * FROM news");
         return NextResponse.json(results);
     } catch (error) {
         return NextResponse.json({ message: error.message });
@@ -11,16 +11,18 @@ export async function GET() {
 }
 export async function POST(request) {
     try {
-        const { name, type, description } = await request.json();
-        const categories_keywords = name.replaceAll(' ', '')
-        const result = await pool.query("INSERT INTO categories SET ?", {
-            name,
+        const { title, type, category_id, short, description } = await request.json();
+        const news_keywords = title.replaceAll(' ', '')
+        const result = await pool.query("INSERT INTO news SET ?", {
+            title,
             type,
+            category_id,
+            short,
             description,
-            categories_keywords
+            news_keywords
         });
 
-        return NextResponse.json({ name, type, description, id: result.insertId });
+        return NextResponse.json({ title, type, category_id, short, description, id: result.insertId });
     } catch (error) {
         return NextResponse.json(
             { message: error.message },

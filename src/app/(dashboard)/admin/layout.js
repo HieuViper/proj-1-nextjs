@@ -31,6 +31,7 @@ const DashboardLayout = ({ children }) => {
       <Link href="/admin/products">Products</Link>,
       <MailOutlined />
     ),
+
     getItem("2", "Test2", <AppstoreOutlined />, [
       getItem("3", <Link href="/admin/">test3</Link>),
       getItem("4", <Link href="/admin/">test4</Link>),
@@ -41,6 +42,11 @@ const DashboardLayout = ({ children }) => {
       getItem("9", <Link href="/admin/">test9</Link>),
       getItem("10", <Link href="/admin/">test10</Link>),
     ]),
+    getItem(
+      "11",
+      <Link href="/admin/articles">Articles</Link>,
+      <MailOutlined />
+    ),
   ];
 
   return (

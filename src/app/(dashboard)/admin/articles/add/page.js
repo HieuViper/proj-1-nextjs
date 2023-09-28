@@ -1,4 +1,4 @@
-import { ArticleForm } from "@/app/components/articles/ArticleForm";
+import { ArticleForm } from "../_components/ArticleForm";
 
 const AddArticlePage = () => {
   return (

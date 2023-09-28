@@ -1,5 +1,5 @@
+import { pool } from "@/config/db";
 import { NextResponse } from "next/server";
-import { pool } from "../../../config/db";
 
 export async function GET(request, { params }) {
   try {

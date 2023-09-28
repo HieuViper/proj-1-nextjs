@@ -1,5 +1,5 @@
+import { pool } from "@/config/db";
 import { NextResponse } from "next/server";
-import { pool } from "../../config/db";
 
 export async function GET() {
   try {
@@ -11,21 +11,30 @@ export async function GET() {
 }
 export async function POST(request) {
   try {
-    const { name, description, price } = await request.json();
+    const { title, short, author, code, category_id, active, content } =
+      await request.json();
 
     const result = await pool.query("INSERT INTO articles SET ?", {
-      name,
-      description,
-      price,
+      title,
+      short,
+      author,
+      code,
+      category_id,
+      active,
+      content,
     });
 
-    return NextResponse.json({ name, description, price, id: result.insertId });
+    return NextResponse.json({
+      title,
+      short,
+      author,
+      code,
+      category_id,
+      active,
+      content,
+      id: result.insertId,
+    });
   } catch (error) {
-    return NextResponse.json(
-      { message: error.message },
-      {
-        status: 500,
-      }
-    );
+    return NextResponse.json({ message: error.message });
   }
 }

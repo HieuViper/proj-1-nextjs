@@ -1,9 +1,9 @@
 "use client";
+import Navbar from "@/components/Navbar";
+import { RootStyleRegistry } from "@/components/RootStyleRegistry";
 import { Inter } from "next/font/google";
 import { usePathname } from "next/navigation";
 import { Toaster } from "react-hot-toast";
-import Navbar from "./components/Navbar";
-import { RootStyleRegistry } from "./components/RootStyleRegistry";
 import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 // export const metadata = {
@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
       <body>
         {!headersList.includes(specificRoute) && <Navbar />}
         <RootStyleRegistry>{children}</RootStyleRegistry>
-        <Toaster />
+        <Toaster position="top-center" />
       </body>
     </html>
   );

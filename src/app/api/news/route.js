@@ -11,24 +11,15 @@ export async function GET() {
 }
 export async function POST(request) {
   try {
-    const { title, type, category_id, short, description } =
+    const { title, type, categories, post_author, post_date, excerpt, content, post_status, news_code, news_position } =
       await request.json();
-    const news_keywords = title.replaceAll(" ", "");
     const result = await pool.query("INSERT INTO news SET ?", {
-      title,
-      type,
-      category_id,
-      short,
-      description,
-      news_keywords,
+      title, type, categories, post_author, post_date, excerpt, content, post_status, news_code, news_position
+
     });
 
     return NextResponse.json({
-      title,
-      type,
-      category_id,
-      short,
-      description,
+      title, type, categories, post_author, post_date, excerpt, content, post_status, news_code, news_position,
       id: result.insertId,
     });
   } catch (error) {

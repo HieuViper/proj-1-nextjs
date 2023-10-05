@@ -1,10 +1,8 @@
-// import newPage from "../../../../admin/products/add/page";
-// export default newPage;
+import { NewsForm } from "../../_components/NewsForm";
 
-import { NewsForm } from "@/app/components/news/NewsForm";
 function EditNews() {
     return (
-        <div className="h-5/6 grid place-items-center ">
+        <div className="">
             Edit new
             <NewsForm />
         </div>

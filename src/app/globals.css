@@ -22,3 +22,9 @@ body {
   font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
   vertical-align: middle;
 }
+
+.ql-editor {
+  min-height: 400px !important;
+  max-height: 600px;
+  overflow: auto;
+}

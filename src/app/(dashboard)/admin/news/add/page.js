@@ -1,7 +1,7 @@
-import { NewsForm } from "@/app/components/news/NewsForm";
+import { NewsForm } from "../_components/NewsForm";
 function AddNews() {
   return (
-    <div className="h-5/6 grid place-items-center ">
+    <div className="">
       Add new
       <NewsForm />
     </div>

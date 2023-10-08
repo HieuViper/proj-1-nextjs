@@ -4,11 +4,9 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import React from 'react';
-import { Button, Form, Input, Select, Space } from 'antd';
+import { Button, Form, Input, Select, Space, Switch } from 'antd';
 import { SaveOutlined, SwapLeftOutlined } from '@ant-design/icons';
 import Editor from "@/components/Editor";
-import { DraftButton } from "@/components/Button/DraftButton";
-import { PublishButton } from "@/components/Button/PublishButton";
 import Link from "next/link";
 
 export function NewsForm() {
@@ -18,7 +16,7 @@ export function NewsForm() {
   const [form] = Form.useForm();
   const { Option } = Select;
   const [cate, setCate] = useState('')
-  const [buttonType, setButtonType] = useState()
+  const [postStatus, setPostStatus] = useState()
   const [data, setData] = useState();
   useEffect(() => {
     const fetchNews = async (id) => {
@@ -30,7 +28,8 @@ export function NewsForm() {
         );
         form.setFieldsValue(data)
         setData(data)
-        setButtonType(data.post_status)
+        setPostStatus(data.post_status)
+        setNewsPosition(data.news_position)
       } catch (error) {
         console.error(error);
       }
@@ -59,37 +58,31 @@ export function NewsForm() {
   const options = [];
   cate && cate.map((item) => options.push({
     label: item.name,
-    value: item.name,
+    value: item.id,
   }))
   // console.log("arrCate", arrCate)
 
   const handleSubmit = async (value) => {
     console.log("value", value)
-    const newDate = "2023-09-29 11:37:01"
-    Object.assign(value, { post_author: 1, post_date: newDate });
-    if (buttonType == "draft") {
-      Object.assign(value, { post_status: "draft" });
-    } else if (buttonType == "publish") {
-      Object.assign(value, { post_status: "publish" });
-    } else {
-      Object.assign(value, { post_status: "trash" });
+    const newsCode = value.title.trim().normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'D')
+      .replace(/\s/g, "-")
+
+    if (postStatus == "publish") {
+      const postDate = new Date().toISOString().slice(0, 10) + " " + new Date().toLocaleTimeString('en-GB')
+      Object.assign(value, { post_date: postDate });
     }
+
+    Object.assign(value, {
+      post_author: 1, post_status: postStatus,
+      news_code: newsCode, news_position: newsPosition
+    });
 
     try {
       if (params?.id) {
-        await axios.put("/api/news/" + params.id, {
-          title: value.title,
-          type: value.type,
-          categories: value.categories,
-          post_author: value.post_author,
-          post_date: value.post_date,
-          excerpt: value.excerpt,
-          content: value.content,
-          post_status: value.post_status,
-          news_code: value.news_code,
-          news_position: value.news_position
-        });
-
+        await axios.put("/api/news/" + params.id, value);
         toast.success("Task Updated", {
           position: "bottom-center",
         });
@@ -142,6 +135,14 @@ export function NewsForm() {
       });
     }, 6000);
   };
+  const [newsPosition, setNewsPosition] = useState()
+  const onChangePosition = (checked) => {
+    if (checked == true) {
+      setNewsPosition(1)
+    } else {
+      setNewsPosition(0)
+    }
+  };
   return (
     <>
       <div className="flex justify-start">
@@ -178,14 +179,14 @@ export function NewsForm() {
               <Form.Item
                 className="p-2"
               >
-                <Button type="primary" ghost htmlType="submit" onClick={() => setButtonType("draft")}>
+                <Button type="primary" ghost htmlType="submit" onClick={() => setPostStatus("draft")}>
                   Switch to Draft
                 </Button>
               </Form.Item>
               <Form.Item
                 className="p-2"
               >
-                <Button p-2 danger htmlType="submit" onClick={() => setButtonType("trash")}>
+                <Button danger htmlType="submit" onClick={() => setPostStatus("trash")}>
                   Move to trash
                 </Button>
               </Form.Item>
@@ -203,7 +204,7 @@ export function NewsForm() {
             <Form.Item
               className="p-2"
             >
-              <Button p-2 danger htmlType="submit" onClick={() => setButtonType("trash")}>
+              <Button danger htmlType="submit" onClick={() => setPostStatus("trash")}>
                 Move to trash
               </Button>
             </Form.Item>
@@ -211,7 +212,7 @@ export function NewsForm() {
               <Form.Item
                 className="p-2"
               >
-                <Button type="dashed" htmlType="submit" onClick={() => setButtonType("draft")}>
+                <Button type="dashed" htmlType="submit" onClick={() => setPostStatus("draft")}>
                   Save Draft
                 </Button>
                 {/* <Button type="primary"
@@ -224,14 +225,23 @@ export function NewsForm() {
 
                 className="p-2"
               >
-                <Button type="primary" htmlType="submit" onClick={() => setButtonType("publish")} >
+                <Button type="primary" htmlType="submit" onClick={() => setPostStatus("publish")} >
                   Publish
                 </Button>
               </Form.Item>
             </div>
           </div>}
 
-
+        <Form.Item
+          label="Priority"
+          name="news_position"
+        >
+          {/* <Select>
+            <Option value={1}>On Top</Option>
+            <Option value={0}>Normal</Option>
+          </Select> */}
+          <Switch checked={newsPosition == 1 ? true : false} onChange={onChangePosition} />
+        </Form.Item>
 
         <Form.Item
           label="Title"
@@ -271,35 +281,11 @@ export function NewsForm() {
               width: '100%',
             }}
             placeholder="Select category"
-            // defaultValue={arrCate}
-            // onChange={handleChange}
             options={options}
           />
-          {/* <Space
-            style={{
-              width: '100%',
-            }}
-            direction="vertical"
-          >
-         
-          </Space> */}
         </Form.Item>
 
-        <Form.Item
-          label="News Position"
-          name="news_position"
-          rules={[
-            {
-              required: true,
-              message: 'Please input your news_position!',
-            },
-          ]}
-        >
-          <Select>
-            <Option value={1}>On Top</Option>
-            <Option value={0}>Normal</Option>
-          </Select>
-        </Form.Item>
+
 
         <Form.Item
           label="Excerpt"

@@ -1,39 +1,24 @@
 /* eslint-disable @next/next/no-async-client-component */
 "use client";
-import { Button, Space, Table, Input, Select, Radio, Popconfirm } from "antd";
+import { Button, Space, Table, Input, Select, Radio, Popconfirm, Tag } from "antd";
 import Search from "antd/es/input/Search";
 import { SearchOutlined, DeleteOutlined, EditOutlined, SyncOutlined } from "@ant-design/icons";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import Highlighter from "react-highlight-words";
 import toast from "react-hot-toast";
 
 function NewsPage() {
-
+  const { Option } = Select
   const router = useRouter();
   const [news, setNews] = useState();
   const [cates, setCates] = useState();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState("");
-  const [searchText, setSearchText] = useState("");
-  const [searchedColumn, setSearchedColumn] = useState("");
   const [status, setStatus] = useState("");
   const [type, setType] = useState("");
 
-
-  const searchInput = useRef(null);
-  const handleSearchByColumn = (selectedKeys, confirm, dataIndex) => {
-    confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-  };
-  const handleReset = (clearFilters) => {
-    clearFilters();
-    setSearchText("");
-  };
   const onSelectChange = (newSelectedRowKeys) => {
     console.log("selectedRowKeys changed: ", newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
@@ -47,7 +32,6 @@ function NewsPage() {
   const startDelete = () => {
     setLoading(true);
     console.log(rowSelection);
-
     axios
       .delete(
         "/api/news/" +
@@ -110,112 +94,6 @@ function NewsPage() {
     fetchProduct();
   }, []);
 
-  // const getColumnSearchProps = (dataIndex) => ({
-  //   filterDropdown: ({
-  //     setSelectedKeys,
-  //     selectedKeys,
-  //     confirm,
-  //     clearFilters,
-  //     close,
-  //   }) => (
-  //     <div
-  //       style={{
-  //         padding: 8,
-  //       }}
-  //       onKeyDown={(e) => e.stopPropagation()}
-  //     >
-  //       <Input
-  //         ref={searchInput}
-  //         placeholder={`Search ${dataIndex}`}
-  //         value={selectedKeys[0]}
-  //         onChange={(e) =>
-  //           setSelectedKeys(e.target.value ? [e.target.value] : [])
-  //         }
-  //         onPressEnter={() =>
-  //           handleSearchByColumn(selectedKeys, confirm, dataIndex)
-  //         }
-  //         style={{
-  //           marginBottom: 8,
-  //           display: "block",
-  //         }}
-  //       />
-  //       <Space>
-  //         <Button
-  //           type="primary"
-  //           onClick={() =>
-  //             handleSearchByColumn(selectedKeys, confirm, dataIndex)
-  //           }
-  //           icon={<SearchOutlined />}
-  //           size="small"
-  //           style={{
-  //             width: 90,
-  //           }}
-  //         >
-  //           Search
-  //         </Button>
-  //         <Button
-  //           onClick={() => clearFilters && handleReset(clearFilters)}
-  //           size="small"
-  //           style={{
-  //             width: 90,
-  //           }}
-  //         >
-  //           Reset
-  //         </Button>
-  //         <Button
-  //           type="link"
-  //           size="small"
-  //           onClick={() => {
-  //             confirm({
-  //               closeDropdown: false,
-  //             });
-  //             setSearchText(selectedKeys[0]);
-  //             setSearchedColumn(dataIndex);
-  //           }}
-  //         >
-  //           Filter
-  //         </Button>
-  //         <Button
-  //           type="link"
-  //           size="small"
-  //           onClick={() => {
-  //             close();
-  //           }}
-  //         >
-  //           close
-  //         </Button>
-  //       </Space>
-  //     </div>
-  //   ),
-  //   filterIcon: (filtered) => (
-  //     <SearchOutlined
-  //       style={{
-  //         color: filtered ? "#1677ff" : undefined,
-  //       }}
-  //     />
-  //   ),
-  //   onFilter: (value, record) =>
-  //     record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-  //   onFilterDropdownOpenChange: (visible) => {
-  //     if (visible) {
-  //       setTimeout(() => searchInput.current?.select(), 100);
-  //     }
-  //   },
-  //   render: (text) =>
-  //     searchedColumn === dataIndex ? (
-  //       <Highlighter
-  //         highlightStyle={{
-  //           backgroundColor: "#ffc069",
-  //           padding: 0,
-  //         }}
-  //         searchWords={[searchText]}
-  //         autoEscape
-  //         textToHighlight={text ? text.toString() : ""}
-  //       />
-  //     ) : (
-  //       text
-  //     ),
-  // });
   const columns = [
     {
       title: "Title",
@@ -261,14 +139,15 @@ function NewsPage() {
             }
             className="cursor-pointer hover:text-sky-500"
           >
-            {cates &&
-              cates?.find((item) => item.id == record.category_id)?.name}
+            {/* {cates &&
+              cates?.find((item) => item.id == record.category_id)?.name} */}
+            {/* {cates && cates.map((item) => (<Tag>{item.name}</Tag>))} */}
           </div>
         );
       },
     },
     {
-      title: "News Position",
+      title: "Priority",
       dataIndex: "news_position",
       key: "news_position",
       sorter: (a, b) =>
@@ -277,7 +156,7 @@ function NewsPage() {
       render: (_, record) => {
         return (
           <div className="font-semibold">
-            {record.news_position == 1 ? "OnTop" : "Normal"}
+            {record.news_position == 1 ? "True" : "False"}
           </div>
         );
       },
@@ -380,7 +259,7 @@ function NewsPage() {
   return (
     <>
       <div className="flex items-center mb-4 gap-x-4">
-        <p className="font-semibold text-xl">news</p>
+        <p className="font-semibold text-xl">News</p>
         <Button className="">
           <Link href={`/admin/news/add`}>Add News</Link>
         </Button>

@@ -9,7 +9,10 @@ import { Avatar, Button, Layout, Menu, theme } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import ContentLayout from "@/components/ContentLayout";
+
 const { Header, Sider, Content } = Layout;
+
 const DashboardLayout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const {

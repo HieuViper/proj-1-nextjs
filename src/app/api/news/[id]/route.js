@@ -31,6 +31,9 @@ export async function PUT(request, { params }) {
       id: params.id,
     });
   } catch (error) {
-    return NextResponse.json({ message: error.message });
+    console.log("data in api", data);
+    console.log("id of news:", params.id);
+    return NextResponse.json({ message: error.message }, {status:422});
+
   }
 }

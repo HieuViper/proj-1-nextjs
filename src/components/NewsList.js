@@ -93,7 +93,7 @@ export default function NewsList( props ) {
   };
 
   const handlePostStatus = async (post_status) => {
-    setSort(null)
+
     //const rs = await axios.get(`/api/news/search?status=${post_status}&type=${process.env.NEXT_PUBLIC_TYPE_NEWS}`);
     router.push(`${pathName}?status=${post_status}&size=${pagination.pageSize}`);
     //setNews(rs.data);
@@ -180,7 +180,7 @@ const changePagination =(value) => {
       sorter:false,
 // // sortDirections:"descend",
       sortOrder:sortTitle,
-      onCell:(record, rowIndex) => {
+      /*onCell:(record, rowIndex) => {
         switch(sortTitle) {
           case null:
             setsortTitle("ascend");
@@ -194,7 +194,7 @@ const changePagination =(value) => {
 //   console.log("record",record)
 //   console.log("rowIndex",rowIndex)
 
-     },
+     },*/
 
 
       render: (_, record) => {

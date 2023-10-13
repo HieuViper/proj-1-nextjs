@@ -14,7 +14,6 @@ export async function GET(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-
     await pool.query("DELETE FROM news WHERE id = ?", [params.id]);
     return NextResponse.json({}, { status: 204 });
   } catch (error) {

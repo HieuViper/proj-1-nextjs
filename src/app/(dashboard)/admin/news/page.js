@@ -17,8 +17,8 @@ async function NewsPage({ searchParams }) {
   const search = searchParams?.search ?? "";
   const page = searchParams?.page ?? 1;
   const size = searchParams?.size ?? process.env.PAGE_SIZE;
-  const orderby = searchParams?.orderby ?? "";
-  const order = searchParams?.order ?? "";
+  let orderby = searchParams?.orderby ?? "";
+  let order = searchParams?.order ?? "";
   const author = searchParams?.author ?? "";
   const category = searchParams?.category ?? "";
   const tag = searchParams?.tag ?? "";
@@ -37,6 +37,7 @@ async function NewsPage({ searchParams }) {
   if(del!="") {
     await deleteNews(del);
   }
+
 
   const newsData = await getAllNews(process.env.POST_TYPE_NEWS, status, page, size, search, orderby, order, author, category, tag);
   const totals = await getTotalNumOfNews(process.env.POST_TYPE_NEWS, status, search, author, category, tag);

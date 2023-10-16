@@ -25,6 +25,7 @@ export default function NewsList( props ) {
     trash: 0,
     priority: 0,
   }
+
   const router = useRouter();
   const pathName = usePathname();
   const searchParams = useSearchParams();

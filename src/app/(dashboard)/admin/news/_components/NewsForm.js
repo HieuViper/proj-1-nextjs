@@ -18,50 +18,7 @@ export function NewsForm(props) {
   const [cate, setCate] = useState()
   const [postStatus, setPostStatus] = useState()
   const [data, setData] = useState();
-  // useEffect(() => {
-  //   const fetchNews = async (id) => {
-  //     try {
-  //       const { data } = await axios.get("/api/news/" + id);
-  //       console.log(
-  //         "🚀 ~ file: NewsForm.js:20 ~ fetchNews ~ data:",
-  //         data
-  //       );
-  //       form.setFieldsValue(data)
-  //       setData(data)
-  //       setPostStatus(data.post_status)
-  //       setNewsPosition(data.news_position)
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-
-  //   if (params?.id) {
-  //     fetchNews(params.id);
-  //   }
-  // }, [params.id]);
-  // useEffect(() => {
-  //   const fetchCate = async () => {
-  //     try {
-  //       const cate = await axios.get("/api/categories");
-  //       console.log(
-  //         "cate",
-  //         cate.data
-  //       );
-  //       setCate(cate?.data)
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-
-  //   fetchCate()
-  // }, []);
-  // const options = [];
-  // cate && cate.map((item) => options.push({
-  //   label: item.name,
-  //   value: item.id,
-  // }))
-  // console.log("arrCate", arrCate)
-
+  const [newsPosition, setNewsPosition] = useState()
 
   console.log('prop :', props);
   useEffect(() => {
@@ -81,7 +38,7 @@ export function NewsForm(props) {
     value: item.id,
   }))
 
-  async function updateNews(value) {
+  async function submitNews(value) {
     const newsCode = value.title.trim().normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/đ/g, 'd')
@@ -90,33 +47,33 @@ export function NewsForm(props) {
 
     if (postStatus == "publish") {
       const postDate = new Date().toISOString().slice(0, 10) + " " + new Date().toLocaleTimeString('en-GB')
-      Object.assign(value, { post_date: postDate });
+      Object.assign(value, { post_date: postDate, news_position: 1 });
     }
-
+    else {
+      Object.assign(value, { news_position: 0 });
+    }
     Object.assign(value, {
       post_author: 1,
       post_status: postStatus,
-      news_code: newsCode, news_position: newsPosition,
+      news_code: newsCode,
       type: process.env.POST_TYPE_NEWS
     });
     try {
-      if (params.id) {
+      if (params?.id) {
         await editNews(value, params.id).then(() => {
           router.push(`${pathName}`)
+
+          if (postStatus == 'trash') {
+            router.push('/admin/news')
+          }
         })
       }
       else {
-        // const sqlquery = "INSERT INTO news SET ?";
-        // await pool.query(sqlquery, {
-        //   title, type, categories, post_author, post_date, excerpt, content, post_status, news_code, news_position
-        // }); 
-        await addNews(value).then((res) => {
-          console.log('res :', res);
-        })
+        await addNews(value)
       }
     }
     catch (error) {
-      throw new Error('Fail to edit news');
+      throw new Error('Fail to submit news');
     }
   }
 
@@ -134,7 +91,8 @@ export function NewsForm(props) {
     }
 
     Object.assign(value, {
-      post_author: 1, post_status: postStatus,
+      post_author: 1,
+      post_status: postStatus,
       news_code: newsCode, news_position: newsPosition
     });
 
@@ -169,17 +127,6 @@ export function NewsForm(props) {
     console.log('Failed:', errorInfo);
   };
 
-  // 
-  const normFile = (e) => {
-    console.log('Upload event:', e);
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e?.fileList;
-  };
-
-
-  const [newsPosition, setNewsPosition] = useState()
   const onChangePosition = (checked) => {
     if (checked == true) {
       setNewsPosition(1)
@@ -212,7 +159,7 @@ export function NewsForm(props) {
         initialValues={{
           remember: true,
         }}
-        onFinish={updateNews}
+        onFinish={submitNews}
         onFinishFailed={handleSubmitFailed}
         autoComplete="off"
         form={form}
@@ -291,18 +238,7 @@ export function NewsForm(props) {
         >
           <Input />
         </Form.Item>
-        {/* <Form.Item
-          label="Type"
-          name="type"
-          rules={[
-            {
-              required: true,
-              message: 'Please input your type!',
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item> */}
+
 
         <Form.Item label="Category" name="categories" rules={[
           {

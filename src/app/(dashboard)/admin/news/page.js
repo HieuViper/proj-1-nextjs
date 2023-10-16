@@ -17,36 +17,43 @@ async function NewsPage({ searchParams }) {
   const search = searchParams?.search ?? "";
   const page = searchParams?.page ?? 1;
   const size = searchParams?.size ?? process.env.PAGE_SIZE;
-  const orderby = searchParams?.orderby ?? "";
-  const order = searchParams?.order ?? "";
+  let orderby = searchParams?.orderby ?? "";
+  let order = searchParams?.order ?? "";
+  const author = searchParams?.author ?? "";
+  const category = searchParams?.category ?? "";
+  const tag = searchParams?.tag ?? "";
 
   console.log("searchparams: ", searchParams);
 
-  if(trash!=""){
+  if (trash != "") {
     await trashNews(trash);
   }
-  if(keys!="") {
-    await deleteBulkNews(keys);
+  if (keys != "") {
+    await deleteBulkNews(keys, status);
   }
-  if(recover!="") {
+  if (recover != "") {
     await recoverNews(recover);
   }
-  if(del!="") {
+  if (del != "") {
     await deleteNews(del);
   }
+  if (Object.keys(searchParams).length == 0) {
+    orderby = 'post_modified';
+    order = 'desc'
+  }
 
-  const newsData = await getAllNews(process.env.POST_TYPE_NEWS, status, page, size, search, orderby, order);
-  const total = await getTotalNumOfNews(process.env.POST_TYPE_NEWS, status, search);
+  const newsData = await getAllNews(process.env.POST_TYPE_NEWS, status, page, size, search, orderby, order, author, category, tag);
+  const totals = await getTotalNumOfNews(process.env.POST_TYPE_NEWS, status, search, author, category, tag);
   const pagination = {
     pageSize: size,
-    total: total.total,
-    current:page,
+    total: totals.itemsOfTable,
+    current: page,
   }
 
   //console.log("data from getNews:", newsData);
   return (
     <>
-      <NewsList dataTable={ JSON.stringify(newsData)} pagination={ pagination }/>;
+      <NewsList dataTable={JSON.stringify(newsData)} pagination={pagination} totals={totals} />;
     </>
   );
 }

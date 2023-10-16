@@ -1,66 +1,81 @@
 "use client";
 import axios from "axios";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import React from 'react';
-import { Button, Form, Input, Select, Space, Switch } from 'antd';
-import { SaveOutlined, SwapLeftOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Select, Switch } from 'antd';
+import { SwapLeftOutlined } from '@ant-design/icons';
 import Editor from "@/components/Editor";
 import Link from "next/link";
+import { addNews, editNews } from "@/library/getNews";
 
-export function NewsForm() {
+export function NewsForm(props) {
   const { TextArea } = Input;
   const router = useRouter();
   const params = useParams();
+  const pathName = usePathname();
   const [form] = Form.useForm();
-  const { Option } = Select;
-  const [cate, setCate] = useState('')
+  const [cate, setCate] = useState()
   const [postStatus, setPostStatus] = useState()
   const [data, setData] = useState();
-  useEffect(() => {
-    const fetchNews = async (id) => {
-      try {
-        const { data } = await axios.get("/api/news/" + id);
-        console.log(
-          "🚀 ~ file: NewsForm.js:20 ~ fetchNews ~ data:",
-          data
-        );
-        form.setFieldsValue(data)
-        setData(data)
-        setPostStatus(data.post_status)
-        setNewsPosition(data.news_position)
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  const [newsPosition, setNewsPosition] = useState()
 
+  console.log('prop :', props);
+  useEffect(() => {
     if (params?.id) {
-      fetchNews(params.id);
+      const data = JSON.parse(props.data)
+      form.setFieldsValue(data)
+      setData(data)
+      setPostStatus(data.post_status)
+      setNewsPosition(data.news_position)
     }
-  }, [params.id]);
-  useEffect(() => {
-    const fetchCate = async () => {
-      try {
-        const cate = await axios.get("/api/categories");
-        console.log(
-          "cate",
-          cate.data
-        );
-        setCate(cate?.data)
-      } catch (error) {
-        console.error(error);
-      }
-    };
+    const cate = JSON.parse(props.cate)
+    setCate(cate)
+  }, [props])
 
-    fetchCate()
-  }, []);
-  const options = [];
-  cate && cate.map((item) => options.push({
+  const options = cate && cate.map((item) => ({
     label: item.name,
     value: item.id,
   }))
-  // console.log("arrCate", arrCate)
+
+  async function submitNews(value) {
+    const newsCode = value.title.trim().normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'D')
+      .replace(/\s/g, "-")
+
+    if (postStatus == "publish") {
+      const postDate = new Date().toISOString().slice(0, 10) + " " + new Date().toLocaleTimeString('en-GB')
+      Object.assign(value, { post_date: postDate, news_position: 1 });
+    }
+    else {
+      Object.assign(value, { news_position: 0 });
+    }
+    Object.assign(value, {
+      post_author: 1,
+      post_status: postStatus,
+      news_code: newsCode,
+      type: process.env.POST_TYPE_NEWS
+    });
+    try {
+      if (params?.id) {
+        await editNews(value, params.id).then(() => {
+          router.push(`${pathName}`)
+
+          if (postStatus == 'trash') {
+            router.push('/admin/news')
+          }
+        })
+      }
+      else {
+        await addNews(value)
+      }
+    }
+    catch (error) {
+      throw new Error('Fail to submit news');
+    }
+  }
 
   const handleSubmit = async (value) => {
     console.log("value", value)
@@ -76,7 +91,8 @@ export function NewsForm() {
     }
 
     Object.assign(value, {
-      post_author: 1, post_status: postStatus,
+      post_author: 1,
+      post_status: postStatus,
       news_code: newsCode, news_position: newsPosition
     });
 
@@ -111,31 +127,6 @@ export function NewsForm() {
     console.log('Failed:', errorInfo);
   };
 
-  // 
-  const normFile = (e) => {
-    console.log('Upload event:', e);
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e?.fileList;
-  };
-
-  const [loadings, setLoadings] = useState([]);
-  const enterLoading = (index) => {
-    setLoadings((prevLoadings) => {
-      const newLoadings = [...prevLoadings];
-      newLoadings[index] = true;
-      return newLoadings;
-    });
-    setTimeout(() => {
-      setLoadings((prevLoadings) => {
-        const newLoadings = [...prevLoadings];
-        newLoadings[index] = false;
-        return newLoadings;
-      });
-    }, 6000);
-  };
-  const [newsPosition, setNewsPosition] = useState()
   const onChangePosition = (checked) => {
     if (checked == true) {
       setNewsPosition(1)
@@ -168,7 +159,7 @@ export function NewsForm() {
         initialValues={{
           remember: true,
         }}
-        onFinish={handleSubmit}
+        onFinish={submitNews}
         onFinishFailed={handleSubmitFailed}
         autoComplete="off"
         form={form}
@@ -215,11 +206,6 @@ export function NewsForm() {
                 <Button type="dashed" htmlType="submit" onClick={() => setPostStatus("draft")}>
                   Save Draft
                 </Button>
-                {/* <Button type="primary"
-                  icon={<SaveOutlined />}
-                  loading={loadings[0]} onClick={() => enterLoading(0)}>
-                  Save Draft
-                </Button> */}
               </Form.Item>
               <Form.Item
 
@@ -228,6 +214,7 @@ export function NewsForm() {
                 <Button type="primary" htmlType="submit" onClick={() => setPostStatus("publish")} >
                   Publish
                 </Button>
+
               </Form.Item>
             </div>
           </div>}
@@ -236,10 +223,6 @@ export function NewsForm() {
           label="Priority"
           name="news_position"
         >
-          {/* <Select>
-            <Option value={1}>On Top</Option>
-            <Option value={0}>Normal</Option>
-          </Select> */}
           <Switch checked={newsPosition == 1 ? true : false} onChange={onChangePosition} />
         </Form.Item>
 
@@ -255,18 +238,7 @@ export function NewsForm() {
         >
           <Input />
         </Form.Item>
-        <Form.Item
-          label="Type"
-          name="type"
-          rules={[
-            {
-              required: true,
-              message: 'Please input your type!',
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
+
 
         <Form.Item label="Category" name="categories" rules={[
           {

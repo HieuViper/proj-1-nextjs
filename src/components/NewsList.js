@@ -10,12 +10,12 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
-export default function NewsList( props ) {
+export default function NewsList(props) {
 
   let initPagination = {
     pageSize: 10,
     total: 0,
-    current:1,
+    current: 1,
   }
   let initTotals = {
     itemsOfTable: 0,
@@ -34,8 +34,11 @@ export default function NewsList( props ) {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
-  const [search, setSearch]  = useState("");
-  const [sortedInfo, setSortedInfo] = useState({});
+  const [search, setSearch] = useState("");
+  const [sortedInfo, setSortedInfo] = useState({
+    order: 'desc',
+    columnKey: 'date'
+  });
   const [author, setAuthor] = useState("");
   const [category, setCategory] = useState("");
   const [tag, setTag] = useState("");
@@ -56,22 +59,22 @@ export default function NewsList( props ) {
   const hasSelected = selectedRowKeys.length > 0;
 
   const startDelete = () => {
-      const current = new URLSearchParams(searchParams);
-      const keys = selectedRowKeys.map((key) => `${key},`)
+    const current = new URLSearchParams(searchParams);
+    const keys = selectedRowKeys.map((key) => `${key},`)
       .join("")
-      .slice(0,-1);
-      current.set("keys", keys);
-      current.set("status", status);
-      current.set("size", paginationServer.pageSize);
-      current.set("search", search);
-      current.set("author", author);
-      current.set("category", category);
-      current.set("tag", tag);
+      .slice(0, -1);
+    current.set("keys", keys);
+    current.set("status", status);
+    current.set("size", paginationServer.pageSize);
+    current.set("search", search);
+    current.set("author", author);
+    current.set("category", category);
+    current.set("tag", tag);
 
-      //add sorter here
-      const searchPara = current.toString() + getOrderPara(sortedInfo);
-      const query = searchPara ? `?${searchPara}` : "";
-      router.push(`${pathName}${query}`);
+    //add sorter here
+    const searchPara = current.toString() + getOrderPara(sortedInfo);
+    const query = searchPara ? `?${searchPara}` : "";
+    router.push(`${pathName}${query}`);
   };
 
   const handleSearch = async (value) => {
@@ -92,55 +95,55 @@ export default function NewsList( props ) {
     setStatus(post_status);
   };
 
-const handleAuthorFilter = (post_author) => {
+  const handleAuthorFilter = (post_author) => {
     router.push(`${pathName}?status=${status}&size=${paginationServer.pageSize}&author=${post_author}`);
     setSortedInfo({});
     setSearch("");
     setCategory("");
     setTag("");
     setAuthor(post_author);
-};
+  };
 
-const handleCategoryFilter = (cat) => {
-  router.push(`${pathName}?status=${status}&size=${paginationServer.pageSize}&category=${cat}`);
-  setSortedInfo({});
-  setSearch("");
-  setAuthor("");
-  setTag("");
-  setCategory(cat);
-}
+  const handleCategoryFilter = (cat) => {
+    router.push(`${pathName}?status=${status}&size=${paginationServer.pageSize}&category=${cat}`);
+    setSortedInfo({});
+    setSearch("");
+    setAuthor("");
+    setTag("");
+    setCategory(cat);
+  }
 
-const handleTagFilter = (tag1) => {
-  router.push(`${pathName}?status=${status}&size=${paginationServer.pageSize}&tag=${tag1}`);
-  //reset the other filters
-  setSortedInfo({});
-  setSearch("");
-  setAuthor("");
-  setCategory("");
-  setTag(tag1);
-}
+  const handleTagFilter = (tag1) => {
+    router.push(`${pathName}?status=${status}&size=${paginationServer.pageSize}&tag=${tag1}`);
+    //reset the other filters
+    setSortedInfo({});
+    setSearch("");
+    setAuthor("");
+    setCategory("");
+    setTag(tag1);
+  }
 
-//getOrderParameter for URL
-const getOrderPara = (sorter) => {
-  if(sorter.order) {
-    let order;
-    if( sorter.order == "ascend" ) order = "asc";
-    if( sorter.order == "descend" ) order = "desc";
-    let orderby;
-    if( sorter.columnKey === 'date' )
-      orderby = status === process.env.NEXT_PUBLIC_PS_PUBLISH ? 'post_date' : 'post_modified';
-    else
-      orderby = sorter.columnKey;
-    return `&orderby=${orderby}&order=${order}`;
-  } else
+  //getOrderParameter for URL
+  const getOrderPara = (sorter) => {
+    if (sorter.order) {
+      let order;
+      if (sorter.order == "ascend") order = "asc";
+      if (sorter.order == "descend") order = "desc";
+      let orderby;
+      if (sorter.columnKey === 'date')
+        orderby = status === process.env.NEXT_PUBLIC_PS_PUBLISH ? 'post_date' : 'post_modified';
+      else
+        orderby = sorter.columnKey;
+      return `&orderby=${orderby}&order=${order}`;
+    } else
       return "";
-}
+  }
 
-const handleChange =(pagination, filters, sorter) => {
-  setSortedInfo(sorter);
-  const orderPara = getOrderPara(sorter);
-  router.push(`${pathName}?page=${pagination.current}&size=${pagination.pageSize}&status=${status}&author=${author}&category=${category}&tag=${tag}&search=${search}${orderPara}`);
-}
+  const handleChange = (pagination, filters, sorter) => {
+    setSortedInfo(sorter);
+    const orderPara = getOrderPara(sorter);
+    router.push(`${pathName}?page=${pagination.current}&size=${pagination.pageSize}&status=${status}&author=${author}&category=${category}&tag=${tag}&search=${search}${orderPara}`);
+  }
 
   useEffect(() => {
     const newsData = JSON.parse(props.dataTable);
@@ -150,31 +153,31 @@ const handleChange =(pagination, filters, sorter) => {
     setSelectedRowKeys([]);
   }, [props]);
 
-
+  const [hover, onHover] = useState(false)
   const columns = [
     {
       title: "Title",
       dataIndex: "title",
       key: "title",
-      sorter: () => {},
-      sortOrder: sortedInfo.columnKey ==='title' ? sortedInfo.order : null,
+      sorter: () => { },
+      sortOrder: sortedInfo.columnKey === 'title' ? sortedInfo.order : null,
       render: (_, record) => {
         return (
           <>
             {<Link href={`/admin/news/edit/${record.id}`}>{record.title}</Link>}
-            <div className='opacity-0 group hover:opacity-100 transition-opacity duration-300'>
+            <div className={`group ${hover ? "opacity-100" : "opacity-0"} transition-opacity duration-300`}>
               {
-              record.post_status !== process.env.NEXT_PUBLIC_PS_TRASH?
-              <>
-                <Link href={`/admin/news/edit/${record.id}`}>Edit</Link> |
-                <Link href={`${pathName}?trash=${record.id}&size=${paginationServer.pageSize}&status=${status}&author=${author}&category=${category}&tag=${tag}&search=${search}${getOrderPara(sortedInfo)}`}> Trash </Link>
-                | <Link href={`/vi/news/preview/${record.id}`}>Preview</Link>
-              </>
-              :
-              <>
-              <Link href={`${pathName}?recover=${record.id}&size=${paginationServer.pageSize}&status=${status}&author=${author}&category=${category}$tag=${tag}&search=${search}${getOrderPara(sortedInfo)}`}>Recover</Link>
-               | <Link href={`${pathName}?del=${record.id}&size=${paginationServer.pageSize}&status=${status}&author=${author}&category=${category}$tag=${tag}&search=${search}${getOrderPara(sortedInfo)}`}>Delete</Link>
-              </>
+                record.post_status !== process.env.NEXT_PUBLIC_PS_TRASH ?
+                  <>
+                    <Link href={`/admin/news/edit/${record.id}`}>Edit</Link> |
+                    <Link href={`${pathName}?trash=${record.id}&size=${paginationServer.pageSize}&status=${status}&author=${author}&category=${category}&tag=${tag}&search=${search}${getOrderPara(sortedInfo)}`}> Trash </Link>
+                    | <Link href={`/vi/news/preview/${record.id}`}>Preview</Link>
+                  </>
+                  :
+                  <>
+                    <Link href={`${pathName}?recover=${record.id}&size=${paginationServer.pageSize}&status=${status}&author=${author}&category=${category}&tag=${tag}&search=${search}${getOrderPara(sortedInfo)}`}>Recover</Link>
+                    | <Link href={`${pathName}?del=${record.id}&size=${paginationServer.pageSize}&status=${status}&author=${author}&category=${category}&tag=${tag}&search=${search}${getOrderPara(sortedInfo)}`}>Delete</Link>
+                  </>
               }
             </div>
           </>
@@ -187,7 +190,7 @@ const handleChange =(pagination, filters, sorter) => {
       key: "post_author",
       render: (_, record) => {
         return (
-          <a href='#' onClick={ () => handleAuthorFilter(record.post_author) }>{record.post_author}</a>
+          <a href='#' onClick={() => handleAuthorFilter(record.post_author)}>{record.post_author}</a>
         );
       },
     },
@@ -201,10 +204,10 @@ const handleChange =(pagination, filters, sorter) => {
         return (
           <>
             {categories.map((cat, index) => (
-              <>
-                <a href='#' onClick={ () => handleCategoryFilter(cat) }>{cat}</a>
+              <div key={index}>
+                <a href='#' onClick={() => handleCategoryFilter(cat)}>{cat}</a>
                 {index < categories.length - 1 && ', '}
-              </>
+              </div>
             ))}
           </>
         );
@@ -221,10 +224,10 @@ const handleChange =(pagination, filters, sorter) => {
         return (
           <>
             {tags.map((tag1, index) => (
-              <>
-                <a href='#' onClick={ () => handleTagFilter(tag1) }>{tag1}</a>
+              <div key={index}>
+                <a href='#' onClick={() => handleTagFilter(tag1)}>{tag1}</a>
                 {index < tags.length - 1 && ', '}
-              </>
+              </div>
             ))}
           </>
         );
@@ -234,16 +237,16 @@ const handleChange =(pagination, filters, sorter) => {
       title: "Date",
       dataIndex: "post_modified",
       key: "date",
-      sorter: () =>{},
-      sortOrder: sortedInfo.columnKey ==='date' ? sortedInfo.order : null,
+      sorter: () => { },
+      sortOrder: sortedInfo.columnKey === 'date' ? sortedInfo.order : null,
       render: (_, record) => {
         return (
           <div>
             {
-            record.post_status == process.env.NEXT_PUBLIC_PS_PUBLISH?
-              <>Published<br/>{format(new Date(record.post_date), "yyyy/MM/dd 'at' h:mma")}</>
-              :
-              <>Last Modified<br/>{format(new Date(record.post_modified), "yyyy/MM/dd 'at' h:mma")}</>
+              record.post_status == process.env.NEXT_PUBLIC_PS_PUBLISH ?
+                <>Published<br />{format(new Date(record.post_date), "yyyy/MM/dd 'at' h:mma")}</>
+                :
+                <>Last Modified<br />{format(new Date(record.post_modified), "yyyy/MM/dd 'at' h:mma")}</>
             }
           </div>
         );
@@ -271,7 +274,7 @@ const handleChange =(pagination, filters, sorter) => {
           className=" w-56"
         />
       </div>
-      <div style={ { marginBottom:23, } }>
+      <div style={{ marginBottom: 23, }}>
         <Button //change this button to a submit button to call server action
           type="primary"
           danger
@@ -310,6 +313,15 @@ const handleChange =(pagination, filters, sorter) => {
         rowKey="id"
         onChange={handleChange}
         pagination={paginationServer}
+        onRow={(record, rowIndex) => {
+          // console.log('rowIndex :', rowIndex);
+          // console.log('record :', record);
+
+          return {
+            onMouseEnter: (event) => { onHover(true) }, // mouse enter row
+            onMouseLeave: (event) => { onHover(false) }, // mouse leave row
+          };
+        }}
       />
 
     </>

@@ -25,17 +25,21 @@ async function NewsPage({ searchParams }) {
 
   console.log("searchparams: ", searchParams);
 
-  if(trash!=""){
+  if (trash != "") {
     await trashNews(trash);
   }
-  if(keys!="") {
+  if (keys != "") {
     await deleteBulkNews(keys, status);
   }
-  if(recover!="") {
+  if (recover != "") {
     await recoverNews(recover);
   }
-  if(del!="") {
+  if (del != "") {
     await deleteNews(del);
+  }
+  if (Object.keys(searchParams).length == 0) {
+    orderby = 'post_modified';
+    order = 'desc'
   }
 
 
@@ -44,13 +48,13 @@ async function NewsPage({ searchParams }) {
   const pagination = {
     pageSize: size,
     total: totals.itemsOfTable,
-    current:page,
+    current: page,
   }
 
   //console.log("data from getNews:", newsData);
   return (
     <>
-      <NewsList dataTable={ JSON.stringify(newsData)} pagination={ pagination } totals={ totals }/>;
+      <NewsList dataTable={JSON.stringify(newsData)} pagination={pagination} totals={totals} />;
     </>
   );
 }

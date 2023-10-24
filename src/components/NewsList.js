@@ -1,48 +1,47 @@
 /* eslint-disable @next/next/no-async-client-component */
 "use client";
 import { format } from 'date-fns';
-import { Button, Space, Table, Input, Select, Radio, Popconfirm, Tag } from "antd";
+import { Button, Space, Table, Input, Select, Radio, Popconfirm, Tag, } from "antd";
 import Search from "antd/es/input/Search";
-import { SearchOutlined, DeleteOutlined, EditOutlined, SyncOutlined } from "@ant-design/icons";
-import axios from "axios";
+import { SearchOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SyncOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast";
 
 export default function NewsList(props) {
 
-  let initPagination = {
+
+  const router = useRouter();
+  const pathName = usePathname();
+  const searchParams = useSearchParams();
+
+  const [paginationServer, setPagination] = useState({
     pageSize: 10,
     total: 0,
     current: 1,
-  }
-  let initTotals = {
+  });
+
+  const [totals, setTotals] = useState({
     itemsOfTable: 0,
     all: 0,
     draft: 0,
     publish: 0,
     trash: 0,
     priority: 0,
-  }
-  const router = useRouter();
-  const pathName = usePathname();
-  const searchParams = useSearchParams();
-
+  });
+  const [sortedInfo, setSortedInfo] = useState({
+    order: 'descend',
+    columnKey: 'date'
+  });
   const [news, setNews] = useState();
-  const [paginationServer, setPagination] = useState(initPagination);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
   const [search, setSearch] = useState("");
-  const [sortedInfo, setSortedInfo] = useState({
-    order: 'desc',
-    columnKey: 'date'
-  });
   const [author, setAuthor] = useState("");
   const [category, setCategory] = useState("");
   const [tag, setTag] = useState("");
-  const [totals, setTotals] = useState(initTotals);
+  const [loadingStatus, setLoadingStatus] = useState(false)
 
 
   const onSearchChange = (e) => {
@@ -151,9 +150,11 @@ export default function NewsList(props) {
     setPagination(props.pagination);
     setTotals(props.totals);
     setSelectedRowKeys([]);
+    setLoadingStatus(false);
+
   }, [props]);
 
-  const [hover, onHover] = useState(false)
+  console.log('props.cate :', props.cate);
   const columns = [
     {
       title: "Title",
@@ -164,19 +165,27 @@ export default function NewsList(props) {
       render: (_, record) => {
         return (
           <>
-            {<Link href={`/admin/news/edit/${record.id}`}>{record.title}</Link>}
-            <div className={`group ${hover ? "opacity-100" : "opacity-0"} transition-opacity duration-300`}>
+            <div className='text-base font-medium pb-2'>{record.title}</div>
+            <div className='flex gap-2'>
               {
                 record.post_status !== process.env.NEXT_PUBLIC_PS_TRASH ?
                   <>
-                    <Link href={`/admin/news/edit/${record.id}`}>Edit</Link> |
-                    <Link href={`${pathName}?trash=${record.id}&size=${paginationServer.pageSize}&status=${status}&author=${author}&category=${category}&tag=${tag}&search=${search}${getOrderPara(sortedInfo)}`}> Trash </Link>
-                    | <Link href={`/vi/news/preview/${record.id}`}>Preview</Link>
+
+                    <Link href={`/admin/news/edit/${record.id}`}>
+                      <span className='btn-edit'><EditOutlined className='pr-1' />Edit</span></Link> |
+                    <Link href={`${pathName}?trash=${record.id}&size=${paginationServer.pageSize}&status=${status}&author=${author}&category=${category}&tag=${tag}&search=${search}${getOrderPara(sortedInfo)}`}>
+                      <span className='btn-trash '>
+                        <DeleteOutlined className='pr-1' />Trash</span>
+                    </Link>
+                    | <Link href={`/vi/news/preview/${record.id}`}>
+                      <span className='btn-preview'><EyeOutlined className='pr-1' />Preview</span></Link>
                   </>
                   :
                   <>
-                    <Link href={`${pathName}?recover=${record.id}&size=${paginationServer.pageSize}&status=${status}&author=${author}&category=${category}&tag=${tag}&search=${search}${getOrderPara(sortedInfo)}`}>Recover</Link>
-                    | <Link href={`${pathName}?del=${record.id}&size=${paginationServer.pageSize}&status=${status}&author=${author}&category=${category}&tag=${tag}&search=${search}${getOrderPara(sortedInfo)}`}>Delete</Link>
+                    <Link href={`${pathName}?recover=${record.id}&size=${paginationServer.pageSize}&status=${status}&author=${author}&category=${category}&tag=${tag}&search=${search}${getOrderPara(sortedInfo)}`}>
+                      <span className='btn-recover'><SyncOutlined className='pr-1' />Recover</span></Link>
+                    | <Link href={`${pathName}?del=${record.id}&size=${paginationServer.pageSize}&status=${status}&author=${author}&category=${category}&tag=${tag}&search=${search}${getOrderPara(sortedInfo)}`}>
+                      <span className='btn-delete'><DeleteOutlined className='pr-1' />Delete</span></Link>
                   </>
               }
             </div>
@@ -198,16 +207,22 @@ export default function NewsList(props) {
       title: "Categories",
       dataIndex: "categories",
       key: "categories",
+      width: 300,
       render: (_, record) => {
         const categories = record.categories.split(',').map(cat => cat.trim());
-
         return (
           <>
-            {categories.map((cat, index) => (
-              <div key={index}>
-                <a href='#' onClick={() => handleCategoryFilter(cat)}>{cat}</a>
-                {index < categories.length - 1 && ', '}
-              </div>
+            {categories.map((cat, i) => (
+              props.cate.map((item) => {
+                if (cat == item.id) {
+                  return (
+                    <a key={i} href='#' onClick={() => handleCategoryFilter(cat)} >
+                      <Tag style={{ marginBottom: '4px' }}>
+                        {item.name}
+                      </Tag></a>
+                  )
+                }
+              })
             ))}
           </>
         );
@@ -256,12 +271,13 @@ export default function NewsList(props) {
 
   return (
     <>
-      <div className="flex items-center mb-4 gap-x-4">
-        <p className="font-semibold text-xl">News</p>
-        <Button className="">
-          <Link href={`/admin/news/add`}>Add News</Link>
-        </Button>
-
+      <div className="flex justify-between mb-4 gap-x-4">
+        <div className='flex'>
+          <p className="font-semibold text-xl pr-4">News</p>
+          <Button className="">
+            <Link href={`/admin/news/add`}>Add News</Link>
+          </Button>
+        </div>
         <Search
           placeholder="input search text"
           value={search}
@@ -269,9 +285,9 @@ export default function NewsList(props) {
           onSearch={(e) => handleSearch(e)}
           enterButton
           style={{
-            width: 200,
+            width: 250,
           }}
-          className=" w-56"
+
         />
       </div>
       <div style={{ marginBottom: 23, }}>
@@ -295,7 +311,7 @@ export default function NewsList(props) {
 
         <Space>
 
-          <Radio.Group defaultValue={""} onChange={(e) => handlePostStatus(e.target.value)} optionType="button"
+          <Radio.Group disabled={loadingStatus} defaultValue={""} onChange={(e) => { handlePostStatus(e.target.value), setLoadingStatus(true) }} optionType="button"
             buttonStyle="solid">
             <Radio.Button value="">All ({totals.all})</Radio.Button>
             <Radio.Button value={process.env.NEXT_PUBLIC_PS_DRAFT}>Draft({totals.draft})</Radio.Button>
@@ -313,18 +329,10 @@ export default function NewsList(props) {
         rowKey="id"
         onChange={handleChange}
         pagination={paginationServer}
-        onRow={(record, rowIndex) => {
-          // console.log('rowIndex :', rowIndex);
-          // console.log('record :', record);
-
-          return {
-            onMouseEnter: (event) => { onHover(true) }, // mouse enter row
-            onMouseLeave: (event) => { onHover(false) }, // mouse leave row
-          };
-        }}
+      // bordered={true}
       />
 
     </>
-  );
+  )
 }
 

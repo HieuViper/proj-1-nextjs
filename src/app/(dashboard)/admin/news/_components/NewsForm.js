@@ -3,7 +3,7 @@ import axios from "axios";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Button, Form, Input, Select, Switch } from 'antd';
+import { Button, Form, Input, Select, Switch, Tooltip } from 'antd';
 import { SwapLeftOutlined } from '@ant-design/icons';
 import Editor from "@/components/Editor";
 import Link from "next/link";
@@ -11,6 +11,7 @@ import { addNews, editNews } from "@/library/getNews";
 
 export function NewsForm(props) {
   const { TextArea } = Input;
+  const { Option } = Select;
   const router = useRouter();
   const params = useParams();
   const pathName = usePathname();
@@ -20,11 +21,10 @@ export function NewsForm(props) {
   const [data, setData] = useState();
   const [newsPosition, setNewsPosition] = useState()
 
-  console.log('prop :', props);
   useEffect(() => {
     if (params?.id) {
       const data = JSON.parse(props.data)
-      form.setFieldsValue(data)
+      form.setFieldsValue({ ...data, categories: (data?.categories).split(',').map(Number) })
       setData(data)
       setPostStatus(data.post_status)
       setNewsPosition(data.news_position)
@@ -33,17 +33,14 @@ export function NewsForm(props) {
     setCate(cate)
   }, [props])
 
-  const options = cate && cate.map((item) => ({
-    label: item.name,
-    value: item.id,
-  }))
-
-  async function submitNews(value) {
+  async function handleSubmit(value) {
+    console.log('value submit:', value);
     const newsCode = value.title.trim().normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/đ/g, 'd')
       .replace(/Đ/g, 'D')
       .replace(/\s/g, "-")
+    value.categories = (value.categories).toString()
 
     if (postStatus == "publish") {
       const postDate = new Date().toISOString().slice(0, 10) + " " + new Date().toLocaleTimeString('en-GB')
@@ -56,7 +53,7 @@ export function NewsForm(props) {
       post_author: 1,
       post_status: postStatus,
       news_code: newsCode,
-      type: process.env.POST_TYPE_NEWS
+      type: process.env.POST_TYPE_NEWS,
     });
     try {
       if (params?.id) {
@@ -64,67 +61,89 @@ export function NewsForm(props) {
           router.push(`${pathName}`)
 
           if (postStatus == 'trash') {
+            toast.success("Move to trash Success", {
+              position: "top-center",
+            });
             router.push('/admin/news')
+          } else if (postStatus == 'draft') {
+            toast.success("Save Draft Success", {
+              position: "top-center",
+            });
+          } else {
+            toast.success("Save Publish Success", {
+              position: "top-center",
+            });
           }
         })
+
       }
       else {
         await addNews(value)
+        if (postStatus == 'draft') {
+          toast.success("Save Draft Success", {
+            position: "top-center",
+          });
+        } else {
+          toast.success("Save Publish Success", {
+            position: "top-center",
+          });
+        }
       }
     }
     catch (error) {
+      toast.error(error.response.data.message);
       throw new Error('Fail to submit news');
     }
   }
 
-  const handleSubmit = async (value) => {
-    console.log("value", value)
-    const newsCode = value.title.trim().normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/đ/g, 'd')
-      .replace(/Đ/g, 'D')
-      .replace(/\s/g, "-")
+  // const handleSubmit = async (value) => {
+  //   console.log("value", value)
+  //   const newsCode = value.title.trim().normalize('NFD')
+  //     .replace(/[\u0300-\u036f]/g, '')
+  //     .replace(/đ/g, 'd')
+  //     .replace(/Đ/g, 'D')
+  //     .replace(/\s/g, "-")
 
-    if (postStatus == "publish") {
-      const postDate = new Date().toISOString().slice(0, 10) + " " + new Date().toLocaleTimeString('en-GB')
-      Object.assign(value, { post_date: postDate });
-    }
+  //   if (postStatus == "publish") {
+  //     const postDate = new Date().toISOString().slice(0, 10) + " " + new Date().toLocaleTimeString('en-GB')
+  //     Object.assign(value, { post_date: postDate });
+  //   }
 
-    Object.assign(value, {
-      post_author: 1,
-      post_status: postStatus,
-      news_code: newsCode, news_position: newsPosition
-    });
+  //   Object.assign(value, {
+  //     post_author: 1,
+  //     post_status: postStatus,
+  //     news_code: newsCode, news_position: newsPosition
+  //   });
 
-    try {
-      if (params?.id) {
-        await axios.put("/api/news/" + params.id, value);
-        toast.success("Task Updated", {
-          position: "bottom-center",
-        });
-        window.location.reload();
-        // router.push("/admin/news");
-        // router.refresh();
-      } else {
-        await axios.post("/api/news", value).then((res) => {
-          console.log("res", res)
-          router.push(`/admin/news/edit/${res.data.id}`);
-        })
+  //   try {
+  //     if (params?.id) {
+  //       await axios.put("/api/news/" + params.id, value);
+  //       toast.success("Task Updated", {
+  //         position: "bottom-center",
+  //       });
+  //       window.location.reload();
+  //       // router.push("/admin/news");
+  //       // router.refresh();
+  //     } else {
+  //       await axios.post("/api/news", value).then((res) => {
+  //         console.log("res", res)
+  //         router.push(`/admin/news/edit/${res.data.id}`);
+  //       })
 
-        toast.success("Task Saved", {
-          position: "bottom-center",
-        });
-      }
+  //       toast.success("Task Saved", {
+  //         position: "bottom-center",
+  //       });
+  //     }
 
-      // router.push("/admin/news");
-      router.refresh();
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
-    // form.resetFields()
-  };
+  //     // router.push("/admin/news");
+  //     router.refresh();
+  //   } catch (error) {
+  //     toast.error(error.response.data.message);
+  //   }
+  //   // form.resetFields()
+  // };
   const handleSubmitFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+    console.log('Failed to submit:', errorInfo);
   };
 
   const onChangePosition = (checked) => {
@@ -159,12 +178,12 @@ export function NewsForm(props) {
         initialValues={{
           remember: true,
         }}
-        onFinish={submitNews}
+        onFinish={handleSubmit}
         onFinishFailed={handleSubmitFailed}
         autoComplete="off"
         form={form}
       >
-        {params?.id && data?.post_status == "publish"
+        {data?.post_status == "publish"
           ? <div className="flex justify-around">
             <div className="flex">
               <Form.Item
@@ -190,15 +209,14 @@ export function NewsForm(props) {
               </Button>
             </Form.Item>
           </div>
-          : <div className="flex justify-around">
-
-            <Form.Item
+          : <div className={`flex  ${params.id ? 'justify-around' : 'justify-end'}`}>
+            {params.id && <Form.Item
               className="p-2"
             >
               <Button danger htmlType="submit" onClick={() => setPostStatus("trash")}>
                 Move to trash
               </Button>
-            </Form.Item>
+            </Form.Item>}
             <div className="flex">
               <Form.Item
                 className="p-2"
@@ -223,7 +241,9 @@ export function NewsForm(props) {
           label="Priority"
           name="news_position"
         >
-          <Switch checked={newsPosition == 1 ? true : false} onChange={onChangePosition} />
+          <Tooltip title="Can active when status is publish">
+            <Switch checked={newsPosition == 1 ? true : false} onChange={onChangePosition} />
+          </Tooltip>
         </Form.Item>
 
         <Form.Item
@@ -238,26 +258,19 @@ export function NewsForm(props) {
         >
           <Input />
         </Form.Item>
-
-
         <Form.Item label="Category" name="categories" rules={[
           {
             required: true,
             message: 'Please select your category!',
           },
-        ]}>
-          <Select
-            mode="multiple"
-            allowClear
-            style={{
-              width: '100%',
-            }}
-            placeholder="Select category"
-            options={options}
-          />
+        ]}
+        >
+          <Select mode="multiple" placeholder="Please category" allowClear filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
+            {cate && cate.map((item, index) => (
+              <Option key={index} value={item.id}>{item.name}</Option>
+            ))}
+          </Select>
         </Form.Item>
-
-
 
         <Form.Item
           label="Excerpt"

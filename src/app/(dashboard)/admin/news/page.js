@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import NewsList from "@/components/NewsList";
-import { getAllNews, deleteBulkNews, recoverNews, deleteNews, trashNews, getTotalNumOfNews } from '@/library/getNews';
+import { getAllNews, deleteBulkNews, recoverNews, deleteNews, trashNews, getTotalNumOfNews, getCategories } from '@/library/getNews';
 
 
 // This part is important!
@@ -47,15 +47,16 @@ async function NewsPage({ searchParams }) {
   const newsData = await getAllNews(status, page, size, search, orderby, order, author, category, tag, lang);
   const totals = await getTotalNumOfNews(status, search, author, category, tag, lang);
   const pagination = {
-    pageSize: size,
+    pageSize: parseInt(size),
     total: totals.itemsOfTable,
-    current: page,
+    current: parseInt(page),
   }
-
+  const cate = await getCategories()
   //console.log("data from getNews:", newsData);
+
   return (
     <>
-      <NewsList dataTable={JSON.stringify(newsData)} pagination={pagination} totals={totals} />;
+      <NewsList dataTable={JSON.stringify(newsData)} pagination={pagination} totals={totals} cate={cate} />;
     </>
   );
 }

@@ -28,3 +28,20 @@ body {
   max-height: 600px;
   overflow: auto;
 }
+
+/* button */
+.btn-edit {
+  color: #2563eb;
+}
+.btn-trash {
+  color: #ef4444;
+}
+.btn-preview {
+  color: #047857;
+}
+.btn-recover {
+  color: #65a30d;
+}
+.btn-delete {
+  color: #ef4444;
+}

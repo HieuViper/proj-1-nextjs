@@ -1,13 +1,13 @@
 import mysql from 'mysql2/promise';
 import { Sequelize, DataTypes } from 'sequelize';
 import { newsModel } from './models/news';
-import { newsLanguageModel } from './models/news_language';
+import { newsLanguageModel } from './models/news_languages';
 import { languagesModel } from './models/languages';
 import { articleModel } from './models/articles';
-import { articleLanguageModel } from './models/articles_language';
-import { articleCateLanguageModel } from './models/articles_cate_lang';
-import { articleCategoriesModel } from './models/articles_categories';
-import { newsCateLanguageModel } from './models/news_cate_language';
+import { articleLanguageModel } from './models/article_languages';
+import { articleCateLanguageModel } from './models/article_cate_langs';
+import { articleCategoriesModel } from './models/article_categories';
+import { newsCateLanguageModel } from './models/news_cate_langs';
 import { newsCategoriesModel } from './models/news_categories';
 
 export const db = {
@@ -39,9 +39,9 @@ async function initialize() {
     db.Languages = languagesModel(sequelize);
     db.Articles = articleModel(sequelize)
     db.Article_languages = articleLanguageModel(sequelize)
-    db.ArticleCategories = articleCategoriesModel(sequelize)
+    db.Article_categories = articleCategoriesModel(sequelize)
     db.Article_cate_langs = articleCateLanguageModel(sequelize)
-    db.NewsCategories = newsCategoriesModel(sequelize)
+    db.News_categories = newsCategoriesModel(sequelize)
     db.News_cate_langs = newsCateLanguageModel(sequelize)
 
     //relationship
@@ -50,10 +50,10 @@ async function initialize() {
     db.Articles.belongsToMany( db.Languages, {through: db.Article_languages });
     db.Languages.belongsToMany( db.Articles, { through: db.Article_languages });
 
-    db.ArticleCategories.belongsToMany(db.Languages, { through: db.Article_cate_langs });
-    db.Languages.belongsToMany(db.ArticleCategories, { through: db.Article_cate_langs });
-    db.NewsCategories.belongsToMany(db.Languages, {through: db.News_cate_langs});
-    db.Languages.belongsToMany(db.NewsCategories, {through: db.News_cate_langs});
+    db.Article_categories.belongsToMany(db.Languages, { through: db.Article_cate_langs });
+    db.Languages.belongsToMany(db.Article_categories, { through: db.Article_cate_langs });
+    db.News_categories.belongsToMany(db.Languages, {through: db.News_cate_langs});
+    db.Languages.belongsToMany(db.News_categories, {through: db.News_cate_langs});
     // sync all models with database
     await sequelize.sync({ force: true });
 

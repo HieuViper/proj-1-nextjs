@@ -22,6 +22,7 @@ async function NewsPage({ searchParams }) {
   const author = searchParams?.author ?? "";
   const category = searchParams?.category ?? "";
   const tag = searchParams?.tag ?? "";
+  const lang = searchParams?.lang ?? process.env.DEFAULT_LANGUAGE;
 
   console.log("searchparams: ", searchParams);
 
@@ -42,8 +43,9 @@ async function NewsPage({ searchParams }) {
     order = 'desc'
   }
 
-  const newsData = await getAllNews(process.env.POST_TYPE_NEWS, status, page, size, search, orderby, order, author, category, tag);
-  const totals = await getTotalNumOfNews(process.env.POST_TYPE_NEWS, status, search, author, category, tag);
+
+  const newsData = await getAllNews(status, page, size, search, orderby, order, author, category, tag, lang);
+  const totals = await getTotalNumOfNews(status, search, author, category, tag, lang);
   const pagination = {
     pageSize: parseInt(size),
     total: totals.itemsOfTable,

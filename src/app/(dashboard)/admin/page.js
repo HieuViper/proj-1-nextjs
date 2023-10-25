@@ -1,17 +1,15 @@
 import { Button } from "antd";
 import { db } from "@/config/db";
-import { QueryTypes } from "sequelize";
+import { createSampleData } from "@/library/createSamples";
 
 const DashboardPage = async () => {
   if( !db.initialized) {
     await db.initialize();
 
   }
-  const createSampleData = () => {
-    // for ( let i = 1; i++; i < 100 ){
-    //   let news = db.News
-    // }
-  }
+
+  //createSampleData();
+
   return (
     <div>
       DashboardPage

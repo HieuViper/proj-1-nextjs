@@ -12,7 +12,18 @@ import { newsCategoriesModel } from './models/news_categories';
 
 export const db = {
     initialized: false,
-    initialize
+    initialize,
+    seq: null,
+    News: null,
+    News_languages: null,
+    Languages: null,
+    Articles: null,
+    Article_languages: null,
+    Article_categories: null,
+    Article_cate_langs: null,
+    News_categories: null,
+    News_cate_langs: null,
+
 };
 
 // initialize db and models, called on first api request from /helpers/api/api-handler.js
@@ -55,7 +66,7 @@ async function initialize() {
     db.News_categories.belongsToMany(db.Languages, {through: db.News_cate_langs});
     db.Languages.belongsToMany(db.News_categories, {through: db.News_cate_langs});
     // sync all models with database
-    await sequelize.sync({ force: true });
+    await sequelize.sync({ alter: true });
 
     db.initialized = true;
     console.log("Initializing database is done")

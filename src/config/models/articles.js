@@ -1,7 +1,6 @@
-
 import { DataTypes } from "sequelize";
 
-export function newsModel(sequelize) {
+export function articleModel(sequelize) {
     const attributes = {
         id: {
             type: DataTypes.BIGINT(20).UNSIGNED,
@@ -19,20 +18,7 @@ export function newsModel(sequelize) {
             collate: 'utf8mb4_unicode_520_ci',
             allowNull: true,
             defaultValue: 'default',
-            //unique: '',
-            //unique: true,
-            //field: 'real name of the column',
-            /*references: {
-                model: BarProp,
-                key: 'id'
-            }*/
             comment: 'Categories has the format: category1, category2, category3',
-        },
-        tags: {
-            type: DataTypes.STRING(200),
-            collate: 'utf8mb4_unicode_520_ci',
-            allowNull: true,
-            comment: 'Tags has the format: tag1, tag2, tag3',
         },
         post_author: {
             type: DataTypes.STRING(200),
@@ -48,7 +34,7 @@ export function newsModel(sequelize) {
         post_date: {
             type: DataTypes.DATE,
             allowNull: true,
-            comment: 'Publish date of the news',
+            comment: 'Publish date of the article',
         },
         post_status: {
             type: DataTypes.STRING(20),
@@ -63,27 +49,27 @@ export function newsModel(sequelize) {
                 }
             },
         },
-        news_code: {
+        article_code: {
             type: DataTypes.STRING(200),
             collate: 'utf8mb4_unicode_520_ci',
             allowNull: false,
-            comment: 'news code is used to build URL',
+            comment: 'article code is used to build URL',
         },
         modified_by: {
             type: DataTypes.STRING(200),
             collate: 'utf8mb4_unicode_520_ci',
             allowNull: true,
-            comment: 'This one is not the author, he is the one modified the news',
+            comment: 'This one is not the author, he is the one modified the article',
         },
         menu_id: {
             type: DataTypes.INTEGER(11).UNSIGNED,
             allowNull: true,
         },
-        news_position: {
+        article_position: {
             type: DataTypes.TINYINT(1),
             allowNull: true,
             defaultValue: 0,
-            comment: 'it has the value 1 that means the news is prioritied',
+            comment: 'it has the value 1 that means the article is prioritied',
         },
         comment_status: {
             type: DataTypes.STRING(20),
@@ -99,10 +85,10 @@ export function newsModel(sequelize) {
 
     const options = {
         updatedAt: 'post_modified',
-        tableName: 'news',
+        tableName: 'articles',
         //timestamps: false,
         //indexes: [{ unique: true, fields: ['someUnique'] }],
     };
 
-    return sequelize.define('news', attributes, options);
+    return sequelize.define('articles', attributes, options);
 }

@@ -1,4 +1,4 @@
-'use server';
+//'use server';
 import { db } from '@/config/db';
 import { QueryTypes, Op } from 'sequelize';
 import { redirect } from 'next/navigation';
@@ -21,22 +21,18 @@ function getSearchQuery(search) {
     ? ''
     : `AND (title LIKE '%${search}%' OR content LIKE '%${search}%' OR categories LIKE '%${search}%')`;
 }
-// export const newsModel = {
-//   testfunction,
-//   getAllNews,
-//   getTotalNumOfNews,
-//   trashNews,
-//   deleteBulkNews,
-//   recoverNews,
-//   deleteNews,
-//   getNews,
-//   editNews,
-//   addNews,
-//   getCategories,
-// };
-// async function testfunction() {
-//   console.log('hello');
-// }
+export const newsModel = {
+  getAllNews,
+  getTotalNumOfNews,
+  trashNews,
+  deleteBulkNews,
+  recoverNews,
+  deleteNews,
+  getNews,
+  editNews,
+  addNews,
+  getCategories,
+};
 //GetNews for tab "All,published, trash"
 export async function getAllNews(
   post_status,
@@ -63,7 +59,6 @@ export async function getAllNews(
     let sqlquery = `SELECT * FROM news_all WHERE (${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}) ${orderQuery} LIMIT ${fromNews}, ${size}`;
 
     const results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
-    console.log('result:', results);
     return results;
   } catch (error) {
     throw new Error('Fail to get news from database' + error.message);

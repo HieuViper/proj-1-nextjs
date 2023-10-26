@@ -83,7 +83,7 @@ async function initialize() {
     through: db.News_cate_langs,
   });
   // sync all models with database
-  await sequelize.sync({ alter: true });
+  //await sequelize.sync({ alter: true });
 
   db.initialized = true;
   console.log("Initializing database is done");

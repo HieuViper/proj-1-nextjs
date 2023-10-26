@@ -267,7 +267,7 @@ export function NewsForm(props) {
         >
           <Select mode="multiple" placeholder="Please category" allowClear filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
             {cate && cate.map((item, index) => (
-              <Option key={index} value={item.id}>{item.name}</Option>
+              <Option key={index} value={item.id}>{item.category_code}</Option>
             ))}
           </Select>
         </Form.Item>

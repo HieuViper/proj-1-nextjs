@@ -13,7 +13,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function NewsList(props) {
+const ArticleList = (props) => {
   const router = useRouter();
   const pathName = usePathname();
   const searchParams = useSearchParams();
@@ -43,7 +43,6 @@ export default function NewsList(props) {
   const [search, setSearch] = useState("");
   const [author, setAuthor] = useState("");
   const [category, setCategory] = useState("");
-  const [tag, setTag] = useState("");
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [lang, setLang] = useState("vi");
 
@@ -77,7 +76,6 @@ export default function NewsList(props) {
     current.set("search", search);
     current.set("author", author);
     current.set("category", category);
-    current.set("tag", tag);
     current.set("lang", lang);
 
     //add sorter here
@@ -97,7 +95,6 @@ export default function NewsList(props) {
     setSortedInfo({});
     setAuthor("");
     setCategory("");
-    setTag("");
   };
 
   const handlePostStatus = async (post_status) => {
@@ -111,7 +108,7 @@ export default function NewsList(props) {
     setSearch("");
     setAuthor("");
     setCategory("");
-    setTag("");
+
     setStatus(post_status);
   };
 
@@ -124,7 +121,7 @@ export default function NewsList(props) {
     //Reset all below states
     setSearch("");
     setCategory("");
-    setTag("");
+
     setAuthor(post_author);
   };
 
@@ -137,22 +134,8 @@ export default function NewsList(props) {
     //Reset all below states
     setSearch("");
     setAuthor("");
-    setTag("");
+
     setCategory(cat);
-  };
-
-  const handleTagFilter = (tag1) => {
-    setSortedInfo(initSort);
-    const orderPara = getOrderPara(initSort, true);
-    router.push(
-      `${pathName}?status=${status}&lang=${lang}&size=${paginationServer.pageSize}&tag=${tag1}${orderPara}`
-    );
-    //reset the other filters
-
-    setSearch("");
-    setAuthor("");
-    setCategory("");
-    setTag(tag1);
   };
 
   //getOrderParameter for URL
@@ -180,7 +163,7 @@ export default function NewsList(props) {
     setSortedInfo(sorter);
     const orderPara = getOrderPara(sorter, true);
     router.push(
-      `${pathName}?page=${pagination.current}&size=${pagination.pageSize}&status=${status}&lang=${lang}&author=${author}&category=${category}&tag=${tag}&search=${search}${orderPara}`
+      `${pathName}?page=${pagination.current}&size=${pagination.pageSize}&status=${status}&lang=${lang}&author=${author}&category=${category}&search=${search}${orderPara}`
     );
   };
 
@@ -196,7 +179,7 @@ export default function NewsList(props) {
     setSearch("");
     setAuthor("");
     setCategory("");
-    setTag("");
+
     setLang(langValue);
   };
 
@@ -234,7 +217,7 @@ export default function NewsList(props) {
                   <Link
                     href={`${pathName}?trash=${record.id}&size=${
                       paginationServer.pageSize
-                    }&status=${status}&author=${author}&category=${category}&tag=${tag}&search=${search}${getOrderPara(
+                    }&status=${status}&author=${author}&category=${category}&search=${search}${getOrderPara(
                       sortedInfo,
                       true
                     )}`}
@@ -257,7 +240,7 @@ export default function NewsList(props) {
                   <Link
                     href={`${pathName}?recover=${record.id}&size=${
                       paginationServer.pageSize
-                    }&status=${status}&author=${author}&category=${category}&tag=${tag}&search=${search}${getOrderPara(
+                    }&status=${status}&author=${author}&category=${category}&search=${search}${getOrderPara(
                       sortedInfo,
                       true
                     )}`}
@@ -271,7 +254,7 @@ export default function NewsList(props) {
                   <Link
                     href={`${pathName}?del=${record.id}&size=${
                       paginationServer.pageSize
-                    }&status=${status}&author=${author}&category=${category}&tag=${tag}&search=${search}${getOrderPara(
+                    }&status=${status}&author=${author}&category=${category}&search=${search}${getOrderPara(
                       sortedInfo,
                       true
                     )}`}
@@ -324,29 +307,6 @@ export default function NewsList(props) {
       },
     },
     {
-      title: "Tags",
-      dataIndex: "tags",
-      key: "tags",
-      render: (_, record) => {
-        const tags = record.tags
-          ? record.tags.split(",").map((cat) => cat.trim())
-          : [];
-
-        return (
-          <>
-            {tags.map((tag1, index) => (
-              <div key={index}>
-                <a href="#" onClick={() => handleTagFilter(tag1)}>
-                  {tag1}
-                </a>
-                {index < tags.length - 1 && ", "}
-              </div>
-            ))}
-          </>
-        );
-      },
-    },
-    {
       title: "Date",
       dataIndex: "post_modified",
       key: "date",
@@ -381,9 +341,9 @@ export default function NewsList(props) {
     <>
       <div className="flex justify-between mb-4 gap-x-4">
         <div className="flex gap-x-5">
-          <p className="font-semibold text-xl pr-4">News</p>
+          <p className="font-semibold text-xl pr-4">Articles</p>
           <Button className="">
-            <Link href={`/admin/news/add`}>Add News</Link>
+            <Link href={`/admin/articles/add`}>Add Article</Link>
           </Button>
           <Select
             defaultValue="vi"
@@ -472,4 +432,6 @@ export default function NewsList(props) {
       />
     </>
   );
-}
+};
+
+export default ArticleList;

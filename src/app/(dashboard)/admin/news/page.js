@@ -2,15 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import NewsList from '@/components/NewsList';
-import {
-  getAllNews,
-  deleteBulkNews,
-  recoverNews,
-  deleteNews,
-  trashNews,
-  getTotalNumOfNews,
-  getCategories,
-} from '@/library/getNews';
+import { newsModel } from '@/library/getNews';
 import { db } from '@/config/db';
 
 // This part is important!
@@ -38,23 +30,23 @@ async function NewsPage({ searchParams }) {
   console.log('searchparams: ', searchParams);
 
   if (trash != '') {
-    await trashNews(trash);
+    await newsModel.trashNews(trash);
   }
   if (keys != '') {
-    await deleteBulkNews(keys, status);
+    await newsModel.deleteBulkNews(keys, status);
   }
   if (recover != '') {
-    await recoverNews(recover);
+    await newsModel.recoverNews(recover);
   }
   if (del != '') {
-    await deleteNews(del);
+    await newsModel.deleteNews(del);
   }
   if (Object.keys(searchParams).length == 0) {
     orderby = 'post_modified';
     order = 'desc';
   }
 
-  const newsData = await getAllNews(
+  const newsData = await newsModel.getAllNews(
     status,
     page,
     size,
@@ -66,7 +58,7 @@ async function NewsPage({ searchParams }) {
     tag,
     lang
   );
-  const totals = await getTotalNumOfNews(
+  const totals = await newsModel.getTotalNumOfNews(
     status,
     search,
     author,
@@ -79,8 +71,6 @@ async function NewsPage({ searchParams }) {
     total: totals.itemsOfTable,
     current: parseInt(page),
   };
-  //const cate = await getCategories();
-  //console.log("data from getNews:", newsData);
 
   return (
     <>
@@ -88,7 +78,6 @@ async function NewsPage({ searchParams }) {
         dataTable={JSON.stringify(newsData)}
         pagination={pagination}
         totals={totals}
-        // cate={cate}
       />
       ;
     </>

@@ -1,62 +1,96 @@
 /* eslint-disable @next/next/no-async-client-component */
 
-import { useRouter } from "next/navigation";
-import NewsList from "@/components/NewsList";
-import { getAllNews, deleteBulkNews, recoverNews, deleteNews, trashNews, getTotalNumOfNews, getCategories } from '@/library/getNews';
-
+import { useRouter } from 'next/navigation';
+import NewsList from '@/components/NewsList';
+import {
+  getAllNews,
+  deleteBulkNews,
+  recoverNews,
+  deleteNews,
+  trashNews,
+  getTotalNumOfNews,
+  getCategories,
+} from '@/library/getNews';
+import { db } from '@/config/db';
 
 // This part is important!
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 async function NewsPage({ searchParams }) {
-  const trash = searchParams?.trash ?? "";
-  const keys = searchParams?.keys ?? "";
-  const recover = searchParams?.recover ?? "";
-  const del = searchParams?.del ?? "";
-  const status = searchParams?.status ?? "";
-  const search = searchParams?.search ?? "";
+  if (!db.initialized) {
+    await db.initialize();
+  }
+  const trash = searchParams?.trash ?? '';
+  const keys = searchParams?.keys ?? '';
+  const recover = searchParams?.recover ?? '';
+  const del = searchParams?.del ?? '';
+  const status = searchParams?.status ?? '';
+  const search = searchParams?.search ?? '';
   const page = searchParams?.page ?? 1;
   const size = searchParams?.size ?? process.env.PAGE_SIZE;
-  let orderby = searchParams?.orderby ?? "";
-  let order = searchParams?.order ?? "";
-  const author = searchParams?.author ?? "";
-  const category = searchParams?.category ?? "";
-  const tag = searchParams?.tag ?? "";
+  let orderby = searchParams?.orderby ?? '';
+  let order = searchParams?.order ?? '';
+  const author = searchParams?.author ?? '';
+  const category = searchParams?.category ?? '';
+  const tag = searchParams?.tag ?? '';
   const lang = searchParams?.lang ?? process.env.DEFAULT_LANGUAGE;
 
-  console.log("searchparams: ", searchParams);
+  console.log('searchparams: ', searchParams);
 
-  if (trash != "") {
+  if (trash != '') {
     await trashNews(trash);
   }
-  if (keys != "") {
+  if (keys != '') {
     await deleteBulkNews(keys, status);
   }
-  if (recover != "") {
+  if (recover != '') {
     await recoverNews(recover);
   }
-  if (del != "") {
+  if (del != '') {
     await deleteNews(del);
   }
   if (Object.keys(searchParams).length == 0) {
     orderby = 'post_modified';
-    order = 'desc'
+    order = 'desc';
   }
 
-
-  const newsData = await getAllNews(status, page, size, search, orderby, order, author, category, tag, lang);
-  const totals = await getTotalNumOfNews(status, search, author, category, tag, lang);
+  const newsData = await getAllNews(
+    status,
+    page,
+    size,
+    search,
+    orderby,
+    order,
+    author,
+    category,
+    tag,
+    lang
+  );
+  const totals = await getTotalNumOfNews(
+    status,
+    search,
+    author,
+    category,
+    tag,
+    lang
+  );
   const pagination = {
     pageSize: parseInt(size),
     total: totals.itemsOfTable,
     current: parseInt(page),
-  }
-  const cate = await getCategories()
+  };
+  //const cate = await getCategories();
   //console.log("data from getNews:", newsData);
 
   return (
     <>
-      <NewsList dataTable={JSON.stringify(newsData)} pagination={pagination} totals={totals} cate={cate} />;
+      <NewsList
+        dataTable={JSON.stringify(newsData)}
+        pagination={pagination}
+        totals={totals}
+        // cate={cate}
+      />
+      ;
     </>
   );
 }

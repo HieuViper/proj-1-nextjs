@@ -66,7 +66,7 @@ async function initialize() {
     db.News_categories.belongsToMany(db.Languages, {through: db.News_cate_langs});
     db.Languages.belongsToMany(db.News_categories, {through: db.News_cate_langs});
     // sync all models with database
-    await sequelize.sync({ alter: true });
+    //await sequelize.sync({ alter: true });
 
     db.initialized = true;
     console.log("Initializing database is done")

@@ -38,5 +38,12 @@
   },
   "devDependencies": {
     "@types/react": "18.2.22"
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false,
+    "net": false,
+    "tls": false
   }
 }

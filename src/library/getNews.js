@@ -29,9 +29,10 @@ export const newsModel = {
   recoverNews,
   deleteNews,
   getNews,
-  editNews,
-  addNews,
+  // editNews,
+  // addNews,
   getCategories,
+  getLanguages,
 };
 //GetNews for tab "All,published, trash"
 export async function getAllNews(
@@ -233,44 +234,50 @@ export async function deleteNews(key) {
 
 export async function getNews(id) {
   try {
-    const result = await db.News.findOne({ where: { id } });
-
-    // const sqlquery = 'SELECT * FROM news WHERE id = ?';
-    // const result = await pool.query(sqlquery, [id]);
+    const sqlquery = 'SELECT * FROM news_all WHERE id=${id}';
+    const result = await db.seq.query(sqlquery, QueryTypes.SELECT);
     return result;
   } catch (error) {
     throw new Error('Fail to get news');
   }
 }
-export async function editNews(data, id) {
-  try {
-    const sqlquery = 'UPDATE news SET ? WHERE id = ?';
-    await pool.query(sqlquery, [data, id]);
-  } catch (error) {
-    throw new Error('Fail to edit news');
-  }
-}
 
-export async function addNews(data) {
-  try {
-    const sqlquery = 'INSERT INTO news SET ?';
-    const result = await pool.query(sqlquery, data);
-    if (result.insertId) {
-      redirect(`/admin/news/edit/${result.insertId}`);
-    }
-    // return result
-  } catch (error) {
-    throw new Error('Fail to add news');
-  }
-}
+// export async function editNews(data, id) {
+//   try {
+//     const sqlquery = 'UPDATE news SET ? WHERE id = ?';
+//     await pool.query(sqlquery, [data, id]);
+//   } catch (error) {
+//     throw new Error('Fail to edit news');
+//   }
+// }
+
+// export async function addNews(data) {
+//   try {
+//     const sqlquery = 'INSERT INTO news SET ?';
+//     const result = await pool.query(sqlquery, data);
+//     if (result.insertId) {
+//       redirect(`/admin/news/edit/${result.insertId}`);
+//     }
+//     // return result
+//   } catch (error) {
+//     throw new Error('Fail to add news');
+//   }
+// }
 
 export async function getCategories() {
   try {
-    const sqlquery = 'SELECT * FROM categories';
     const results = await db.News_categories.findAll();
     return results;
   } catch (error) {
-    console.log(error);
-    throw new Error('Fail to get categories');
+    throw new Error('Fail to get categories: ' + error.message);
+  }
+}
+
+export async function getLanguages() {
+  try {
+    const results = await db.Languages.findAll();
+    return results;
+  } catch (error) {
+    throw new Error('Fail to get categories: ' + error.message);
   }
 }

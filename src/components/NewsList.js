@@ -49,6 +49,8 @@ export default function NewsList(props) {
   });
   const [sortedInfo, setSortedInfo] = useState(initSort);
   const [news, setNews] = useState();
+  const [langTable, setLangTable] = useState([]);
+  const [lang, setLang] = useState('vi');
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
@@ -57,10 +59,12 @@ export default function NewsList(props) {
   const [category, setCategory] = useState('');
   const [tag, setTag] = useState('');
   const [loadingStatus, setLoadingStatus] = useState(false);
-  const [lang, setLang] = useState('vi');
+
 
   useEffect(() => {
     const newsData = JSON.parse(props.dataTable);
+    const langData = JSON.parse(props.langTable);
+    setLangTable(langData);
     setNews(newsData);
     setPagination(props.pagination);
     setTotals(props.totals);
@@ -177,30 +181,6 @@ export default function NewsList(props) {
     setTag(tag1);
   };
 
-  //getOrderParameter for URL
-  //parameter: sorter: sort state of the table
-  //statusPara: status of table: publish, draft, trash, priority
-  const getOrderPara = (sorter, statusPara, stringResult) => {
-    if (sorter.order) {
-      let order;
-      if (sorter.order == 'ascend') order = 'asc';
-      if (sorter.order == 'descend') order = 'desc';
-      let orderby;
-      if (sorter.columnKey === 'date')
-        orderby =
-          statusPara === process.env.NEXT_PUBLIC_PS_PUBLISH
-            ? 'post_date'
-            : 'post_modified';
-      else orderby = sorter.columnKey;
-      return stringResult
-        ? `&orderby=${orderby}&order=${order}`
-        : { orderby, order };
-    } else return stringResult ? '' : { orderby: null, order: null };
-  };
-  //set orderPara string
-  orderParaDefault = getOrderPara(sortedInfo, status, true);
-  orderParaInit = getOrderPara(initSort, status, true);
-
   const handleChange = (pagination, filters, sorter) => {
     setSortedInfo(sorter);
     const orderPara = getOrderPara(sorter, status, true);
@@ -224,7 +204,34 @@ export default function NewsList(props) {
     setLang(langValue);
   };
 
-  //console.log('props.cate :', props.cate);
+  //getOrderParameter for URL
+  //parameter: sorter: sort state of the table
+  //statusPara: status of table: publish, draft, trash, priority
+  const getOrderPara = (sorter, statusPara, stringResult) => {
+    if (sorter.order) {
+      let order;
+      if (sorter.order == 'ascend') order = 'asc';
+      if (sorter.order == 'descend') order = 'desc';
+      let orderby;
+      if (sorter.columnKey === 'date')
+        orderby =
+          statusPara === process.env.NEXT_PUBLIC_PS_PUBLISH
+            ? 'post_date'
+            : 'post_modified';
+      else orderby = sorter.columnKey;
+      return stringResult
+        ? `&orderby=${orderby}&order=${order}`
+        : { orderby, order };
+    } else return stringResult ? '' : { orderby: null, order: null };
+  };
+  //set orderPara string
+  orderParaDefault = getOrderPara(sortedInfo, status, true);
+  orderParaInit = getOrderPara(initSort, status, true);
+  //set languages for the languages select box
+  let langOptions = langTable.map( (lang) => {
+    return { value: lang.code, label: lang.name };
+  });
+
   const columns = [
     {
       title: 'Title',
@@ -394,7 +401,8 @@ export default function NewsList(props) {
               width: 120,
             }}
             onChange={handleChangeLanguage}
-            options={[
+            options={langOptions}
+            /*[
               {
                 value: 'vi',
                 label: 'Tiếng Việt',
@@ -403,7 +411,7 @@ export default function NewsList(props) {
                 value: 'en',
                 label: 'English',
               },
-            ]}
+            ]*/
           />
         </div>
         <Search

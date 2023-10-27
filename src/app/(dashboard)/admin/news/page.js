@@ -71,13 +71,14 @@ async function NewsPage({ searchParams }) {
     total: totals.itemsOfTable,
     current: parseInt(page),
   };
-
+  const langTable = await newsModel.getLanguages();
   return (
     <>
       <NewsList
         dataTable={JSON.stringify(newsData)}
         pagination={pagination}
         totals={totals}
+        langTable={JSON.stringify(langTable)}
       />
       ;
     </>

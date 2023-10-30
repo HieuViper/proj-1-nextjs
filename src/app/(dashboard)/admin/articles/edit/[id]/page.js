@@ -1,4 +1,4 @@
-import { getArticle } from "@/library/getArticles";
+import { getArticle, getCategories } from "@/library/getArticles";
 import { ArticleForm } from "../../_components/ArticleForm";
 
 export const dynamic = "force-dynamic";

@@ -36,10 +36,10 @@ const ArticleList = (props) => {
     priority: 0,
   });
   const [sortedInfo, setSortedInfo] = useState(initSort);
-  const [news, setNews] = useState();
+  const [articles, setArticles] = useState();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState(searchParams?.get("status") ?? "");
   const [search, setSearch] = useState("");
   const [author, setAuthor] = useState("");
   const [category, setCategory] = useState("");
@@ -49,9 +49,9 @@ const ArticleList = (props) => {
   const onSearchChange = (e) => {
     setSearch(e.target.value);
   };
-  const onSelectChange = (newSelectedRowKeys) => {
-    console.log("selectedRowKeys changed: ", newSelectedRowKeys);
-    setSelectedRowKeys(newSelectedRowKeys);
+  const onSelectChange = (articleSelectedRowKeys) => {
+    console.log("selectedRowKeys changed: ", articleSelectedRowKeys);
+    setSelectedRowKeys(articleSelectedRowKeys);
   };
   const rowSelection = {
     selectedRowKeys,
@@ -184,8 +184,8 @@ const ArticleList = (props) => {
   };
 
   useEffect(() => {
-    const newsData = JSON.parse(props.dataTable);
-    setNews(newsData);
+    const articlesData = JSON.parse(props.dataTable);
+    setArticles(articlesData);
     setPagination(props.pagination);
     setTotals(props.totals);
     setSelectedRowKeys([]);
@@ -207,7 +207,7 @@ const ArticleList = (props) => {
             <div className="flex gap-2">
               {record.post_status !== process.env.NEXT_PUBLIC_PS_TRASH ? (
                 <>
-                  <Link href={`/admin/news/edit/${record.id}`}>
+                  <Link href={`/admin/articles/edit/${record.id}`}>
                     <span className="btn-edit">
                       <EditOutlined className="pr-1" />
                       Edit
@@ -228,7 +228,7 @@ const ArticleList = (props) => {
                     </span>
                   </Link>
                   |{" "}
-                  <Link href={`/vi/news/preview/${record.id}`}>
+                  <Link href={`/vi/articles/preview/${record.id}`}>
                     <span className="btn-preview">
                       <EyeOutlined className="pr-1" />
                       Preview
@@ -397,7 +397,7 @@ const ArticleList = (props) => {
         <Space>
           <Radio.Group
             disabled={loadingStatus}
-            defaultValue={""}
+            defaultValue={status}
             onChange={(e) => {
               handlePostStatus(e.target.value), setLoadingStatus(true);
             }}
@@ -424,7 +424,7 @@ const ArticleList = (props) => {
         style={{ marginTop: 10 }}
         rowSelection={rowSelection}
         columns={columns}
-        dataSource={news}
+        dataSource={articles}
         rowKey="id"
         onChange={handleChange}
         pagination={paginationServer}

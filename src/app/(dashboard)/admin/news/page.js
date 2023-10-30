@@ -1,16 +1,12 @@
 /* eslint-disable @next/next/no-async-client-component */
 
 import NewsList from "@/components/NewsList";
-import { db } from "@/config/db";
 import { newsModel } from "@/library/getNews";
 
 // This part is important!
 export const dynamic = "force-dynamic";
 
 async function NewsPage({ searchParams }) {
-  if (!db.initialized) {
-    await db.initialize();
-  }
   const trash = searchParams?.trash ?? "";
   const keys = searchParams?.keys ?? "";
   const recover = searchParams?.recover ?? "";

@@ -1,6 +1,5 @@
 "use server";
 import { db } from "@/config/db";
-import { redirect } from "next/navigation";
 import { Op, QueryTypes } from "sequelize";
 
 //get Status query from parameter post_status
@@ -222,32 +221,36 @@ export async function deleteArticle(key) {
 
 export async function getArticle(id) {
   try {
-    const result = await db.Articles.findOne({ where: { id } });
+    let sqlquery = `SELECT * FROM articles_all WHERE id=${id}`;
+    //let results = await pool.query(sqlquery, [post_type]);
+    let result = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    // const result = await db.Article_categories.findOne({ where: { id: id } });
     return result;
   } catch (error) {
+    console.log("12345", error);
     throw new Error("Fail to get articles");
   }
 }
 export async function editarticle(data, id) {
-  try {
-    const sqlquery = "UPDATE articles SET ? WHERE id = ?";
-    await pool.query(sqlquery, [data, id]);
-  } catch (error) {
-    throw new Error("Fail to edit articles");
-  }
+  // try {
+  //   const sqlquery = "UPDATE articles SET ? WHERE id = ?";
+  //   await pool.query(sqlquery, [data, id]);
+  // } catch (error) {
+  //   throw new Error("Fail to edit articles");
+  // }
 }
 
 export async function addarticle(data) {
-  try {
-    const sqlquery = "INSERT INTO articles SET ?";
-    const result = await pool.query(sqlquery, data);
-    if (result.insertId) {
-      redirect(`/admin/articles/edit/${result.insertId}`);
-    }
-    // return result
-  } catch (error) {
-    throw new Error("Fail to add articles");
-  }
+  // try {
+  //   const sqlquery = "INSERT INTO articles SET ?";
+  //   const result = await pool.query(sqlquery, data);
+  //   if (result.insertId) {
+  //     // redirect(`/admin/articles/edit/${result.insertId}`);
+  //   }
+  //   // return result
+  // } catch (error) {
+  //   throw new Error("Fail to add articles");
+  // }
 }
 
 export async function getCategories() {

@@ -1,11 +1,9 @@
 "use client";
 import { Button, Form, Input, Select } from "antd";
-import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 
-export function ArticleForm() {
+export function ArticleForm(props) {
   const [articles, setArticles] = useState({
     title: "",
     category_id: 0,
@@ -22,65 +20,25 @@ export function ArticleForm() {
   const [cate, setCate] = useState("");
 
   useEffect(() => {
-    const fetchCate = async () => {
-      try {
-        const cate = await axios.get("/api/categories");
-        console.log("cate", cate.data);
-        setCate(cate?.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchCate();
-  }, []);
-  useEffect(() => {
-    const fetcharticles = async (id) => {
-      try {
-        const { data } = await axios.get("/api/articles/" + id);
-        console.log(
-          "🚀 ~ file: articlesForm.js:20 ~ fetcharticles ~ data:",
-          data
-        );
-        setArticles(data);
-        form.setFieldsValue(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
     if (params?.id) {
-      fetcharticles(params.id);
+      const data = JSON.parse(props.data);
+      form.setFieldsValue({
+        ...data,
+        categories: (data?.categories).split(",").map(Number),
+      });
+      setData(data);
+      setPostStatus(data.post_status);
+      setNewsPosition(data.news_position);
     }
-  }, [params.id]);
+    const cate = JSON.parse(props.cate);
+    setCate(cate);
+  }, [props]);
 
   const handleChange = ({ target: { name, value } }) =>
     setArticles({ ...articles, [name]: value });
 
   const handleSubmit = async (e) => {
     // e.preventDefault();
-    console.log(form.getFieldsValue());
-    try {
-      if (params?.id) {
-        await axios.put("/api/articles/" + params.id, form.getFieldsValue());
-
-        toast.success("Task Updated", {
-          position: "bottom-center",
-        });
-      } else {
-        const rs = await axios.post("/api/articles", form.getFieldsValue());
-        console.log("🚀 ~ file: ArticleForm.js:75 ~ handleSubmit ~ rs:", rs);
-
-        toast.success("Task Saved", {
-          position: "bottom-center",
-        });
-      }
-
-      router.push("/admin/articles");
-      router.refresh();
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
   };
   const handleSubmitFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);

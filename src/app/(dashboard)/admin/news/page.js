@@ -1,49 +1,48 @@
 /* eslint-disable @next/next/no-async-client-component */
 
-import { useRouter } from 'next/navigation';
-import NewsList from '@/components/NewsList';
-import { newsModel } from '@/library/getNews';
-import { db } from '@/config/db';
+import NewsList from "@/components/NewsList";
+import { db } from "@/config/db";
+import { newsModel } from "@/library/getNews";
 
 // This part is important!
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 async function NewsPage({ searchParams }) {
   if (!db.initialized) {
     await db.initialize();
   }
-  const trash = searchParams?.trash ?? '';
-  const keys = searchParams?.keys ?? '';
-  const recover = searchParams?.recover ?? '';
-  const del = searchParams?.del ?? '';
-  const status = searchParams?.status ?? '';
-  const search = searchParams?.search ?? '';
+  const trash = searchParams?.trash ?? "";
+  const keys = searchParams?.keys ?? "";
+  const recover = searchParams?.recover ?? "";
+  const del = searchParams?.del ?? "";
+  const status = searchParams?.status ?? "";
+  const search = searchParams?.search ?? "";
   const page = searchParams?.page ?? 1;
   const size = searchParams?.size ?? process.env.PAGE_SIZE;
-  let orderby = searchParams?.orderby ?? '';
-  let order = searchParams?.order ?? '';
-  const author = searchParams?.author ?? '';
-  const category = searchParams?.category ?? '';
-  const tag = searchParams?.tag ?? '';
+  let orderby = searchParams?.orderby ?? "";
+  let order = searchParams?.order ?? "";
+  const author = searchParams?.author ?? "";
+  const category = searchParams?.category ?? "";
+  const tag = searchParams?.tag ?? "";
   const lang = searchParams?.lang ?? process.env.DEFAULT_LANGUAGE;
 
-  console.log('searchparams: ', searchParams);
+  // console.log('searchparams: ', searchParams);
 
-  if (trash != '') {
+  if (trash != "") {
     await newsModel.trashNews(trash);
   }
-  if (keys != '') {
+  if (keys != "") {
     await newsModel.deleteBulkNews(keys, status);
   }
-  if (recover != '') {
+  if (recover != "") {
     await newsModel.recoverNews(recover);
   }
-  if (del != '') {
+  if (del != "") {
     await newsModel.deleteNews(del);
   }
   if (Object.keys(searchParams).length == 0) {
-    orderby = 'post_modified';
-    order = 'desc';
+    orderby = "post_modified";
+    order = "desc";
   }
 
   const newsData = await newsModel.getAllNews(

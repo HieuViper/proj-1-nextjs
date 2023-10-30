@@ -1,12 +1,12 @@
 //'use server';
-import { db } from '@/config/db';
-import { QueryTypes, Op } from 'sequelize';
-import { redirect } from 'next/navigation';
+import { db } from "@/config/db";
+import { redirect } from "next/navigation";
+import { Op, QueryTypes } from "sequelize";
 
 //get Status query from parameter post_status
 function getStatusQuery(post_status) {
   switch (post_status) {
-    case '':
+    case "":
       return `post_status!='${process.env.POST_STATUS_TRASH}'`;
     case process.env.POST_STATUS_PRIORITY:
       return `news_position=1`;
@@ -17,8 +17,8 @@ function getStatusQuery(post_status) {
 
 //get search query from search parameter
 function getSearchQuery(search) {
-  return search == ''
-    ? ''
+  return search == ""
+    ? ""
     : `AND (title LIKE '%${search}%' OR content LIKE '%${search}%' OR categories LIKE '%${search}%')`;
 }
 export const newsModel = {
@@ -49,20 +49,20 @@ export async function getAllNews(
 ) {
   try {
     const fromNews = (page - 1) * size; //determine the beginning news
-    const authorQuery = author == '' ? '' : `AND post_author='${author}'`;
+    const authorQuery = author == "" ? "" : `AND post_author='${author}'`;
     const catQuery =
-      category == '' ? '' : `AND categories LIKE '%${category}%'`;
-    const tagQuery = tag == '' ? '' : `AND tags like '%${tag}%'`;
+      category == "" ? "" : `AND categories LIKE '%${category}%'`;
+    const tagQuery = tag == "" ? "" : `AND tags like '%${tag}%'`;
     const statusQuery = getStatusQuery(post_status);
     const searchQuery = getSearchQuery(search);
-    const orderQuery = orderby == '' ? '' : `ORDER BY ${orderby} ${order}`;
+    const orderQuery = orderby == "" ? "" : `ORDER BY ${orderby} ${order}`;
 
     let sqlquery = `SELECT * FROM news_all WHERE (${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}) ${orderQuery} LIMIT ${fromNews}, ${size}`;
 
     const results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     return results;
   } catch (error) {
-    throw new Error('Fail to get news from database' + error.message);
+    throw new Error("Fail to get news from database" + error.message);
   }
 }
 
@@ -88,17 +88,17 @@ export async function getTotalNumOfNews(
     //get total number of news in the return news table
     const statusQuery = getStatusQuery(post_status);
     const searchQuery = getSearchQuery(search);
-    const authorQuery = author == '' ? '' : `AND post_author='${author}'`;
+    const authorQuery = author == "" ? "" : `AND post_author='${author}'`;
     const catQuery =
-      category == '' ? '' : `AND categories LIKE '%${category}%'`;
-    const tagQuery = tag == '' ? '' : `AND tags like '%${tag}%'`;
+      category == "" ? "" : `AND categories LIKE '%${category}%'`;
+    const tagQuery = tag == "" ? "" : `AND tags like '%${tag}%'`;
 
     let sqlquery = `SELECT count(*) AS total FROM news_all WHERE ${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}`;
     //let results = await pool.query(sqlquery, [post_type]);
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.itemsOfTable = results[0].total;
   } catch (error) {
-    throw new Error('cannot get items Of Table:' + error.message);
+    throw new Error("cannot get items Of Table:" + error.message);
   }
   try {
     //get total number of news in All Status
@@ -107,7 +107,7 @@ export async function getTotalNumOfNews(
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.all = results[0].total;
   } catch (error) {
-    throw new Error('cannot get number of news in All Tab:' + error.message);
+    throw new Error("cannot get number of news in All Tab:" + error.message);
   }
   try {
     //get total number of news in draft status
@@ -116,7 +116,7 @@ export async function getTotalNumOfNews(
     totals.draft = results[0].total;
   } catch (error) {
     throw new Error(
-      'Cannot get total of news in Draft status:' + error.message
+      "Cannot get total of news in Draft status:" + error.message
     );
   }
   try {
@@ -126,7 +126,7 @@ export async function getTotalNumOfNews(
     totals.publish = results[0].total;
   } catch (error) {
     throw new Error(
-      'Cannot get total of news in published status:' + error.message
+      "Cannot get total of news in published status:" + error.message
     );
   }
   try {
@@ -136,7 +136,7 @@ export async function getTotalNumOfNews(
     totals.trash = results[0].total;
   } catch (error) {
     throw new Error(
-      'Cannot get total of news in trash status: ' + error.message
+      "Cannot get total of news in trash status: " + error.message
     );
   }
   try {
@@ -148,7 +148,7 @@ export async function getTotalNumOfNews(
     return totals;
   } catch (error) {
     throw new Error(
-      'Cannot get total of news in priority status:' + error.message
+      "Cannot get total of news in priority status:" + error.message
     );
   }
 }
@@ -165,14 +165,14 @@ export async function trashNews(key) {
       }
     );
   } catch (error) {
-    throw new Error('Fail to move news to trash bin');
+    throw new Error("Fail to move news to trash bin");
   }
 }
 
 //Delete bulk of news, articles based on newsid
 export async function deleteBulkNews(keys, status) {
   try {
-    const keysArr = keys.split(',');
+    const keysArr = keys.split(",");
     if (status != process.env.POST_STATUS_TRASH)
       await db.News.update(
         { post_status: process.env.POST_STATUS_TRASH },
@@ -194,7 +194,7 @@ export async function deleteBulkNews(keys, status) {
       });
   } catch (error) {
     console.log(error);
-    throw new Error('Fail to delete news');
+    throw new Error("Fail to delete news");
   }
 }
 
@@ -238,7 +238,16 @@ export async function getNews(id) {
     const result = await db.seq.query(sqlquery, QueryTypes.SELECT);
     return result;
   } catch (error) {
-    throw new Error('Fail to get news');
+    throw new Error("Fail to get news");
+  }
+}
+
+export async function editNews(data, id) {
+  try {
+    const sqlquery = "UPDATE news SET ? WHERE id = ?";
+    await pool.query(sqlquery, [data, id]);
+  } catch (error) {
+    throw new Error("Fail to edit news");
   }
 }
 

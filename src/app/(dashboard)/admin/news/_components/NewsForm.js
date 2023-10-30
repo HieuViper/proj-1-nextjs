@@ -3,11 +3,14 @@ import axios from "axios";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Button, Form, Input, Select, Switch, Tooltip } from 'antd';
+import { Button, Form, Input, Select, Switch, Tooltip, Tabs } from 'antd';
 import { SwapLeftOutlined } from '@ant-design/icons';
 import Editor from "@/components/Editor";
 import Link from "next/link";
-import { addNews, editNews } from "@/library/getNews";
+import { addNews, editNews } from "@/library/updateNews";
+import FormItem from "antd/es/form/FormItem";
+
+
 
 export function NewsForm(props) {
   const { TextArea } = Input;
@@ -16,26 +19,53 @@ export function NewsForm(props) {
   const params = useParams();
   const pathName = usePathname();
   const [form] = Form.useForm();
+
   const [cate, setCate] = useState()
   const [postStatus, setPostStatus] = useState()
   const [data, setData] = useState();
-  const [newsPosition, setNewsPosition] = useState()
+  const [tags, setTags] = useState();
+  const [newsPosition, setNewsPosition] = useState();
+
+  const authors = [{
+    value: 'huy',
+    label: 'Jack Huy',
+  },
+  {
+    value: 'Cao',
+    label: 'Peter Cao',
+  }];
 
   useEffect(() => {
     if (params?.id) {
-      const data = JSON.parse(props.data)
+      const data = JSON.parse(props.data);
+      //format data to be suitable for the form fields
       form.setFieldsValue({ ...data, categories: (data?.categories).split(',').map(Number) })
-      setData(data)
-      setPostStatus(data.post_status)
-      setNewsPosition(data.news_position)
+      setData(data);
+      setPostStatus(data.post_status);
+      setNewsPosition(data.news_position);
     }
-    const cate = JSON.parse(props.cate)
-    setCate(cate)
+    const cate = JSON.parse(props.cate);
+    setCate(cate);
+    const tags = JSON.parse(props.tags);
+    setTags(tags);
+
   }, [props])
 
+
+  //Generate newsCode for the post. It pick the Title of the default language
+  function generateNewsCode() {
+    let newsCode = form.getFieldValue(`title_${process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE}`).trim().normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'D')
+      .replace(/\s/g, "-")
+    form.setFieldValue('news_code', newsCode);
+  }
+
+  //Handle submit form data to server
   async function handleSubmit(value) {
     console.log('value submit:', value);
-    const newsCode = value.title.trim().normalize('NFD')
+    const newsCode = value.titlevi.trim().normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/đ/g, 'd')
       .replace(/Đ/g, 'D')
@@ -51,11 +81,12 @@ export function NewsForm(props) {
     }
     Object.assign(value, {
       post_author: 1,
-      post_status: postStatus,
+      //post_status: postStatus,
       news_code: newsCode,
       type: process.env.POST_TYPE_NEWS,
     });
     try {
+      //editing news
       if (params?.id) {
         await editNews(value, params.id).then(() => {
           router.push(`${pathName}`)
@@ -77,8 +108,9 @@ export function NewsForm(props) {
         })
 
       }
+      //adding news
       else {
-        await addNews(value)
+        await addNews(value).then((message) => {console.log("message from server:", message)})
         if (postStatus == 'draft') {
           toast.success("Save Draft Success", {
             position: "top-center",
@@ -96,52 +128,6 @@ export function NewsForm(props) {
     }
   }
 
-  // const handleSubmit = async (value) => {
-  //   console.log("value", value)
-  //   const newsCode = value.title.trim().normalize('NFD')
-  //     .replace(/[\u0300-\u036f]/g, '')
-  //     .replace(/đ/g, 'd')
-  //     .replace(/Đ/g, 'D')
-  //     .replace(/\s/g, "-")
-
-  //   if (postStatus == "publish") {
-  //     const postDate = new Date().toISOString().slice(0, 10) + " " + new Date().toLocaleTimeString('en-GB')
-  //     Object.assign(value, { post_date: postDate });
-  //   }
-
-  //   Object.assign(value, {
-  //     post_author: 1,
-  //     post_status: postStatus,
-  //     news_code: newsCode, news_position: newsPosition
-  //   });
-
-  //   try {
-  //     if (params?.id) {
-  //       await axios.put("/api/news/" + params.id, value);
-  //       toast.success("Task Updated", {
-  //         position: "bottom-center",
-  //       });
-  //       window.location.reload();
-  //       // router.push("/admin/news");
-  //       // router.refresh();
-  //     } else {
-  //       await axios.post("/api/news", value).then((res) => {
-  //         console.log("res", res)
-  //         router.push(`/admin/news/edit/${res.data.id}`);
-  //       })
-
-  //       toast.success("Task Saved", {
-  //         position: "bottom-center",
-  //       });
-  //     }
-
-  //     // router.push("/admin/news");
-  //     router.refresh();
-  //   } catch (error) {
-  //     toast.error(error.response.data.message);
-  //   }
-  //   // form.resetFields()
-  // };
   const handleSubmitFailed = (errorInfo) => {
     console.log('Failed to submit:', errorInfo);
   };
@@ -153,6 +139,87 @@ export function NewsForm(props) {
       setNewsPosition(0)
     }
   };
+  //Set value for post_status field
+  const setStatusHidden = ( value ) => {
+    form.setFieldValue('post_status', value);
+    console.log("value of form,", form.getFieldValue('post_status'));
+  }
+
+
+
+
+
+
+// tab handle
+
+  const TabComponent = ({lang}) => {
+    return (
+      <>
+      <Form.Item
+          label="Title"
+          name={`title_${lang}`}
+          rules={[
+            {
+              required: true,
+              message: 'Please input your title!',
+            },
+          ]}
+        >
+          {
+          lang == process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE && data?.post_status != process.env.NEXT_PUBLIC_PS_PUBLISH ?
+            <Input onChange={() => generateNewsCode()} />
+            :
+            <Input />
+         }
+
+
+        </Form.Item>
+        <Form.Item
+          label="Excerpt"
+          name={`excerpt${lang}`}
+          rules={[
+            {
+              required: true,
+              message: 'Please input your excerpt!',
+            },
+          ]}
+        >
+          <TextArea rows={4} />
+        </Form.Item>
+        <Form.Item
+          label="Content"
+          name={`content${lang}`}
+          rules={[
+            {
+              required: true,
+              message: 'Please input your content!',
+            },
+          ]}
+        >
+          <Editor />
+        </Form.Item>
+      </>
+    )
+  }
+  const itemTab = [
+    {
+      key: 'vi',
+      label: 'Tieng Viet',
+      children: <>
+        <TabComponent lang='vi' />
+      </>,
+    },
+    {
+      key: 'en',
+      label: 'English',
+      children: <TabComponent lang='en' />,
+    },
+  ];
+
+  const handleChangeTab = (key) => {
+    console.log('>>> key tab ', key);
+  }
+
   return (
     <>
       <div className="flex justify-start">
@@ -183,20 +250,22 @@ export function NewsForm(props) {
         autoComplete="off"
         form={form}
       >
-        {data?.post_status == "publish"
-          ? <div className="flex justify-around">
+        {
+          //Handle display Action buttons
+        postStatus == "publish" ?
+          ( <div className="flex justify-around">
             <div className="flex">
               <Form.Item
                 className="p-2"
               >
-                <Button type="primary" ghost htmlType="submit" onClick={() => setPostStatus("draft")}>
+                <Button type="primary" ghost htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_DRAFT)}>
                   Switch to Draft
                 </Button>
               </Form.Item>
               <Form.Item
                 className="p-2"
               >
-                <Button danger htmlType="submit" onClick={() => setPostStatus("trash")}>
+                <Button danger htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_TRASH)}>
                   Move to trash
                 </Button>
               </Form.Item>
@@ -204,24 +273,28 @@ export function NewsForm(props) {
             <Form.Item
               className="p-2"
             >
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" onClick={() => setStatusHidden(postStatus)}>
                 Update
               </Button>
             </Form.Item>
           </div>
-          : <div className={`flex  ${params.id ? 'justify-around' : 'justify-end'}`}>
-            {params.id && <Form.Item
-              className="p-2"
-            >
-              <Button danger htmlType="submit" onClick={() => setPostStatus("trash")}>
+          )
+          :
+          (
+          <div className={`flex  ${params.id ? 'justify-around' : 'justify-end'}`}>
+            {
+            params.id &&
+            <Form.Item className="p-2">
+              <Button danger htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_TRASH)}>
                 Move to trash
               </Button>
-            </Form.Item>}
+            </Form.Item>
+            }
             <div className="flex">
               <Form.Item
                 className="p-2"
               >
-                <Button type="dashed" htmlType="submit" onClick={() => setPostStatus("draft")}>
+                <Button type="dashed" htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_DRAFT)}>
                   Save Draft
                 </Button>
               </Form.Item>
@@ -229,13 +302,15 @@ export function NewsForm(props) {
 
                 className="p-2"
               >
-                <Button type="primary" htmlType="submit" onClick={() => setPostStatus("publish")} >
+                <Button type="primary" htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_PUBLISH)} >
                   Publish
                 </Button>
 
               </Form.Item>
             </div>
-          </div>}
+          </div>
+          )
+        }
 
         <Form.Item
           label="Priority"
@@ -247,17 +322,32 @@ export function NewsForm(props) {
         </Form.Item>
 
         <Form.Item
-          label="Title"
-          name="title"
-          rules={[
-            {
-              required: true,
-              message: 'Please input your title!',
-            },
-          ]}
+          label="Slug"
+          name="news_code"
         >
-          <Input />
+          <Input disabled={
+            data?.post_status == process.env.NEXT_PUBLIC_PS_PUBLISH ? true : false  //disabled this field if the post already has newscode
+          }
+          />
         </Form.Item>
+
+        <Form.Item label="Author" name="post_author" rules={[
+          {
+            required: true,
+            message: 'Please select your category!',
+          },
+        ]}
+        >
+          <Select
+            //value={}
+            style={{
+              width: 120,
+            }}
+            //onChange={handleChangeLanguage}
+            options={authors}
+          />
+        </Form.Item>
+
         <Form.Item label="Category" name="categories" rules={[
           {
             required: true,
@@ -272,31 +362,32 @@ export function NewsForm(props) {
           </Select>
         </Form.Item>
 
-        <Form.Item
-          label="Excerpt"
-          name="excerpt"
-          rules={[
-            {
-              required: true,
-              message: 'Please input your excerpt!',
-            },
-          ]}
+        <Form.Item label="Tags" name="tags" rules={[
+          {
+            required: true,
+            message: 'Please add your tags!',
+          },
+        ]}
         >
-          <TextArea rows={4} />
+          <Select mode="multiple" placeholder="Please tags" allowClear filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
+            {tags && tags.map((item, index) => (
+              <Option key={index} value={item.id}>{item.tag_code}</Option>
+            ))}
+          </Select>
         </Form.Item>
-        <Form.Item
-          label="Content"
-          name="content"
-          rules={[
-            {
-              required: true,
-              message: 'Please input your content!',
-            },
-          ]}
-        // wrapperCol={{ xs: { span: 8, offset: 12 }, sm: { span: 8, offset: 12 } }}
-        >
-          <Editor />
-        </Form.Item>
+
+           {/* Manage multilanguages here */}
+
+           <Tabs defaultActiveKey="1" items={itemTab} onChange={handleChangeTab} />
+
+      <Form.Item
+        name="post_status"
+        style={{ display: 'none' }} // Hide the field using CSS
+        // or className="hidden-field" // Apply a CSS class to hide the field
+      >
+        <Input />
+      </Form.Item>
+
       </Form>
     </>
   );

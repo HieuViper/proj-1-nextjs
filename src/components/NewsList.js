@@ -1,27 +1,12 @@
 /* eslint-disable @next/next/no-async-client-component */
 'use client';
 import { format } from 'date-fns';
-import {
-  Button,
-  Space,
-  Table,
-  Input,
-  Select,
-  Radio,
-  Popconfirm,
-  Tag,
-} from 'antd';
+import { Button, Space, Table, Input, Select, Radio } from 'antd';
 import Search from 'antd/es/input/Search';
-import {
-  SearchOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  EyeOutlined,
-  SyncOutlined,
-} from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, EyeOutlined, SyncOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function NewsList(props) {
   const router = useRouter();
@@ -402,16 +387,6 @@ export default function NewsList(props) {
             }}
             onChange={handleChangeLanguage}
             options={langOptions}
-            /*[
-              {
-                value: 'vi',
-                label: 'Tiếng Việt',
-              },
-              {
-                value: 'en',
-                label: 'English',
-              },
-            ]*/
           />
         </div>
         <Search

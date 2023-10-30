@@ -1,7 +1,6 @@
 //'use server';
 import { db } from '@/config/db';
 import { QueryTypes, Op } from 'sequelize';
-import { redirect } from 'next/navigation';
 
 //get Status query from parameter post_status
 function getStatusQuery(post_status) {
@@ -21,7 +20,7 @@ function getSearchQuery(search) {
     ? ''
     : `AND (title LIKE '%${search}%' OR content LIKE '%${search}%' OR categories LIKE '%${search}%')`;
 }
-export const newsModel = {
+export const newsMHandle = {
   getAllNews,
   getTotalNumOfNews,
   trashNews,

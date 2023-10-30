@@ -1,14 +1,7 @@
 import { Button } from "antd";
-import { db } from "@/config/db";
-import { createSampleData } from "@/library/createSamples";
 
 const DashboardPage = async () => {
-  if( !db.initialized) {
-    await db.initialize();
-
-  }
-
-  //createSampleData();
+  // createSampleData();
 
   return (
     <div>

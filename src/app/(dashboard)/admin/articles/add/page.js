@@ -1,10 +1,12 @@
+import { getCategories } from "@/library/getArticles";
 import { ArticleForm } from "../_components/ArticleForm";
 
-const AddArticlePage = () => {
+const AddArticlePage = async () => {
+  const cate = await getCategories();
   return (
-    <div className="h-5/6 grid place-items-center ">
-      newssss
-      <ArticleForm />
+    <div className="">
+      Add new article
+      <ArticleForm cate={cate} />
     </div>
   );
 };

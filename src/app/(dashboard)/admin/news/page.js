@@ -9,6 +9,7 @@ import { db } from '@/config/db';
 export const dynamic = "force-dynamic";
 
 async function NewsPage({ searchParams }) {
+  if(!db.initialized) await db.initialize();
   const trash = searchParams?.trash ?? "";
   const keys = searchParams?.keys ?? "";
   const recover = searchParams?.recover ?? "";
@@ -27,16 +28,16 @@ async function NewsPage({ searchParams }) {
   // console.log('searchparams: ', searchParams);
 
   if (trash != '') {
-    await newsModel.trashNews(trash);
+    await newsMHandle.trashNews(trash);
   }
   if (keys != '') {
-    await newsModel.deleteBulkNews(keys, status);
+    await newsMHandle.deleteBulkNews(keys, status);
   }
   if (recover != '') {
-    await newsModel.recoverNews(recover);
+    await newsMHandle.recoverNews(recover);
   }
   if (del != '') {
-    await newsModel.deleteNews(del);
+    await newsMHandle.deleteNews(del);
   }
   if (Object.keys(searchParams).length == 0) {
     orderby = "post_modified";

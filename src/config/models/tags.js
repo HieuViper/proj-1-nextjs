@@ -15,7 +15,12 @@ export function tagsModel(sequelize) {
     },
     tag_code: {
       type: DataTypes.STRING(200),
-      defaultValue: "unknown",
+      allowNull: false,
+      validate: {
+        notNull: {
+            msg: 'You have to insert tag code',
+        }
+    },,
       comment: "code of tag",
     },
     description: {
@@ -28,9 +33,9 @@ export function tagsModel(sequelize) {
   };
 
   const options = {
-    updatedAt: "post_modified",
+    //updatedAt: "post_modified",
     tableName: "tags",
-    //timestamps: false,
+    timestamps: false,
     //indexes: [{ unique: true, fields: ['someUnique'] }],
   };
 

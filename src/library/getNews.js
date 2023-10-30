@@ -13,7 +13,6 @@ function getStatusQuery(post_status) {
       return `post_status='${post_status}'`;
   }
 }
-
 //get search query from search parameter
 function getSearchQuery(search) {
   return search == ""
@@ -241,14 +240,7 @@ export async function getNews(id) {
   }
 }
 
-export async function editNews(data, id) {
-  try {
-    const sqlquery = "UPDATE news SET ? WHERE id = ?";
-    await pool.query(sqlquery, [data, id]);
-  } catch (error) {
-    throw new Error("Fail to edit news");
-  }
-}
+
 
 // export async function editNews(data, id) {
 //   try {

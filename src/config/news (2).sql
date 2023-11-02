@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 02, 2023 at 05:14 AM
+-- Generation Time: Nov 02, 2023 at 05:22 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.1.17
 
@@ -27,6 +27,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `news`
 --
 
+DROP TABLE IF EXISTS `news`;
 CREATE TABLE `news` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `image` varchar(200) DEFAULT NULL COMMENT 'feature image of the post',

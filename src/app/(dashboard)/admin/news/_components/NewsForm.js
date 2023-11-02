@@ -18,12 +18,12 @@ export function NewsForm(props) {
   const searchParams = useSearchParams();
   const [form] = Form.useForm();
 
-  const [cate, setCate] = useState();
-  const [tags, setTags] = useState();
-  const [langTable, setLangTable] = useState();
-  const [postStatus, setPostStatus] = useState();
-  const [data, setData] = useState();
-  const [catTree, setCatTree] = useState();
+ // const [cate, setCate] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [langTable, setLangTable] = useState([]);
+  const [postStatus, setPostStatus] = useState('');
+  const [data, setData] = useState([]);
+  const [catTree, setCatTree] = useState([]);
 
   const authors = [{
     value: 'huy',
@@ -34,38 +34,7 @@ export function NewsForm(props) {
     label: 'Peter Cao',
   }];
 
-  function buildCategoryTree(categories, parent = null) {
-    const categoryTree = [];
 
-    for (const category of categories) {
-      if (category.parent === parent) {
-        const children = buildCategoryTree(categories, category.id);
-        if (children.length > 0) {
-          category.children = children;
-        }
-        categoryTree.push(category);
-      }
-    }
-
-    return categoryTree;
-  }
-  function notifyAddNewsSuccess() {
-    //get message redirected from add news route
-    if(searchParams.get('message')){
-      const message = searchParams.get('message') ?? '';
-      if( message == 1 ){ //signal of success edit on server
-        let messageNotify = 'Add news successfully';
-        toast.success(messageNotify, {
-          position: "top-center",
-        });
-      } else {  //signal of faillure on server
-        let messageNotify = `Cannot add new news, please try again or inform admin: ${message}`;
-        toast.success(messageNotify, {
-          position: "top-center",
-        });
-      }
-    }
-}
   //get the the title, content, excerpt from news data
   //property: name of the column  you want to get the value
   //lang: language of the content
@@ -84,21 +53,19 @@ export function NewsForm(props) {
 
 
   useEffect(() => {
-    const cate = JSON.parse(props.cate);
-    setCate(cate);
-    console.log('category:', cate);
-    const  catTree  = buildCategoryTree( cate );
-    setCatTree( catTree );
+    //const cate = (props.cate);
 
-    console.log('categoy tree:', catTree);
-    const tags = JSON.parse(props.tags);
-    setTags(tags);
+    //setCate( props.cate );
+    //const  catTree  = buildCategoryTree( cate );
+    setCatTree( buildCategoryTree( JSON.parse( props.cate )) );
+    //const tags = (props.tags);
+    setTags( JSON.parse(props.tags) );
     //get languages Table
-    const langTable = JSON.parse(props.langTable);
-    setLangTable(langTable); //set languageTable for news
+    //const langTable = (props.langTable);
+    setLangTable( JSON.parse(props.langTable) ); //set languageTable for news
     if (params?.id) {
       //get the news, newsdata is an array it's each row is a language's news
-      let newsData = JSON.parse(props.data);
+      let newsData = (props.data);
       //Build the data for title, excerpt, content
       let mainNewsContent = {};
 
@@ -120,6 +87,8 @@ export function NewsForm(props) {
       setPostStatus(data1.post_status);
       notifyAddNewsSuccess();
     }
+
+    console.log('effect');
 
   }, [props])
 
@@ -190,7 +159,16 @@ export function NewsForm(props) {
       }
       //adding news
       else {
-        await props.addNews(value, newsLangs);
+        await props.addNews(value, newsLangs).then(( message ) => {
+          console.log('message from server:', message);
+          if( message && message != 1) {
+            let messageNotify = 'Cannot update news, please try again or inform admin' + message;
+              toast.success(messageNotify, {
+                position: "top-center",
+              });
+          }
+        }
+        );
       }
   }
 
@@ -202,6 +180,24 @@ export function NewsForm(props) {
     console.log('>>> key tab ', key);
   }
 
+  //Notify success adding new from /admin/add
+  function notifyAddNewsSuccess() {
+    //get message redirected from add news route
+    if(searchParams.get('message')){
+      const message = searchParams.get('message') ?? '';
+      if( message == 1 ){ //signal of success edit on server
+        let messageNotify = 'Add news successfully';
+        toast.success(messageNotify, {
+          position: "top-center",
+        });
+      } else {  //signal of faillure on server
+        let messageNotify = `Cannot add new news, please try again or inform admin: ${message}`;
+        toast.success(messageNotify, {
+          position: "top-center",
+        });
+      }
+    }
+  }
   const onChangePosition = (checked) => {
     form.setFieldValue('news_position', checked);
   };
@@ -214,6 +210,20 @@ export function NewsForm(props) {
   }
   //Build category tree from category table
 
+  function buildCategoryTree(categories, parent = null) {
+    const categoryTree = [];
+
+    for (const category of categories) {
+      if (category.parent === parent) {
+        const children = buildCategoryTree(categories, category.id);
+        if (children.length > 0) {
+          category.children = children;
+        }
+        categoryTree.push(category);
+      }
+    }
+    return categoryTree;
+  }
 
   //render <option> for select box from category tree
   function renderCategoryOptions(category, level = 0) {
@@ -395,7 +405,7 @@ export function NewsForm(props) {
           name="news_position"
         >
           <Tooltip title="Can only be active when publishing the news">
-            <Switch  onChange={onChangePosition} />
+            <Switch onChange={onChangePosition} />
           </Tooltip>
         </Form.Item>
 
@@ -465,6 +475,7 @@ export function NewsForm(props) {
       <Form.Item
         name="publish"
         style={{ display: 'none' }} // Hide the field using CSS
+        valuePropName="checked"
         // or className="hidden-field" // Apply a CSS class to hide the field
       >
         <Switch />

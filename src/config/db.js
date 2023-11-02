@@ -97,22 +97,8 @@ async function initialize() {
   db.Tags.belongsToMany( db.Languages, { through: db.Tag_langs } );
   db.Languages.belongsToMany( db.Tags, { through: db.Tag_langs } );
   // sync all models with database
-  //await sequelize.sync({ alter: true });
+  await sequelize.sync({ alter: true });
 
   db.initialized = true;
   console.log("Initializing database is done");
 }
-
-/*
-import mysql from "serverless-mysql";
-
-export const pool = mysql({
-  config: {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
-    database: process.env.DB_DBNAME,
-  },
-});
-*/

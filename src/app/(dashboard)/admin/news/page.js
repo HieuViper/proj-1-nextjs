@@ -1,52 +1,51 @@
 /* eslint-disable @next/next/no-async-client-component */
 
 import { useRouter } from 'next/navigation';
-import NewsList from '@/components/NewsList';
-import { newsModel } from '@/library/getNews';
+import { newsMHandle } from '@/library/getNews';
 import { db } from '@/config/db';
+import NewsList from './_components/NewsList';
 
 // This part is important!
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 async function NewsPage({ searchParams }) {
-  if (!db.initialized) {
-    await db.initialize();
-  }
-  const trash = searchParams?.trash ?? '';
-  const keys = searchParams?.keys ?? '';
-  const recover = searchParams?.recover ?? '';
-  const del = searchParams?.del ?? '';
-  const status = searchParams?.status ?? '';
-  const search = searchParams?.search ?? '';
+   if(!db.initialized) await db.initialize();
+
+  const trash = searchParams?.trash ?? "";
+  const keys = searchParams?.keys ?? "";
+  const recover = searchParams?.recover ?? "";
+  const del = searchParams?.del ?? "";
+  const status = searchParams?.status ?? "";
+  const search = searchParams?.search ?? "";
   const page = searchParams?.page ?? 1;
   const size = searchParams?.size ?? process.env.PAGE_SIZE;
-  let orderby = searchParams?.orderby ?? '';
-  let order = searchParams?.order ?? '';
-  const author = searchParams?.author ?? '';
-  const category = searchParams?.category ?? '';
-  const tag = searchParams?.tag ?? '';
+  let orderby = searchParams?.orderby ?? "";
+  let order = searchParams?.order ?? "";
+  const author = searchParams?.author ?? "";
+  const category = searchParams?.category ?? "";
+  const tag = searchParams?.tag ?? "";
   const lang = searchParams?.lang ?? process.env.DEFAULT_LANGUAGE;
 
-  console.log('searchparams: ', searchParams);
+  // console.log('searchparams: ', searchParams);
 
   if (trash != '') {
-    await newsModel.trashNews(trash);
+    await newsMHandle.trashNews(trash);
   }
   if (keys != '') {
-    await newsModel.deleteBulkNews(keys, status);
+    await newsMHandle.deleteBulkNews(keys, status);
   }
   if (recover != '') {
-    await newsModel.recoverNews(recover);
+    await newsMHandle.recoverNews(recover);
   }
   if (del != '') {
-    await newsModel.deleteNews(del);
+    await newsMHandle.deleteNews(del);
   }
   if (Object.keys(searchParams).length == 0) {
-    orderby = 'post_modified';
-    order = 'desc';
+    orderby = "post_modified";
+    order = "desc";
   }
-
-  const newsData = await newsModel.getAllNews(
+console.log('news list page');
+  const newsData = await newsMHandle.getAllNews(
     status,
     page,
     size,
@@ -58,7 +57,7 @@ async function NewsPage({ searchParams }) {
     tag,
     lang
   );
-  const totals = await newsModel.getTotalNumOfNews(
+  const totals = await newsMHandle.getTotalNumOfNews(
     status,
     search,
     author,
@@ -71,13 +70,14 @@ async function NewsPage({ searchParams }) {
     total: totals.itemsOfTable,
     current: parseInt(page),
   };
-
+  const langTable = await newsMHandle.getLanguages();
   return (
     <>
       <NewsList
         dataTable={JSON.stringify(newsData)}
         pagination={pagination}
         totals={totals}
+        langTable={JSON.stringify(langTable)}
       />
       ;
     </>

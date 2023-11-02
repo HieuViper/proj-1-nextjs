@@ -1,12 +1,12 @@
 //'use server';
 import { db } from '@/config/db';
 import { QueryTypes, Op } from 'sequelize';
-import { redirect } from 'next/navigation';
+
 
 //get Status query from parameter post_status
 function getStatusQuery(post_status) {
   switch (post_status) {
-    case '':
+    case "":
       return `post_status!='${process.env.POST_STATUS_TRASH}'`;
     case process.env.POST_STATUS_PRIORITY:
       return `news_position=1`;
@@ -14,14 +14,13 @@ function getStatusQuery(post_status) {
       return `post_status='${post_status}'`;
   }
 }
-
 //get search query from search parameter
 function getSearchQuery(search) {
-  return search == ''
-    ? ''
+  return search == ""
+    ? ""
     : `AND (title LIKE '%${search}%' OR content LIKE '%${search}%' OR categories LIKE '%${search}%')`;
 }
-export const newsModel = {
+export const newsMHandle = {
   getAllNews,
   getTotalNumOfNews,
   trashNews,
@@ -29,9 +28,13 @@ export const newsModel = {
   recoverNews,
   deleteNews,
   getNews,
-  editNews,
-  addNews,
+  // editNews,
+  // addNews,
   getCategories,
+  getTags,
+  getLanguages,
+  updateANews,
+  addANews,
 };
 //GetNews for tab "All,published, trash"
 export async function getAllNews(
@@ -48,20 +51,22 @@ export async function getAllNews(
 ) {
   try {
     const fromNews = (page - 1) * size; //determine the beginning news
-    const authorQuery = author == '' ? '' : `AND post_author='${author}'`;
+    const authorQuery = author == "" ? "" : `AND post_author='${author}'`;
     const catQuery =
-      category == '' ? '' : `AND categories LIKE '%${category}%'`;
-    const tagQuery = tag == '' ? '' : `AND tags like '%${tag}%'`;
+      category == "" ? "" : `AND categories LIKE '%${category}%'`;
+    const tagQuery = tag == "" ? "" : `AND tags like '%${tag}%'`;
     const statusQuery = getStatusQuery(post_status);
     const searchQuery = getSearchQuery(search);
-    const orderQuery = orderby == '' ? '' : `ORDER BY ${orderby} ${order}`;
+    const orderQuery = orderby == "" ? "" : `ORDER BY ${orderby} ${order}`;
 
     let sqlquery = `SELECT * FROM news_all WHERE (${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}) ${orderQuery} LIMIT ${fromNews}, ${size}`;
 
     const results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+
     return results;
   } catch (error) {
-    throw new Error('Fail to get news from database' + error.message);
+
+    throw new Error("Fail to get news from database" + error.message);
   }
 }
 
@@ -87,17 +92,18 @@ export async function getTotalNumOfNews(
     //get total number of news in the return news table
     const statusQuery = getStatusQuery(post_status);
     const searchQuery = getSearchQuery(search);
-    const authorQuery = author == '' ? '' : `AND post_author='${author}'`;
+    const authorQuery = author == "" ? "" : `AND post_author='${author}'`;
     const catQuery =
-      category == '' ? '' : `AND categories LIKE '%${category}%'`;
-    const tagQuery = tag == '' ? '' : `AND tags like '%${tag}%'`;
+      category == "" ? "" : `AND categories LIKE '%${category}%'`;
+    const tagQuery = tag == "" ? "" : `AND tags like '%${tag}%'`;
 
     let sqlquery = `SELECT count(*) AS total FROM news_all WHERE ${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}`;
     //let results = await pool.query(sqlquery, [post_type]);
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.itemsOfTable = results[0].total;
   } catch (error) {
-    throw new Error('cannot get items Of Table:' + error.message);
+
+    throw new Error("cannot get items Of Table:" + error.message);
   }
   try {
     //get total number of news in All Status
@@ -106,7 +112,8 @@ export async function getTotalNumOfNews(
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.all = results[0].total;
   } catch (error) {
-    throw new Error('cannot get number of news in All Tab:' + error.message);
+
+    throw new Error("cannot get number of news in All Tab:" + error.message);
   }
   try {
     //get total number of news in draft status
@@ -114,8 +121,9 @@ export async function getTotalNumOfNews(
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.draft = results[0].total;
   } catch (error) {
+
     throw new Error(
-      'Cannot get total of news in Draft status:' + error.message
+      "Cannot get total of news in Draft status:" + error.message
     );
   }
   try {
@@ -124,8 +132,9 @@ export async function getTotalNumOfNews(
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.publish = results[0].total;
   } catch (error) {
+
     throw new Error(
-      'Cannot get total of news in published status:' + error.message
+      "Cannot get total of news in published status:" + error.message
     );
   }
   try {
@@ -135,7 +144,7 @@ export async function getTotalNumOfNews(
     totals.trash = results[0].total;
   } catch (error) {
     throw new Error(
-      'Cannot get total of news in trash status: ' + error.message
+      "Cannot get total of news in trash status: " + error.message
     );
   }
   try {
@@ -146,8 +155,9 @@ export async function getTotalNumOfNews(
 
     return totals;
   } catch (error) {
+
     throw new Error(
-      'Cannot get total of news in priority status:' + error.message
+      "Cannot get total of news in priority status:" + error.message
     );
   }
 }
@@ -163,15 +173,16 @@ export async function trashNews(key) {
         },
       }
     );
+
   } catch (error) {
-    throw new Error('Fail to move news to trash bin');
+    throw new Error("Fail to move news to trash bin");
   }
 }
 
 //Delete bulk of news, articles based on newsid
 export async function deleteBulkNews(keys, status) {
   try {
-    const keysArr = keys.split(',');
+    const keysArr = keys.split(",");
     if (status != process.env.POST_STATUS_TRASH)
       await db.News.update(
         { post_status: process.env.POST_STATUS_TRASH },
@@ -191,9 +202,10 @@ export async function deleteBulkNews(keys, status) {
           },
         },
       });
+
   } catch (error) {
     console.log(error);
-    throw new Error('Fail to delete news');
+    throw new Error("Fail to delete news");
   }
 }
 
@@ -208,8 +220,7 @@ export async function recoverNews(key) {
         },
       }
     );
-    // const sqlquery = `UPDATE news SET post_status='${process.env.POST_STATUS_DRAFT}' WHERE id = ?`;
-    // await pool.query(sqlquery, [key]);
+
   } catch (error) {
     throw new Error(`Fail to recover news id = ${key}`);
   }
@@ -233,44 +244,129 @@ export async function deleteNews(key) {
 
 export async function getNews(id) {
   try {
-    const result = await db.News.findOne({ where: { id } });
 
-    // const sqlquery = 'SELECT * FROM news WHERE id = ?';
-    // const result = await pool.query(sqlquery, [id]);
+    const sqlquery = `SELECT * FROM news_all WHERE id=${id}`;
+    const result = await db.seq.query(sqlquery, {type: QueryTypes.SELECT});
     return result;
   } catch (error) {
-    throw new Error('Fail to get news');
-  }
-}
-export async function editNews(data, id) {
-  try {
-    const sqlquery = 'UPDATE news SET ? WHERE id = ?';
-    await pool.query(sqlquery, [data, id]);
-  } catch (error) {
-    throw new Error('Fail to edit news');
+    throw new Error("Fail to get news:", error.message );
   }
 }
 
-export async function addNews(data) {
-  try {
-    const sqlquery = 'INSERT INTO news SET ?';
-    const result = await pool.query(sqlquery, data);
-    if (result.insertId) {
-      redirect(`/admin/news/edit/${result.insertId}`);
-    }
-    // return result
-  } catch (error) {
-    throw new Error('Fail to add news');
-  }
-}
 
-export async function getCategories() {
+//get all Categories
+export async function getCategories( lang ) {
   try {
-    const sqlquery = 'SELECT * FROM categories';
-    const results = await db.News_categories.findAll();
+    let strquery;
+    if( lang )
+      strquery = `SELECT * FROM news_cat_all WHERE languageCode='${lang}'`;
+    else
+      strquery = 'SELECT * FROM news_cat_all';
+    const results = await db.seq.query( strquery, { type: QueryTypes.SELECT });
     return results;
   } catch (error) {
-    console.log(error);
-    throw new Error('Fail to get categories');
+    throw new Error('Fail to get categories: ' + error.message);
+  }
+}
+//get all tags
+export async function getTags(lang) {
+  try {
+    let strquery;
+    if( lang )
+      strquery = `SELECT * FROM tags_all WHERE languageCode='${lang}'`;
+    else
+      strquery = 'SELECT * FROM tags_all';
+    const results = await db.seq.query( strquery, { type: QueryTypes.SELECT });
+    return results;
+  } catch (error) {
+    throw new Error('Fail to get Tags: ' + error.message);
+  }
+}
+
+export async function getLanguages() {
+  //console.log('db in language:', db);
+  try {
+    const results = await db.Languages.findAll({
+      order: db.seq.literal(`code='${process.env.DEFAULT_LANGUAGE}' DESC`),
+    });
+    return results;
+  } catch (error) {
+    throw new Error('Fail to get languages: ' + error.message);
+  }
+}
+
+//Update new information of a News from Edit form
+//parameter: data: contain updated value for news Table
+//           newsLangs: contain updated value for news_languages Table
+//           id:  contain id of the news that need to be updated
+export async function updateANews(data, newsLangs, id) {
+  const t = await db.seq.transaction();
+  try{
+    //update into news Table
+    const currentLoginUser = 'huy'; //we add information of modifier huy
+    data = {...data, modified_by: currentLoginUser};
+    if(data.post_date)
+      data.post_date = db.seq.literal('now()');   //user has press publish button, set time for post_date
+    console.log('data :', data);
+    await db.News.update(
+       data ,
+      {
+        where: {
+          id: id,
+        },
+        transaction: t,
+      },
+    );
+      //update into news_languages Table
+    for (const element of newsLangs) {
+      console.log('element:', element);
+      const { languageCode, newsId, ...newsLangRow } = element;
+      await db.News_languages.update(
+        newsLangRow,
+        {
+          where: {
+            [Op.and]: [
+              { newsId: id },
+              { languageCode: languageCode }
+            ]
+          },
+          transaction: t,
+        }
+      );
+    }
+
+    await t.commit();
+  } catch(error) {
+    await t.rollback();
+    throw new Error('Cannot update news:' + error.message);
+  }
+}
+
+
+
+//Add a new News from Add form
+//parameter: data: contain updated value for news Table
+//           newsLangs: contain updated value for news_languages Table
+export async function addANews(data, newsLangs){
+  const t = await db.seq.transaction();
+  try{
+    //update into news Table
+    const currentLoginUser = 'huy'; //we add information of modifier huy
+    if(data.post_date)
+      data.post_date = db.seq.literal('now()');   //user has press publish button, set time for post_date
+    console.log('data :', data);
+    const news = await db.News.create( data, { transaction: t } );
+      //add newsId property to the newsLangs
+    for( const element of newsLangs ){
+      element.newsId = news.id;
+    }
+      //create records in news_languages Table
+    await db.News_languages.bulkCreate( newsLangs, { validate: true, transaction: t } );
+
+    await t.commit();
+    return news.id;
+  } catch(error) {
+    await t.rollback();
+    throw new Error('Cannot create news:' + error.message);
   }
 }

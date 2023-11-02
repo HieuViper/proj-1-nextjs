@@ -17,7 +17,7 @@ export default function NewsList(props) {
   const router = useRouter();
   const pathName = usePathname();
   const searchParams = useSearchParams();
-  console.log('search', searchParams.get('status'));
+  // console.log('search', searchParams.get('status'));
 
   console.log('orderParaDefaultsdasd :');
   let orderParaDefault = '';
@@ -26,7 +26,7 @@ export default function NewsList(props) {
     order: "descend",
     columnKey: "date",
   };
-  const [paginationServer, setPagination] = useState({
+  const [paginationServer, setPaginationServer] = useState({
     pageSize: 10,
     total: 0,
     current: 1,
@@ -58,7 +58,7 @@ export default function NewsList(props) {
     const langData = JSON.parse(props.langTable);
     setLangTable(langData);
     setNews(newsData);
-    setPagination(props.pagination);
+    setPaginationServer(props.pagination);
     setTotals(props.totals);
     setSelectedRowKeys([]);
     setLoadingStatus(false);
@@ -69,7 +69,7 @@ export default function NewsList(props) {
     setSearch(e.target.value);
   };
   const onSelectChange = (newSelectedRowKeys) => {
-    console.log("selectedRowKeys changed: ", newSelectedRowKeys);
+    // console.log("selectedRowKeys changed: ", newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
   };
   const rowSelection = {
@@ -106,7 +106,7 @@ export default function NewsList(props) {
 
   const handleSearch = async (value) => {
     //set state sorter to init state, that means sort follow the date column
-
+    setSearch(value)
     const orderPara = orderParaInit;
     router.push(
       `${pathName}?status=${status}&lang=${lang}&size=${paginationServer.pageSize}&search=${value}${orderPara}`
@@ -208,6 +208,7 @@ export default function NewsList(props) {
 
 
   const handleChange = (pagination, filters, sorter) => {
+    setLoadingStatus(true)
     setSortedInfo(sorter);
     const orderPara = getOrderPara(sorter, status, true);
     router.push(
@@ -240,7 +241,6 @@ export default function NewsList(props) {
       sorter: () => { },
       sortOrder: sortedInfo.columnKey === 'title' ? sortedInfo.order : null,
       render: (_, record) => {
-        console.log('record :', record);
         //let orderPara = orderParaDefault;
         return (
           <>
@@ -410,9 +410,9 @@ export default function NewsList(props) {
       <div className="flex justify-between mb-4 gap-x-4">
         <div className="flex gap-x-5">
           <p className="font-semibold text-xl pr-4">News</p>
-          <Button className="">
-            <Link href={`/admin/news/add`}>Add News</Link>
-          </Button>
+
+          <Link href={`/admin/news/add`}><Button >Add News </Button></Link>
+
           <Select
             defaultValue={process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE}
             value={lang}
@@ -435,8 +435,8 @@ export default function NewsList(props) {
         </div>
         <Search
           placeholder="input search text"
-          value={search}
-          onChange={(e) => onSearchChange(e)}
+          // value={search}
+          // onChange={(e) => onSearchChange(e)}
           onSearch={(e) => handleSearch(e)}
           enterButton
           style={{
@@ -496,11 +496,12 @@ export default function NewsList(props) {
         dataSource={news}
         rowKey="id"
         onChange={handleChange}
-        pagination={paginationServer}
+        pagination={{ ...paginationServer, disabled: loadingStatus }}
         // bordered={true}
         scroll={{
           x: 1300,
         }}
+
       />
     </>
   );

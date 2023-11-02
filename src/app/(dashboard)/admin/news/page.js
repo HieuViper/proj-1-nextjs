@@ -9,7 +9,7 @@ import NewsList from './_components/NewsList';
 export const dynamic = "force-dynamic";
 
 async function NewsPage({ searchParams }) {
-   if(!db.initialized) await db.initialize();
+  if (!db.initialized) await db.initialize();
 
   const trash = searchParams?.trash ?? "";
   const keys = searchParams?.keys ?? "";
@@ -44,7 +44,7 @@ async function NewsPage({ searchParams }) {
     orderby = "post_modified";
     order = "desc";
   }
-console.log('news list page');
+  console.log('news list page');
   const newsData = await newsMHandle.getAllNews(
     status,
     page,
@@ -69,6 +69,7 @@ console.log('news list page');
     pageSize: parseInt(size),
     total: totals.itemsOfTable,
     current: parseInt(page),
+    // disabled: true
   };
   const langTable = await newsMHandle.getLanguages();
   return (

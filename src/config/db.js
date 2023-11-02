@@ -50,14 +50,15 @@ async function initialize() {
     process.env.DB_DBNAME,
     process.env.DB_USER,
     process.env.DB_PASSWORD,
-    { host: process.env.DB_HOST, dialect: process.env.DB_DIALECT, pool: {
-      max: 5,
-      min: 0,
-      acquire: 30000,
-      idle: 10000
+    {
+      host: process.env.DB_HOST, dialect: process.env.DB_DIALECT, pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+      },
+      timezone: '+07:00',
     },
-    timezone: '+07:00',
-   },
 
   );
 
@@ -94,10 +95,10 @@ async function initialize() {
   db.Languages.belongsToMany(db.News_categories, {
     through: db.News_cate_langs,
   });
-  db.Tags.belongsToMany( db.Languages, { through: db.Tag_langs } );
-  db.Languages.belongsToMany( db.Tags, { through: db.Tag_langs } );
+  db.Tags.belongsToMany(db.Languages, { through: db.Tag_langs });
+  db.Languages.belongsToMany(db.Tags, { through: db.Tag_langs });
   // sync all models with database
-  await sequelize.sync({ alter: true });
+  // await sequelize.sync({ alter: true });
 
   db.initialized = true;
   console.log("Initializing database is done");

@@ -4,6 +4,7 @@ const nextConfig = {
         serverComponentsExternalPackages: ['sequelize'],
         serverActions: true,
       },
+      reactStrictMode: false
 }
 
 module.exports = nextConfig

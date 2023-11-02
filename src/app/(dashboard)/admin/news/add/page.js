@@ -21,7 +21,11 @@ async function AddNews() {
         message = `Fail to add a news, try again or inform your admin: ${error.message}`;
     }
     console.log('id:', id);
-    id && redirect(`/admin/news/edit/${id}?message=${message}`);
+    if(id){
+      redirect(`/admin/news/edit/${id}?message=${message}`);
+    }
+
+    return message;
   }
   const cate = await newsMHandle.getCategories( process.env.DEFAULT_LANGUAGE );
   const tags = await newsMHandle.getTags( process.env.DEFAULT_LANGUAGE) ;
@@ -29,7 +33,7 @@ async function AddNews() {
   return (
     <div className="">
       <h1>Add new News</h1>
-      <NewsForm cate = { JSON.stringify( cate ) }
+      <NewsForm cate = { JSON.stringify(cate) }
                 tags = { JSON.stringify( tags ) }
                 langTable = { JSON.stringify( langTable ) }
                 {...{ addNews }}

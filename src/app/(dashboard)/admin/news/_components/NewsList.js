@@ -39,8 +39,7 @@ export default function NewsList(props) {
   });
   const [sortedInfo, setSortedInfo] = useState(initSort);
   const [news, setNews] = useState();
-  const [langTable, setLangTable] = useState([]);
-  const [lang, setLang] = useState('vi');
+  const [langTable, setLangTable] = useState([])
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
@@ -50,6 +49,8 @@ export default function NewsList(props) {
   const [tag, setTag] = useState("");
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [lang, setLang] = useState("vi");
+
+
 
   useEffect(() => {
     const newsData = JSON.parse(props.dataTable);
@@ -171,28 +172,9 @@ export default function NewsList(props) {
     setTag(tag1);
   };
 
-  const handleChange = (pagination, filters, sorter) => {
-    setSortedInfo(sorter);
-    const orderPara = getOrderPara(sorter, status, true);
-    router.push(
-      `${pathName}?page=${pagination.current}&size=${pagination.pageSize}&status=${status}&lang=${lang}&author=${author}&category=${category}&tag=${tag}&search=${search}${orderPara}`
-    );
-  };
 
-  const handleChangeLanguage = (langValue) => {
-    setSortedInfo(initSort);
-    const orderPara = orderParaInit;
-    router.push(
-      `${pathName}?status=${status}&size=${paginationServer.pageSize}${orderPara}&lang=${langValue}`
-    );
-    //reset the other filters
 
-    setSearch('');
-    setAuthor('');
-    setCategory('');
-    setTag('');
-    setLang(langValue);
-  };
+
 
   //getOrderParameter for URL
   //parameter: sorter: sort state of the table
@@ -223,7 +205,7 @@ export default function NewsList(props) {
   });
 
 
-  const handleChange = (pagination, filters, sorter) => {
+const handleChange = (pagination, filters, sorter) => {
     setSortedInfo(sorter);
     const orderPara = getOrderPara(sorter, status, true);
     router.push(
@@ -237,7 +219,7 @@ export default function NewsList(props) {
     router.push(
       `${pathName}?status=${status}&size=${paginationServer.pageSize}${orderPara}&lang=${langValue}`
     );
-    //reset the other filters
+   //reset the other filters
 
     setSearch("");
     setAuthor("");
@@ -419,12 +401,12 @@ export default function NewsList(props) {
             options={langOptions}
             /*[
               {
-                value: "vi",
-                label: "Tiếng Việt",
+                value: 'vi',
+                label: 'Tiếng Việt',
               },
               {
-                value: "en",
-                label: "English",
+                value: 'en',
+                label: 'English',
               },
             ]*/
           />

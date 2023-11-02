@@ -1,12 +1,16 @@
 /* eslint-disable @next/next/no-async-client-component */
 
-import NewsList from "@/components/NewsList";
-import { newsModel } from "@/library/getNews";
+import { useRouter } from 'next/navigation';
+import { newsMHandle } from '@/library/getNews';
+import { db } from '@/config/db';
+import NewsList from './_components/NewsList';
 
 // This part is important!
 export const dynamic = "force-dynamic";
 
 async function NewsPage({ searchParams }) {
+   if(!db.initialized) await db.initialize();
+
   const trash = searchParams?.trash ?? "";
   const keys = searchParams?.keys ?? "";
   const recover = searchParams?.recover ?? "";
@@ -24,24 +28,24 @@ async function NewsPage({ searchParams }) {
 
   // console.log('searchparams: ', searchParams);
 
-  if (trash != "") {
-    await newsModel.trashNews(trash);
+  if (trash != '') {
+    await newsMHandle.trashNews(trash);
   }
-  if (keys != "") {
-    await newsModel.deleteBulkNews(keys, status);
+  if (keys != '') {
+    await newsMHandle.deleteBulkNews(keys, status);
   }
-  if (recover != "") {
-    await newsModel.recoverNews(recover);
+  if (recover != '') {
+    await newsMHandle.recoverNews(recover);
   }
-  if (del != "") {
-    await newsModel.deleteNews(del);
+  if (del != '') {
+    await newsMHandle.deleteNews(del);
   }
   if (Object.keys(searchParams).length == 0) {
     orderby = "post_modified";
     order = "desc";
   }
-
-  const newsData = await newsModel.getAllNews(
+console.log('news list page');
+  const newsData = await newsMHandle.getAllNews(
     status,
     page,
     size,
@@ -53,7 +57,7 @@ async function NewsPage({ searchParams }) {
     tag,
     lang
   );
-  const totals = await newsModel.getTotalNumOfNews(
+  const totals = await newsMHandle.getTotalNumOfNews(
     status,
     search,
     author,
@@ -66,7 +70,7 @@ async function NewsPage({ searchParams }) {
     total: totals.itemsOfTable,
     current: parseInt(page),
   };
-  const langTable = await newsModel.getLanguages();
+  const langTable = await newsMHandle.getLanguages();
   return (
     <>
       <NewsList

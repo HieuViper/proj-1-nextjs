@@ -28,7 +28,7 @@ export function tagsModel(sequelize) {
   };
 
   const options = {
-    updatedAt: "post_modified",
+    updatedAt: "tag_modified",
     tableName: "tags",
     //timestamps: false,
     //indexes: [{ unique: true, fields: ['someUnique'] }],

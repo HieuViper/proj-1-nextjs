@@ -40,7 +40,6 @@ export default function NewsList(props) {
   const [sortedInfo, setSortedInfo] = useState(initSort);
   const [news, setNews] = useState();
   const [langTable, setLangTable] = useState([]);
-  const [lang, setLang] = useState('vi');
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
@@ -171,29 +170,6 @@ export default function NewsList(props) {
     setTag(tag1);
   };
 
-  const handleChange = (pagination, filters, sorter) => {
-    setSortedInfo(sorter);
-    const orderPara = getOrderPara(sorter, status, true);
-    router.push(
-      `${pathName}?page=${pagination.current}&size=${pagination.pageSize}&status=${status}&lang=${lang}&author=${author}&category=${category}&tag=${tag}&search=${search}${orderPara}`
-    );
-  };
-
-  const handleChangeLanguage = (langValue) => {
-    setSortedInfo(initSort);
-    const orderPara = orderParaInit;
-    router.push(
-      `${pathName}?status=${status}&size=${paginationServer.pageSize}${orderPara}&lang=${langValue}`
-    );
-    //reset the other filters
-
-    setSearch('');
-    setAuthor('');
-    setCategory('');
-    setTag('');
-    setLang(langValue);
-  };
-
   //getOrderParameter for URL
   //parameter: sorter: sort state of the table
   //statusPara: status of table: publish, draft, trash, priority
@@ -218,10 +194,9 @@ export default function NewsList(props) {
   orderParaDefault = getOrderPara(sortedInfo, status, true);
   orderParaInit = getOrderPara(initSort, status, true);
   //set languages for the languages select box
-  let langOptions = langTable.map( (lang) => {
+  let langOptions = langTable.map((lang) => {
     return { value: lang.code, label: lang.name };
   });
-
 
   const handleChange = (pagination, filters, sorter) => {
     setSortedInfo(sorter);

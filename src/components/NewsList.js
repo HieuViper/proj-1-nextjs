@@ -27,6 +27,9 @@ export default function NewsList(props) {
   const router = useRouter();
   const pathName = usePathname();
   const searchParams = useSearchParams();
+  console.log('search', searchParams.get('status'));
+
+  console.log('orderParaDefaultsdasd :');
   let orderParaDefault = '';
   let orderParaInit = '';
   const initSort = {
@@ -51,13 +54,13 @@ export default function NewsList(props) {
   const [news, setNews] = useState();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState(searchParams.get('status') ?? '');
   const [search, setSearch] = useState('');
   const [author, setAuthor] = useState('');
   const [category, setCategory] = useState('');
   const [tag, setTag] = useState('');
   const [loadingStatus, setLoadingStatus] = useState(false);
-  const [lang, setLang] = useState('vi');
+  const [lang, setLang] = useState(process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE);
 
   useEffect(() => {
     const newsData = JSON.parse(props.dataTable);
@@ -66,6 +69,7 @@ export default function NewsList(props) {
     setTotals(props.totals);
     setSelectedRowKeys([]);
     setLoadingStatus(false);
+    // setStatus(searchParams.get('status') ?? '')
   }, [props]);
 
   const onSearchChange = (e) => {
@@ -164,17 +168,17 @@ export default function NewsList(props) {
     setCategory(cat);
   };
 
-  const handleTagFilter = (tag1) => {
+  const handleTagFilter = (tag) => {
     const orderPara = orderParaInit;
     router.push(
-      `${pathName}?status=${status}&lang=${lang}&size=${paginationServer.pageSize}&tag=${tag1}${orderPara}`
+      `${pathName}?status=${status}&lang=${lang}&size=${paginationServer.pageSize}&tag=${tag}${orderPara}`
     );
     //reset the other filters
     setSortedInfo(initSort);
     setSearch('');
     setAuthor('');
     setCategory('');
-    setTag(tag1);
+    setTag(tag);
   };
 
   //getOrderParameter for URL
@@ -230,14 +234,19 @@ export default function NewsList(props) {
       title: 'Title',
       dataIndex: 'title',
       key: 'title',
-      sorter: () => {},
+      fixed: 'left',
+      sorter: () => { },
       sortOrder: sortedInfo.columnKey === 'title' ? sortedInfo.order : null,
       render: (_, record) => {
+        console.log('record :', record);
         //let orderPara = orderParaDefault;
-        //console.log('title render');
         return (
           <>
-            <div className="text-base font-medium pb-2">{record.title}</div>
+            <div className="text-base font-medium pb-2">
+              {record.title}
+              {record.post_status == "draft" && searchParams.get('status') == '' && <span className='text-xs'> (Draft)</span>}
+              {record.news_position == 1 && searchParams.get('status') == '' && <span className='text-xs'> (Sticky)</span>}
+            </div>
             <div className="flex gap-2">
               {record.post_status !== process.env.NEXT_PUBLIC_PS_TRASH ? (
                 <>
@@ -294,6 +303,7 @@ export default function NewsList(props) {
       title: 'Post Author',
       dataIndex: 'post_author',
       key: 'post_author',
+      width: 100,
       render: (_, record) => {
         return (
           <a href="#" onClick={() => handleAuthorFilter(record.post_author)}>
@@ -306,20 +316,19 @@ export default function NewsList(props) {
       title: 'Categories',
       dataIndex: 'categories',
       key: 'categories',
-      width: 300,
+      width: 200,
       render: (_, record) => {
         const categories = record.categories
           ? record.categories.split(',').map((cat) => cat.trim())
           : [];
         return (
           <>
-            {categories.map((cat1, index) => (
-              <div key={index}>
-                <a href="#" onClick={() => handleCategoryFilter(cat1)}>
-                  {cat1}
-                </a>
-                {index < categories.length - 1 && ', '}
-              </div>
+            {categories.map((cat, index) => (
+              <a href="#" onClick={() => handleCategoryFilter(cat)} key={index}>
+                <Tag color='green' style={{ marginBottom: '4px' }}>
+                  {cat}
+                </Tag>
+              </a>
             ))}
           </>
         );
@@ -329,6 +338,7 @@ export default function NewsList(props) {
       title: 'Tags',
       dataIndex: 'tags',
       key: 'tags',
+      width: 200,
       render: (_, record) => {
         const tags = record.tags
           ? record.tags.split(',').map((cat) => cat.trim())
@@ -336,23 +346,37 @@ export default function NewsList(props) {
 
         return (
           <>
-            {tags.map((tag1, index) => (
-              <div key={index}>
-                <a href="#" onClick={() => handleTagFilter(tag1)}>
-                  {tag1}
-                </a>
-                {index < tags.length - 1 && ', '}
-              </div>
+            {tags.map((tag, index) => (
+              <a href="#" onClick={() => handleTagFilter(tag)} key={index}>
+                <Tag color='blue' style={{ marginBottom: '4px' }}>
+                  {tag}
+                </Tag>
+              </a>
             ))}
           </>
         );
       },
     },
     {
+      title: 'Short',
+      dataIndex: 'excerpt',
+      key: 'excerpt',
+      render: (_, record) => {
+        return (
+          <div>
+            {record.excerpt}
+          </div>
+        );
+      },
+    },
+
+    {
       title: 'Date',
       dataIndex: 'post_modified',
       key: 'date',
-      sorter: () => {},
+      fixed: 'right',
+      width: 200,
+      sorter: () => { },
       sortOrder: sortedInfo.columnKey === 'date' ? sortedInfo.order : null,
       render: (_, record) => {
         return (
@@ -388,7 +412,7 @@ export default function NewsList(props) {
             <Link href={`/admin/news/add`}>Add News</Link>
           </Button>
           <Select
-            defaultValue="vi"
+            defaultValue={process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE}
             value={lang}
             style={{
               width: 120,
@@ -439,15 +463,15 @@ export default function NewsList(props) {
         <Space>
           <Radio.Group
             disabled={loadingStatus}
-            defaultValue={''}
+            defaultValue={searchParams.get('status') ?? ''}
             onChange={(e) => {
               handlePostStatus(e.target.value), setLoadingStatus(true);
             }}
             optionType="button"
             buttonStyle="solid"
           >
-            <Radio.Button value="">All ({totals.all})</Radio.Button>
-            <Radio.Button value={process.env.NEXT_PUBLIC_PS_DRAFT}>
+            <Radio.Button value="" >All ({totals.all})</Radio.Button>
+            <Radio.Button value={process.env.NEXT_PUBLIC_PS_DRAFT} >
               Draft({totals.draft})
             </Radio.Button>
             <Radio.Button value={process.env.NEXT_PUBLIC_PS_PUBLISH}>
@@ -471,6 +495,9 @@ export default function NewsList(props) {
         onChange={handleChange}
         pagination={paginationServer}
         // bordered={true}
+        scroll={{
+          x: 1300,
+        }}
       />
     </>
   );

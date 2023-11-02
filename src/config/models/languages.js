@@ -33,6 +33,11 @@ export function languagesModel(sequelize) {
             allowNull: true,
             comment: 'Short Description',
         },
+        active: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true,
+            comment: 'Active language',
+        },
     };
 
     const options = {

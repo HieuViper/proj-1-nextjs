@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Oct 25, 2023 at 09:54 AM
+-- Generation Time: Nov 02, 2023 at 05:26 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.1.17
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `nextdb`
 --
+CREATE DATABASE IF NOT EXISTS `nextdb` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `nextdb`;
 
 -- --------------------------------------------------------
 
@@ -27,6 +29,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `articles`
 --
 
+DROP TABLE IF EXISTS `articles`;
 CREATE TABLE `articles` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `image` varchar(200) DEFAULT NULL COMMENT 'feature image of the post',
@@ -156,6 +159,7 @@ INSERT INTO `articles` (`id`, `image`, `categories`, `post_author`, `post_date`,
 -- Stand-in structure for view `articles_all`
 -- (See below for the actual view)
 --
+DROP VIEW IF EXISTS `articles_all`;
 CREATE TABLE `articles_all` (
 `id` bigint(20) unsigned
 ,`image` varchar(200)
@@ -184,6 +188,7 @@ CREATE TABLE `articles_all` (
 -- Table structure for table `article_categories`
 --
 
+DROP TABLE IF EXISTS `article_categories`;
 CREATE TABLE `article_categories` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `category_code` varchar(200) DEFAULT ''
@@ -195,6 +200,7 @@ CREATE TABLE `article_categories` (
 -- Table structure for table `article_cate_langs`
 --
 
+DROP TABLE IF EXISTS `article_cate_langs`;
 CREATE TABLE `article_cate_langs` (
   `name` varchar(200) DEFAULT 'undefined',
   `description` longtext DEFAULT NULL COMMENT 'Description',
@@ -208,6 +214,7 @@ CREATE TABLE `article_cate_langs` (
 -- Stand-in structure for view `article_cat_all`
 -- (See below for the actual view)
 --
+DROP VIEW IF EXISTS `article_cat_all`;
 CREATE TABLE `article_cat_all` (
 `id` bigint(20) unsigned
 ,`category_code` varchar(200)
@@ -223,6 +230,7 @@ CREATE TABLE `article_cat_all` (
 -- Table structure for table `article_languages`
 --
 
+DROP TABLE IF EXISTS `article_languages`;
 CREATE TABLE `article_languages` (
   `title` varchar(300) DEFAULT 'undefined' COMMENT 'Title can be null',
   `excerpt` text DEFAULT NULL COMMENT 'Short Description',
@@ -443,19 +451,21 @@ INSERT INTO `article_languages` (`title`, `excerpt`, `content`, `articleId`, `la
 -- Table structure for table `languages`
 --
 
+DROP TABLE IF EXISTS `languages`;
 CREATE TABLE `languages` (
   `code` varchar(10) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `description` varchar(200) DEFAULT NULL COMMENT 'Short Description'
+  `description` varchar(200) DEFAULT NULL COMMENT 'Short Description',
+  `active` tinyint(1) DEFAULT 1 COMMENT 'Active language'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `languages`
 --
 
-INSERT INTO `languages` (`code`, `name`, `description`) VALUES
-('en', 'english', 'english'),
-('vi', 'tiếng việt', 'tiếng việt');
+INSERT INTO `languages` (`code`, `name`, `description`, `active`) VALUES
+('en', 'english', 'english', 1),
+('vi', 'tiếng việt', 'tiếng việt', 1);
 
 -- --------------------------------------------------------
 
@@ -463,6 +473,7 @@ INSERT INTO `languages` (`code`, `name`, `description`) VALUES
 -- Table structure for table `news`
 --
 
+DROP TABLE IF EXISTS `news`;
 CREATE TABLE `news` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `image` varchar(200) DEFAULT NULL COMMENT 'feature image of the post',
@@ -486,306 +497,307 @@ CREATE TABLE `news` (
 --
 
 INSERT INTO `news` (`id`, `image`, `categories`, `tags`, `post_author`, `post_date`, `post_status`, `news_code`, `modified_by`, `menu_id`, `news_position`, `comment_status`, `comment_count`, `createdAt`, `post_modified`) VALUES
-(1, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(2, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(3, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(4, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(5, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(6, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(7, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(1, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 09:55:56'),
+(3, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 08:45:58'),
+(4, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 08:46:57'),
+(5, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-26 02:15:08'),
+(6, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 08:46:59'),
+(7, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-26 02:15:08'),
 (8, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(9, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(10, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(9, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 08:59:19'),
+(10, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-26 02:16:05'),
 (11, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (12, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (13, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(14, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(15, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(14, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 08:44:06'),
+(15, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (16, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (17, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (18, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (19, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(20, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(21, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(20, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(21, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-26 08:08:57'),
 (22, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (23, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (24, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(25, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(25, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (26, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (27, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(28, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(28, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-26 05:00:14'),
 (29, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(30, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(30, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (31, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (32, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (33, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (34, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(35, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (36, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (37, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (38, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (39, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(40, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(40, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (41, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(42, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (43, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (44, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(45, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(45, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (46, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (47, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (48, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(49, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(50, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(49, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-27 02:47:39'),
+(50, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (51, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (52, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (53, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (54, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(55, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(56, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(55, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(56, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-27 02:47:42'),
 (57, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (58, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (59, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(60, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(60, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (61, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (62, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(63, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(63, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-27 02:47:43'),
 (64, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(65, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(65, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (66, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (67, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (68, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (69, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(70, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(70, NULL, 'cat3', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (71, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (72, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (73, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (74, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(75, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(75, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (76, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(77, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(77, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (78, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (79, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(80, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(80, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (81, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (82, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (83, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(84, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(85, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(84, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(85, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (86, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (87, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (88, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (89, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(90, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(91, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(90, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(91, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-26 04:59:13'),
 (92, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (93, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (94, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(95, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(95, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (96, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (97, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(98, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
+(98, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
 (99, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(100, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-25 07:21:35'),
-(101, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(102, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(100, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:21:35', '2023-10-26 02:15:57'),
+(101, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-26 02:16:05'),
+(102, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-26 02:16:05'),
 (103, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (104, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(105, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(105, NULL, 'cat3', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-26 08:08:56'),
 (106, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (107, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (108, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (109, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(110, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(110, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (111, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(112, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(112, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (113, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (114, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(115, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(115, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (116, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (117, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (118, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(119, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(120, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(119, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(120, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (121, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (122, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (123, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (124, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(125, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(126, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(125, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(126, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (127, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (128, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (129, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(130, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(130, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (131, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (132, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(133, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(133, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (134, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(135, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(135, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (136, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (137, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (138, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (139, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(140, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(140, NULL, 'cat3', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (141, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (142, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (143, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (144, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(145, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(145, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (146, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(147, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(147, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (148, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (149, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(150, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(150, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (151, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (152, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (153, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(154, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(155, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(154, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(155, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (156, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (157, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (158, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (159, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(160, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
-(161, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(160, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
+(161, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (162, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (163, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:42', '2023-10-25 07:40:42'),
 (164, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
-(165, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
+(165, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (166, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (167, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
-(168, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
+(168, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (169, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
-(170, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
+(170, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (171, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (172, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (173, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (174, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
-(175, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
+(175, NULL, 'cat3', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (176, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (177, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (178, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (179, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
-(180, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
+(180, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (181, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
-(182, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
+(182, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (183, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (184, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
-(185, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
+(185, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (186, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (187, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (188, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
-(189, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
-(190, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
+(189, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
+(190, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (191, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (192, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (193, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (194, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
-(195, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
-(196, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
+(195, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
+(196, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (197, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (198, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
 (199, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
-(200, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
-(201, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(202, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(203, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(204, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(205, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(206, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(207, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(208, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(209, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(210, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(211, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(212, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(213, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
+(200, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:40:43', '2023-10-25 07:40:43'),
+(201, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-30 08:49:33'),
+(202, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-30 08:49:28'),
+(203, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-30 08:49:33'),
+(204, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-30 08:49:43'),
+(205, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-30 08:49:43'),
+(206, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'tieu-de-cua-tin-206fffdfd', NULL, NULL, 1, NULL, 0, '2023-10-25 07:41:41', '2023-11-01 07:02:38'),
+(207, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-11-01 07:17:49'),
+(208, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'tieu-de-cua-tin-208ssf-d-fsdfs', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-11-01 07:21:45'),
+(209, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'tieu-de-cua-tin-209-rerere', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-11-01 07:33:13'),
+(210, NULL, 'cat3', 'tag1, tag2,nghe_thuat', 'Cao', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-11-01 07:34:36'),
+(211, NULL, 'cat1,nha_dat,thoi_trang', 'tag1', 'huy', NULL, 'publish', 'tieu-de-cua-tin-211-f--fd', 'huy', NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-11-01 08:40:22'),
+(212, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-11-01 20:53:19', 'trash', 'tieu-de-cua-tin-212rt', 'huy', NULL, 1, NULL, 0, '2023-10-25 07:41:41', '2023-11-01 21:05:04'),
+(213, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-11-01 15:55:57', 'draft', 'title_news_project', 'huy', NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-11-01 19:44:50'),
 (214, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(215, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
+(215, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (216, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(217, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
+(217, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (218, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (219, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(220, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
+(220, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (221, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (222, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (223, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(224, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(225, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
+(224, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
+(225, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (226, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (227, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (228, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (229, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(230, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(231, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
+(230, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
+(231, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (232, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (233, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (234, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(235, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
+(235, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (236, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (237, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(238, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
+(238, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (239, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(240, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
+(240, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (241, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (242, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (243, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (244, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(245, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
+(245, NULL, 'cat3', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (246, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (247, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (248, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (249, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(250, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
+(250, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (251, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(252, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
+(252, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'publish', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (253, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
 (254, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(255, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(256, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(257, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(258, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(259, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(260, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(261, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(262, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(263, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(264, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(265, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(266, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(267, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(268, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(269, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(270, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(271, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(272, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(273, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(274, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(275, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(276, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(277, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(278, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(279, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(280, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(281, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(282, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(283, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(284, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(285, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(286, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
-(287, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 07:41:42'),
-(288, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 07:41:42'),
-(289, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 07:41:42'),
-(290, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 07:41:42'),
-(291, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 07:41:42'),
-(292, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 07:41:42'),
-(293, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 07:41:42'),
-(294, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 07:41:42'),
-(295, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 07:41:42'),
-(296, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 07:41:42'),
-(297, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 07:41:42'),
-(298, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 07:41:42'),
-(299, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 07:41:42'),
-(300, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 07:41:42');
+(255, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'draft', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 07:41:41'),
+(258, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:02:00'),
+(259, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:02:07'),
+(260, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:02:07'),
+(261, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:02:41'),
+(262, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:02:41'),
+(263, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:17:10'),
+(264, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:17:10'),
+(265, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:17:44'),
+(266, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:17:44'),
+(267, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:17:49'),
+(268, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:17:49'),
+(269, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:34:48'),
+(270, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:34:48'),
+(271, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:38:53'),
+(272, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:40:22'),
+(273, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:40:22'),
+(274, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:40:53'),
+(275, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:43:33'),
+(276, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:43:42'),
+(277, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-25 09:51:09'),
+(278, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-26 01:54:45'),
+(279, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-26 01:46:57'),
+(280, NULL, 'cat3', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-26 01:54:45'),
+(281, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-26 02:15:34'),
+(282, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-26 07:33:54'),
+(283, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-26 02:15:40'),
+(284, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-30 08:49:28'),
+(286, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:41', '2023-10-27 03:10:31'),
+(287, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 08:44:24'),
+(288, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 08:44:27'),
+(289, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 08:44:35'),
+(290, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 08:44:29'),
+(291, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 08:46:41'),
+(292, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 08:46:43'),
+(293, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 09:02:00'),
+(294, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', '2023-10-25 15:40:19', 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 08:44:46'),
+(295, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 08:44:51'),
+(296, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 08:46:45'),
+(297, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 08:46:53'),
+(298, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 08:46:47'),
+(299, NULL, 'cat1, cat2', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 08:46:52'),
+(300, NULL, 'cat3', 'tag1, tag2', 'huy', NULL, 'trash', 'title_news_project', NULL, NULL, 0, NULL, 0, '2023-10-25 07:41:42', '2023-10-25 08:46:48'),
+(301, NULL, 'nha_dat', 'nghe_thuat', 'huy', NULL, 'publish', 'tieu-de-22:04', NULL, NULL, 1, NULL, 0, '2023-11-01 22:04:42', '2023-11-01 22:04:42'),
+(302, NULL, 'nha_dat,thoi_trang', 'nghe_thuat', 'Cao', NULL, 'draft', 'tieu-de-22:23', NULL, NULL, 1, NULL, 0, '2023-11-01 22:23:39', '2023-11-01 22:23:39'),
+(303, NULL, 'nha_dat', 'nghe_thuat', 'huy', '2023-11-01 22:28:53', 'publish', 'tieu-de-22:28', NULL, NULL, 0, NULL, 0, '2023-11-01 22:28:53', '2023-11-01 22:28:53'),
+(304, NULL, 'nha_dat', '', 'huy', NULL, 'draft', 'fdg', NULL, NULL, 0, NULL, 0, '2023-11-01 22:35:45', '2023-11-01 22:35:45'),
+(305, NULL, 'nha_dat', 'nghe_thuat', 'huy', NULL, 'draft', 'rer', NULL, NULL, 0, NULL, 0, '2023-11-01 22:37:51', '2023-11-01 22:37:51'),
+(306, NULL, 'nha_dat', '', 'huy', '2023-11-01 22:56:57', 'publish', 'tieu-de-22:56', NULL, NULL, 0, NULL, 0, '2023-11-01 22:56:57', '2023-11-01 22:56:57'),
+(307, NULL, 'nha_dat,thoi_trang', '', 'huy', NULL, 'draft', 'tieu-de72', 'huy', NULL, 0, NULL, 0, '2023-11-01 22:59:56', '2023-11-01 23:08:21');
 
 -- --------------------------------------------------------
 
@@ -793,6 +805,7 @@ INSERT INTO `news` (`id`, `image`, `categories`, `tags`, `post_author`, `post_da
 -- Stand-in structure for view `news_all`
 -- (See below for the actual view)
 --
+DROP VIEW IF EXISTS `news_all`;
 CREATE TABLE `news_all` (
 `id` bigint(20) unsigned
 ,`image` varchar(200)
@@ -822,11 +835,21 @@ CREATE TABLE `news_all` (
 -- Table structure for table `news_categories`
 --
 
+DROP TABLE IF EXISTS `news_categories`;
 CREATE TABLE `news_categories` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `parent` bigint(20) UNSIGNED DEFAULT NULL,
   `category_code` varchar(200) DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `news_categories`
+--
+
+INSERT INTO `news_categories` (`id`, `parent`, `category_code`) VALUES
+(1, NULL, 'nha_dat'),
+(2, NULL, 'thoi_trang'),
+(3, 1, 'vung_tau');
 
 -- --------------------------------------------------------
 
@@ -834,6 +857,7 @@ CREATE TABLE `news_categories` (
 -- Table structure for table `news_cate_langs`
 --
 
+DROP TABLE IF EXISTS `news_cate_langs`;
 CREATE TABLE `news_cate_langs` (
   `name` varchar(200) DEFAULT 'undefined',
   `description` longtext DEFAULT NULL COMMENT 'Description',
@@ -841,12 +865,25 @@ CREATE TABLE `news_cate_langs` (
   `languageCode` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `news_cate_langs`
+--
+
+INSERT INTO `news_cate_langs` (`name`, `description`, `newsCategoryId`, `languageCode`) VALUES
+('real estate', 'house is expensive', 1, 'en'),
+('Nhà đất', 'Nhà đất đắt đỏ', 1, 'vi'),
+('Fashion', 'Fashion is beautiful', 2, 'en'),
+('Thời trang', 'Thời trang đẹp', 2, 'vi'),
+('vung tau', 'description vung tau', 3, 'en'),
+('vũng tàu', 'mô tả vũng tàu', 3, 'vi');
+
 -- --------------------------------------------------------
 
 --
 -- Stand-in structure for view `news_cat_all`
 -- (See below for the actual view)
 --
+DROP VIEW IF EXISTS `news_cat_all`;
 CREATE TABLE `news_cat_all` (
 `id` bigint(20) unsigned
 ,`parent` bigint(20) unsigned
@@ -863,6 +900,7 @@ CREATE TABLE `news_cat_all` (
 -- Table structure for table `news_languages`
 --
 
+DROP TABLE IF EXISTS `news_languages`;
 CREATE TABLE `news_languages` (
   `title` varchar(300) DEFAULT 'undefined' COMMENT 'Title can be null',
   `excerpt` text DEFAULT NULL COMMENT 'Short Description',
@@ -878,8 +916,6 @@ CREATE TABLE `news_languages` (
 INSERT INTO `news_languages` (`title`, `excerpt`, `content`, `newsId`, `languageCode`) VALUES
 ('Title of news 1', 'Excerpt of news 1', 'Content of news 1', 1, 'en'),
 ('tiêu đề của tin 1', 'mô tả ngắn của tin 1', 'Nội dung của tin 1', 1, 'vi'),
-('Title of news 2', 'Excerpt of news 2', 'Content of news 2', 2, 'en'),
-('tiêu đề của tin 2', 'mô tả ngắn của tin 2', 'Nội dung của tin 2', 2, 'vi'),
 ('Title of news 3', 'Excerpt of news 3', 'Content of news 3', 3, 'en'),
 ('tiêu đề của tin 3', 'mô tả ngắn của tin 3', 'Nội dung của tin 3', 3, 'vi'),
 ('Title of news 4', 'Excerpt of news 4', 'Content of news 4', 4, 'en'),
@@ -944,8 +980,6 @@ INSERT INTO `news_languages` (`title`, `excerpt`, `content`, `newsId`, `language
 ('tiêu đề của tin 33', 'mô tả ngắn của tin 33', 'Nội dung của tin 33', 33, 'vi'),
 ('Title of news 34', 'Excerpt of news 34', 'Content of news 34', 34, 'en'),
 ('tiêu đề của tin 34', 'mô tả ngắn của tin 34', 'Nội dung của tin 34', 34, 'vi'),
-('Title of news 35', 'Excerpt of news 35', 'Content of news 35', 35, 'en'),
-('tiêu đề của tin 35', 'mô tả ngắn của tin 35', 'Nội dung của tin 35', 35, 'vi'),
 ('Title of news 36', 'Excerpt of news 36', 'Content of news 36', 36, 'en'),
 ('tiêu đề của tin 36', 'mô tả ngắn của tin 36', 'Nội dung của tin 36', 36, 'vi'),
 ('Title of news 37', 'Excerpt of news 37', 'Content of news 37', 37, 'en'),
@@ -958,8 +992,6 @@ INSERT INTO `news_languages` (`title`, `excerpt`, `content`, `newsId`, `language
 ('tiêu đề của tin 40', 'mô tả ngắn của tin 40', 'Nội dung của tin 40', 40, 'vi'),
 ('Title of news 41', 'Excerpt of news 41', 'Content of news 41', 41, 'en'),
 ('tiêu đề của tin 41', 'mô tả ngắn của tin 41', 'Nội dung của tin 41', 41, 'vi'),
-('Title of news 42', 'Excerpt of news 42', 'Content of news 42', 42, 'en'),
-('tiêu đề của tin 42', 'mô tả ngắn của tin 42', 'Nội dung của tin 42', 42, 'vi'),
 ('Title of news 43', 'Excerpt of news 43', 'Content of news 43', 43, 'en'),
 ('tiêu đề của tin 43', 'mô tả ngắn của tin 43', 'Nội dung của tin 43', 43, 'vi'),
 ('Title of news 44', 'Excerpt of news 44', 'Content of news 44', 44, 'en'),
@@ -1292,16 +1324,16 @@ INSERT INTO `news_languages` (`title`, `excerpt`, `content`, `newsId`, `language
 ('tiêu đề của tin 207', 'mô tả ngắn của tin 207', 'Nội dung của tin 207', 207, 'vi'),
 ('Title of news 208', 'Excerpt of news 208', 'Content of news 208', 208, 'en'),
 ('tiêu đề của tin 208', 'mô tả ngắn của tin 208', 'Nội dung của tin 208', 208, 'vi'),
-('Title of news 209', 'Excerpt of news 209', 'Content of news 209', 209, 'en'),
-('tiêu đề của tin 209', 'mô tả ngắn của tin 209', 'Nội dung của tin 209', 209, 'vi'),
-('Title of news 210', 'Excerpt of news 210', 'Content of news 210', 210, 'en'),
-('tiêu đề của tin 210', 'mô tả ngắn của tin 210', 'Nội dung của tin 210', 210, 'vi'),
-('Title of news 211', 'Excerpt of news 211', 'Content of news 211', 211, 'en'),
-('tiêu đề của tin 211', 'mô tả ngắn của tin 211', 'Nội dung của tin 211', 211, 'vi'),
-('Title of news 212', 'Excerpt of news 212', 'Content of news 212', 212, 'en'),
-('tiêu đề của tin 212', 'mô tả ngắn của tin 212', 'Nội dung của tin 212', 212, 'vi'),
-('Title of news 213', 'Excerpt of news 213', 'Content of news 213', 213, 'en'),
-('tiêu đề của tin 213', 'mô tả ngắn của tin 213', 'Nội dung của tin 213', 213, 'vi'),
+('Title of news 209', 'Excerpt of news 209', 'Excerpt of news 209', 209, 'en'),
+('tiêu đề của tin 209 rerere', 'mô tả ngắn của tin 209', 'mô tả ngắn của tin 209', 209, 'vi'),
+('Title of news 210 fdg f ', 'Excerpt of news 210 dfg dg', 'Excerpt of news 210 dfg dg', 210, 'en'),
+('tiêu đề của tin 210dfgd', 'mô tả ngắn của tin 210 d df d', 'mô tả ngắn của tin 210 d df d', 210, 'vi'),
+('Title of news 211 df ', 'Excerpt of news 211 df ', 'Excerpt of news 211 df ', 211, 'en'),
+('tiêu đề của tin 211 f  fd', 'mô tả ngắn của tin 211 f ', 'mô tả ngắn của tin 211 f ', 211, 'vi'),
+('Title of news 212', 'Excerpt of news 212', 'Excerpt of news 212', 212, 'en'),
+('tiêu đề của tin 212rt ', 'mô tả ngắn của tin 212rt', 'mô tả ngắn của tin 212rt', 212, 'vi'),
+('Title of news 213', 'Excerpt of news 213', 'Excerpt of news 213', 213, 'en'),
+('tiêu đề của tin 213', 'mô tả ngắn của tin 213', 'mô tả ngắn của tin 213', 213, 'vi'),
 ('Title of news 214', 'Excerpt of news 214', 'Content of news 214', 214, 'en'),
 ('tiêu đề của tin 214', 'mô tả ngắn của tin 214', 'Nội dung của tin 214', 214, 'vi'),
 ('Title of news 215', 'Excerpt of news 215', 'Content of news 215', 215, 'en'),
@@ -1386,10 +1418,6 @@ INSERT INTO `news_languages` (`title`, `excerpt`, `content`, `newsId`, `language
 ('tiêu đề của tin 254', 'mô tả ngắn của tin 254', 'Nội dung của tin 254', 254, 'vi'),
 ('Title of news 255', 'Excerpt of news 255', 'Content of news 255', 255, 'en'),
 ('tiêu đề của tin 255', 'mô tả ngắn của tin 255', 'Nội dung của tin 255', 255, 'vi'),
-('Title of news 256', 'Excerpt of news 256', 'Content of news 256', 256, 'en'),
-('tiêu đề của tin 256', 'mô tả ngắn của tin 256', 'Nội dung của tin 256', 256, 'vi'),
-('Title of news 257', 'Excerpt of news 257', 'Content of news 257', 257, 'en'),
-('tiêu đề của tin 257', 'mô tả ngắn của tin 257', 'Nội dung của tin 257', 257, 'vi'),
 ('Title of news 258', 'Excerpt of news 258', 'Content of news 258', 258, 'en'),
 ('tiêu đề của tin 258', 'mô tả ngắn của tin 258', 'Nội dung của tin 258', 258, 'vi'),
 ('Title of news 259', 'Excerpt of news 259', 'Content of news 259', 259, 'en'),
@@ -1444,8 +1472,6 @@ INSERT INTO `news_languages` (`title`, `excerpt`, `content`, `newsId`, `language
 ('tiêu đề của tin 283', 'mô tả ngắn của tin 283', 'Nội dung của tin 283', 283, 'vi'),
 ('Title of news 284', 'Excerpt of news 284', 'Content of news 284', 284, 'en'),
 ('tiêu đề của tin 284', 'mô tả ngắn của tin 284', 'Nội dung của tin 284', 284, 'vi'),
-('Title of news 285', 'Excerpt of news 285', 'Content of news 285', 285, 'en'),
-('tiêu đề của tin 285', 'mô tả ngắn của tin 285', 'Nội dung của tin 285', 285, 'vi'),
 ('Title of news 286', 'Excerpt of news 286', 'Content of news 286', 286, 'en'),
 ('tiêu đề của tin 286', 'mô tả ngắn của tin 286', 'Nội dung của tin 286', 286, 'vi'),
 ('Title of news 287', 'Excerpt of news 287', 'Content of news 287', 287, 'en'),
@@ -1475,7 +1501,78 @@ INSERT INTO `news_languages` (`title`, `excerpt`, `content`, `newsId`, `language
 ('Title of news 299', 'Excerpt of news 299', 'Content of news 299', 299, 'en'),
 ('tiêu đề của tin 299', 'mô tả ngắn của tin 299', 'Nội dung của tin 299', 299, 'vi'),
 ('Title of news 300', 'Excerpt of news 300', 'Content of news 300', 300, 'en'),
-('tiêu đề của tin 300', 'mô tả ngắn của tin 300', 'Nội dung của tin 300', 300, 'vi');
+('tiêu đề của tin 300', 'mô tả ngắn của tin 300', 'Nội dung của tin 300', 300, 'vi'),
+('title', 'excerpt', 'excerpt', 301, 'en'),
+('tiêu đề 22:04', 'mô tả', 'mô tả', 301, 'vi'),
+('', '', '', 302, 'en'),
+('tiêu đề 22:23', 'mô tả ngắn', 'mô tả ngắn', 302, 'vi'),
+('title', 'excerpt', 'excerpt', 303, 'en'),
+('tiêu đề 22:28', 'mổ  tả', 'mổ  tả', 303, 'vi'),
+('', '', '', 304, 'en'),
+('fdg', 'fdg', 'fdg', 304, 'vi'),
+('', '', '', 305, 'en'),
+('rer', 'er', 'er', 305, 'vi'),
+('', '', '', 306, 'en'),
+('tiêu đề 22:56', 'mô tả ngắn', 'mô tả ngắn', 306, 'vi'),
+('', '', '', 307, 'en'),
+('tieu đe72', 'mô ta ngan', 'mô ta ngan', 307, 'vi');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tags`
+--
+
+DROP TABLE IF EXISTS `tags`;
+CREATE TABLE `tags` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `tag_code` varchar(200) NOT NULL COMMENT 'code of tag'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tags`
+--
+
+INSERT INTO `tags` (`id`, `tag_code`) VALUES
+(1, 'nghe_thuat');
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `tags_all`
+-- (See below for the actual view)
+--
+DROP VIEW IF EXISTS `tags_all`;
+CREATE TABLE `tags_all` (
+`id` bigint(20) unsigned
+,`tag_code` varchar(200)
+,`name` varchar(200)
+,`description` longtext
+,`tagId` bigint(20) unsigned
+,`languageCode` varchar(10)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tag_langs`
+--
+
+DROP TABLE IF EXISTS `tag_langs`;
+CREATE TABLE `tag_langs` (
+  `name` varchar(200) DEFAULT 'undefined',
+  `description` longtext DEFAULT NULL COMMENT 'Description',
+  `tagId` bigint(20) UNSIGNED NOT NULL,
+  `languageCode` varchar(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tag_langs`
+--
+
+INSERT INTO `tag_langs` (`name`, `description`, `tagId`, `languageCode`) VALUES
+('art', 'description', 1, 'en'),
+('nghệ thuật', 'mô tả', 1, 'vi');
 
 -- --------------------------------------------------------
 
@@ -1484,6 +1581,7 @@ INSERT INTO `news_languages` (`title`, `excerpt`, `content`, `newsId`, `language
 --
 DROP TABLE IF EXISTS `articles_all`;
 
+DROP VIEW IF EXISTS `articles_all`;
 CREATE ALGORITHM=MERGE DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `articles_all`  AS SELECT `a`.`id` AS `id`, `a`.`image` AS `image`, `a`.`categories` AS `categories`, `a`.`post_author` AS `post_author`, `a`.`post_date` AS `post_date`, `a`.`post_status` AS `post_status`, `a`.`article_code` AS `article_code`, `a`.`modified_by` AS `modified_by`, `a`.`menu_id` AS `menu_id`, `a`.`article_position` AS `article_position`, `a`.`comment_status` AS `comment_status`, `a`.`comment_count` AS `comment_count`, `a`.`createdAt` AS `createdAt`, `a`.`post_modified` AS `post_modified`, `b`.`title` AS `title`, `b`.`excerpt` AS `excerpt`, `b`.`content` AS `content`, `b`.`articleId` AS `articleId`, `b`.`languageCode` AS `languageCode` FROM (`articles` `a` join `article_languages` `b`) WHERE `a`.`id` = `b`.`articleId` ;
 
 -- --------------------------------------------------------
@@ -1493,6 +1591,7 @@ CREATE ALGORITHM=MERGE DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `art
 --
 DROP TABLE IF EXISTS `article_cat_all`;
 
+DROP VIEW IF EXISTS `article_cat_all`;
 CREATE ALGORITHM=MERGE DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `article_cat_all`  AS SELECT `a`.`id` AS `id`, `a`.`category_code` AS `category_code`, `b`.`name` AS `name`, `b`.`description` AS `description`, `b`.`articleCategoryId` AS `articleCategoryId`, `b`.`languageCode` AS `languageCode` FROM (`article_categories` `a` join `article_cate_langs` `b`) WHERE `a`.`id` = `b`.`articleCategoryId` ;
 
 -- --------------------------------------------------------
@@ -1502,6 +1601,7 @@ CREATE ALGORITHM=MERGE DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `art
 --
 DROP TABLE IF EXISTS `news_all`;
 
+DROP VIEW IF EXISTS `news_all`;
 CREATE ALGORITHM=MERGE DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `news_all`  AS SELECT `a`.`id` AS `id`, `a`.`image` AS `image`, `a`.`categories` AS `categories`, `a`.`tags` AS `tags`, `a`.`post_author` AS `post_author`, `a`.`post_date` AS `post_date`, `a`.`post_status` AS `post_status`, `a`.`news_code` AS `news_code`, `a`.`modified_by` AS `modified_by`, `a`.`menu_id` AS `menu_id`, `a`.`news_position` AS `news_position`, `a`.`comment_status` AS `comment_status`, `a`.`comment_count` AS `comment_count`, `a`.`createdAt` AS `createdAt`, `a`.`post_modified` AS `post_modified`, `b`.`title` AS `title`, `b`.`excerpt` AS `excerpt`, `b`.`content` AS `content`, `b`.`newsId` AS `newsId`, `b`.`languageCode` AS `languageCode` FROM (`news` `a` join `news_languages` `b`) WHERE `a`.`id` = `b`.`newsId` ;
 
 -- --------------------------------------------------------
@@ -1511,7 +1611,18 @@ CREATE ALGORITHM=MERGE DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `new
 --
 DROP TABLE IF EXISTS `news_cat_all`;
 
+DROP VIEW IF EXISTS `news_cat_all`;
 CREATE ALGORITHM=MERGE DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `news_cat_all`  AS SELECT `a`.`id` AS `id`, `a`.`parent` AS `parent`, `a`.`category_code` AS `category_code`, `b`.`name` AS `name`, `b`.`description` AS `description`, `b`.`newsCategoryId` AS `newsCategoryId`, `b`.`languageCode` AS `languageCode` FROM (`news_categories` `a` join `news_cate_langs` `b`) WHERE `a`.`id` = `b`.`newsCategoryId` ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `tags_all`
+--
+DROP TABLE IF EXISTS `tags_all`;
+
+DROP VIEW IF EXISTS `tags_all`;
+CREATE ALGORITHM=MERGE DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tags_all`  AS SELECT `a`.`id` AS `id`, `a`.`tag_code` AS `tag_code`, `b`.`name` AS `name`, `b`.`description` AS `description`, `b`.`tagId` AS `tagId`, `b`.`languageCode` AS `languageCode` FROM (`tags` `a` join `tag_langs` `b`) WHERE `a`.`id` = `b`.`tagId` ;
 
 --
 -- Indexes for dumped tables
@@ -1576,6 +1687,19 @@ ALTER TABLE `news_languages`
   ADD KEY `languageCode` (`languageCode`);
 
 --
+-- Indexes for table `tags`
+--
+ALTER TABLE `tags`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tag_langs`
+--
+ALTER TABLE `tag_langs`
+  ADD PRIMARY KEY (`tagId`,`languageCode`),
+  ADD KEY `languageCode` (`languageCode`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -1595,13 +1719,19 @@ ALTER TABLE `article_categories`
 -- AUTO_INCREMENT for table `news`
 --
 ALTER TABLE `news`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=301;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=308;
 
 --
 -- AUTO_INCREMENT for table `news_categories`
 --
 ALTER TABLE `news_categories`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `tags`
+--
+ALTER TABLE `tags`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
@@ -1634,6 +1764,13 @@ ALTER TABLE `news_cate_langs`
 ALTER TABLE `news_languages`
   ADD CONSTRAINT `news_languages_ibfk_1` FOREIGN KEY (`newsId`) REFERENCES `news` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `news_languages_ibfk_2` FOREIGN KEY (`languageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tag_langs`
+--
+ALTER TABLE `tag_langs`
+  ADD CONSTRAINT `tag_langs_ibfk_1` FOREIGN KEY (`tagId`) REFERENCES `tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `tag_langs_ibfk_2` FOREIGN KEY (`languageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

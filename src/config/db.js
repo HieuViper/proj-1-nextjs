@@ -9,6 +9,7 @@ import { newsModel } from "./models/news";
 import { newsCateLanguageModel } from "./models/news_cate_langs";
 import { newsCategoriesModel } from "./models/news_categories";
 import { newsLanguageModel } from "./models/news_languages";
+import { tagLangsModel } from "./models/tag_langs";
 import { tagsModel } from "./models/tags";
 
 export const db = {
@@ -25,6 +26,7 @@ export const db = {
   News_categories: null,
   News_cate_langs: null,
   Tags: null,
+  Tag_langs: null,
 };
 
 // initialize db and models, called on first api request from /helpers/api/api-handler.js
@@ -48,7 +50,17 @@ async function initialize() {
     process.env.DB_DBNAME,
     process.env.DB_USER,
     process.env.DB_PASSWORD,
-    { host: process.env.DB_HOST, dialect: process.env.DB_DIALECT }
+    {
+      host: process.env.DB_HOST,
+      dialect: process.env.DB_DIALECT,
+      pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000,
+      },
+      timezone: "+07:00",
+    }
   );
 
   // init models and add them to the exported db object
@@ -63,6 +75,7 @@ async function initialize() {
   db.News_categories = newsCategoriesModel(sequelize);
   db.News_cate_langs = newsCateLanguageModel(sequelize);
   db.Tags = tagsModel(sequelize);
+  db.Tag_langs = tagLangsModel(sequelize);
 
   //relationship
   db.News.belongsToMany(db.Languages, { through: db.News_languages });
@@ -82,6 +95,8 @@ async function initialize() {
   db.Languages.belongsToMany(db.News_categories, {
     through: db.News_cate_langs,
   });
+  db.Tags.belongsToMany(db.Languages, { through: db.Tag_langs });
+  db.Languages.belongsToMany(db.Tags, { through: db.Tag_langs });
   // sync all models with database
   // await sequelize.sync({ alter: true });
 

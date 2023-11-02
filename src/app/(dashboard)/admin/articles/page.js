@@ -16,9 +16,9 @@ import ArticleList from "./_components/ArticleList";
 export const dynamic = "force-dynamic";
 
 async function ArticlePage({ searchParams }) {
-  if (!db.initialized) {
-    await db.initialize();
-  }
+  // if (!db.initialized) {
+  //   await db.initialize();
+  // }
   const trash = searchParams?.trash ?? "";
   const keys = searchParams?.keys ?? "";
   const recover = searchParams?.recover ?? "";

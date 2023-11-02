@@ -394,12 +394,12 @@ export default function NewsList(props) {
             options={langOptions}
             /*[
               {
-                value: "vi",
-                label: "Tiếng Việt",
+                value: 'vi',
+                label: 'Tiếng Việt',
               },
               {
-                value: "en",
-                label: "English",
+                value: 'en',
+                label: 'English',
               },
             ]*/
           />

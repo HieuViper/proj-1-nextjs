@@ -8,29 +8,22 @@ export function tagsModel(sequelize) {
       primaryKey: true,
       allownNull: false,
     },
-    name: {
-      type: DataTypes.STRING(200),
-      defaultValue: "unknown",
-      comment: "name of tag",
-    },
     tag_code: {
       type: DataTypes.STRING(200),
-      defaultValue: "unknown",
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: "You have to insert tag code",
+        },
+      },
       comment: "code of tag",
-    },
-    description: {
-      type: DataTypes.TEXT,
-      collate: "utf8mb4_unicode_520_ci",
-      comment: "Content of tag",
-      allowNull: true,
-      defaultValue: "undefined",
     },
   };
 
   const options = {
     updatedAt: "tag_modified",
     tableName: "tags",
-    //timestamps: false,
+    timestamps: false,
     //indexes: [{ unique: true, fields: ['someUnique'] }],
   };
 

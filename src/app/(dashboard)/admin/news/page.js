@@ -1,15 +1,16 @@
 /* eslint-disable @next/next/no-async-client-component */
 
 import { useRouter } from 'next/navigation';
-import NewsList from '@/components/NewsList';
 import { newsMHandle } from '@/library/getNews';
 import { db } from '@/config/db';
+import NewsList from './_components/NewsList';
 
 // This part is important!
 export const dynamic = "force-dynamic";
 
 async function NewsPage({ searchParams }) {
-  if(!db.initialized) await db.initialize();
+   if(!db.initialized) await db.initialize();
+
   const trash = searchParams?.trash ?? "";
   const keys = searchParams?.keys ?? "";
   const recover = searchParams?.recover ?? "";
@@ -43,7 +44,7 @@ async function NewsPage({ searchParams }) {
     orderby = "post_modified";
     order = "desc";
   }
-
+console.log('news list page');
   const newsData = await newsMHandle.getAllNews(
     status,
     page,

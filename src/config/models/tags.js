@@ -8,11 +8,6 @@ export function tagsModel(sequelize) {
       primaryKey: true,
       allownNull: false,
     },
-    name: {
-      type: DataTypes.STRING(200),
-      defaultValue: "unknown",
-      comment: "name of tag",
-    },
     tag_code: {
       type: DataTypes.STRING(200),
       allowNull: false,
@@ -20,15 +15,8 @@ export function tagsModel(sequelize) {
         notNull: {
             msg: 'You have to insert tag code',
         }
-    },,
-      comment: "code of tag",
     },
-    description: {
-      type: DataTypes.TEXT,
-      collate: "utf8mb4_unicode_520_ci",
-      comment: "Content of tag",
-      allowNull: true,
-      defaultValue: "undefined",
+      comment: "code of tag",
     },
   };
 

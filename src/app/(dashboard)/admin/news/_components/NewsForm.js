@@ -1,14 +1,11 @@
 "use client";
 import axios from "axios";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Button, Form, Input, Select, Switch, Tooltip, Tabs } from 'antd';
 import { SwapLeftOutlined } from '@ant-design/icons';
-import Editor from "@/components/Editor";
 import Link from "next/link";
-import { addNews, editNews } from "@/library/updateNews";
-import FormItem from "antd/es/form/FormItem";
 
 
 
@@ -18,13 +15,15 @@ export function NewsForm(props) {
   const router = useRouter();
   const params = useParams();
   const pathName = usePathname();
+  const searchParams = useSearchParams();
   const [form] = Form.useForm();
 
-  const [cate, setCate] = useState()
-  const [postStatus, setPostStatus] = useState()
-  const [data, setData] = useState();
+  const [cate, setCate] = useState();
   const [tags, setTags] = useState();
-  const [newsPosition, setNewsPosition] = useState();
+  const [langTable, setLangTable] = useState();
+  const [postStatus, setPostStatus] = useState();
+  const [data, setData] = useState();
+  const [catTree, setCatTree] = useState();
 
   const authors = [{
     value: 'huy',
@@ -35,19 +34,92 @@ export function NewsForm(props) {
     label: 'Peter Cao',
   }];
 
-  useEffect(() => {
-    if (params?.id) {
-      const data = JSON.parse(props.data);
-      //format data to be suitable for the form fields
-      form.setFieldsValue({ ...data, categories: (data?.categories).split(',').map(Number) })
-      setData(data);
-      setPostStatus(data.post_status);
-      setNewsPosition(data.news_position);
+  function buildCategoryTree(categories, parent = null) {
+    const categoryTree = [];
+
+    for (const category of categories) {
+      if (category.parent === parent) {
+        const children = buildCategoryTree(categories, category.id);
+        if (children.length > 0) {
+          category.children = children;
+        }
+        categoryTree.push(category);
+      }
     }
+
+    return categoryTree;
+  }
+  function notifyAddNewsSuccess() {
+    //get message redirected from add news route
+    if(searchParams.get('message')){
+      const message = searchParams.get('message') ?? '';
+      if( message == 1 ){ //signal of success edit on server
+        let messageNotify = 'Add news successfully';
+        toast.success(messageNotify, {
+          position: "top-center",
+        });
+      } else {  //signal of faillure on server
+        let messageNotify = `Cannot add new news, please try again or inform admin: ${message}`;
+        toast.success(messageNotify, {
+          position: "top-center",
+        });
+      }
+    }
+}
+  //get the the title, content, excerpt from news data
+  //property: name of the column  you want to get the value
+  //lang: language of the content
+  // news: an array of news_lang
+  function getNewsValue( property, news, lang ) {
+    // console.log('vao day');
+    let rs
+    news.forEach(element => {
+      if( element.languageCode == lang )
+      {
+        rs=  element[property];
+      }
+    });
+    return rs
+  }
+
+
+  useEffect(() => {
     const cate = JSON.parse(props.cate);
     setCate(cate);
+    console.log('category:', cate);
+    const  catTree  = buildCategoryTree( cate );
+    setCatTree( catTree );
+
+    console.log('categoy tree:', catTree);
     const tags = JSON.parse(props.tags);
     setTags(tags);
+    //get languages Table
+    const langTable = JSON.parse(props.langTable);
+    setLangTable(langTable); //set languageTable for news
+    if (params?.id) {
+      //get the news, newsdata is an array it's each row is a language's news
+      let newsData = JSON.parse(props.data);
+      //Build the data for title, excerpt, content
+      let mainNewsContent = {};
+
+      langTable?.forEach((lang) => {
+        mainNewsContent[`title_${lang.code}`] = getNewsValue('title', newsData, lang.code);
+        mainNewsContent[`excerpt_${lang.code}`] = getNewsValue('excerpt', newsData, lang.code);
+        mainNewsContent[`content_${lang.code}`] = getNewsValue('content', newsData, lang.code);
+      })
+      //format data to be suitable for the form fields
+      let data1 = {...newsData[0], ...mainNewsContent};    //get the first row of news to join with the new properties
+
+      data1= {...data1,
+        categories: data1.categories?.split(','),  //set an array of category code to the field categories
+        tags: data1?.tags?.split(','),                 //set an array of tag code to the field tags
+        news_position: data1?.news_position == 1 ? true : false,
+      }
+      form.setFieldsValue( data1 );  //the data for the all the fields of form is done formating
+      setData(data1);        //set state for news
+      setPostStatus(data1.post_status);
+      notifyAddNewsSuccess();
+    }
 
   }, [props])
 
@@ -65,90 +137,102 @@ export function NewsForm(props) {
   //Handle submit form data to server
   async function handleSubmit(value) {
     console.log('value submit:', value);
-    const newsCode = value.titlevi.trim().normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/đ/g, 'd')
-      .replace(/Đ/g, 'D')
-      .replace(/\s/g, "-")
-    value.categories = (value.categories).toString()
-
-    if (postStatus == "publish") {
-      const postDate = new Date().toISOString().slice(0, 10) + " " + new Date().toLocaleTimeString('en-GB')
-      Object.assign(value, { post_date: postDate, news_position: 1 });
+    //Reformat value data make it be suitable
+    value.categories = (value.categories).toString();
+    value.tags = value.tags?.toString() ?? '';
+    //value.news_position = newsPosition ? 1 : 0;
+    console.log('news_position 2: ', form.getFieldValue('news_position'));
+    value.news_position = form.getFieldValue('news_position') ?? false;
+    value.news_position = value.news_position ? 1 : 0;
+    if(form.getFieldValue('publish')){
+      value = {...value, post_date: '1'}; //add property post_date into the value object
     }
-    else {
-      Object.assign(value, { news_position: 0 });
-    }
-    Object.assign(value, {
-      post_author: 1,
-      //post_status: postStatus,
-      news_code: newsCode,
-      type: process.env.POST_TYPE_NEWS,
+    delete value['publish'];
+    //Creating an array of records for inserting into news_lamguages table
+    const newsLangs = langTable.map( lang => {
+      delete value[`title_${lang.code}`];    //delete unsused properties
+      delete value[`excerpt_${lang.code}`];
+      delete value[`content_${lang.code}`];
+      return {
+        title: form.getFieldValue(`title_${lang.code}`) ?? '',
+        excerpt: form.getFieldValue(`excerpt_${lang.code}`) ?? '',
+        content: form.getFieldValue(`excerpt_${lang.code}`) ?? '',
+        languageCode: lang.code,
+        newsId: params?.id,
+      };
     });
-    try {
+
+   // try {
       //editing news
       if (params?.id) {
-        await editNews(value, params.id).then(() => {
-          router.push(`${pathName}`)
-
-          if (postStatus == 'trash') {
-            toast.success("Move to trash Success", {
-              position: "top-center",
-            });
-            router.push('/admin/news')
-          } else if (postStatus == 'draft') {
-            toast.success("Save Draft Success", {
-              position: "top-center",
-            });
-          } else {
-            toast.success("Save Publish Success", {
-              position: "top-center",
-            });
-          }
-        })
-
-      }
-      //adding news
-      else {
-        await addNews(value).then((message) => {console.log("message from server:", message)})
-        if (postStatus == 'draft') {
-          toast.success("Save Draft Success", {
-            position: "top-center",
-          });
-        } else {
-          toast.success("Save Publish Success", {
-            position: "top-center",
+        if(value.post_status == process.env.NEXT_PUBLIC_PS_TRASH)
+          //await delNews(value, newsLangs, params.id);
+          await props.dell(value, newsLangs, params.id);
+        else{
+          await props.editNews(value, newsLangs, params.id).then((message) => {
+            if( message.message == 1 ) { //signal of success edit on server
+              setPostStatus(form.getFieldValue('post_status')); //set postStatus state to rerender action buttons
+              let messageNotify = form.getFieldValue('post_status') == process.env.NEXT_PUBLIC_PS_DRAFT ?
+                  'Save Draft Success'
+                  :
+                  'Save Publish Success';
+              toast.success(messageNotify, {
+                position: "top-center",
+              });
+            } else {  //signal of faillure on server
+              let messageNotify = 'Cannot update news, please try again or inform admin';
+              toast.success(messageNotify, {
+                position: "top-center",
+              });
+            }
           });
         }
       }
-    }
-    catch (error) {
-      toast.error(error.response.data.message);
-      throw new Error('Fail to submit news');
-    }
+      //adding news
+      else {
+        await props.addNews(value, newsLangs);
+      }
   }
 
   const handleSubmitFailed = (errorInfo) => {
     console.log('Failed to submit:', errorInfo);
   };
-
-  const onChangePosition = (checked) => {
-    if (checked == true) {
-      setNewsPosition(1)
-    } else {
-      setNewsPosition(0)
-    }
-  };
-  //Set value for post_status field
-  const setStatusHidden = ( value ) => {
-    form.setFieldValue('post_status', value);
-    console.log("value of form,", form.getFieldValue('post_status'));
+  //i dont see this function is useful, we can delete it
+  const handleChangeTab = (key) => {
+    console.log('>>> key tab ', key);
   }
 
+  const onChangePosition = (checked) => {
+    form.setFieldValue('news_position', checked);
+  };
+  //Set value for post_status field
+  //parameters: value: the state of post_status
+  //            publish: boolean, is publish button pressed?
+  const setStatusHidden = ( value, publish = false ) => {
+    form.setFieldValue('post_status', value);
+    form.setFieldValue('publish', publish);
+  }
+  //Build category tree from category table
 
 
+  //render <option> for select box from category tree
+  function renderCategoryOptions(category, level = 0) {
+    const options = [];
 
+    options.push(
+      <Option key={category.id} value={category.category_code}>
+        {Array(level).fill('—').join(' ')} {category.name}
+      </Option>
+    );
 
+    if (category.children) {
+      for (const childCategory of category.children) {
+        options.push(...renderCategoryOptions(childCategory, level + 1));
+      }
+    }
+
+    return options;
+  }
 
 // tab handle
 
@@ -165,7 +249,7 @@ export function NewsForm(props) {
             },
           ]}
         >
-          {
+          {//only generate news_code when post status is not published
           lang == process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE && data?.post_status != process.env.NEXT_PUBLIC_PS_PUBLISH ?
             <Input onChange={() => generateNewsCode()} />
             :
@@ -176,7 +260,7 @@ export function NewsForm(props) {
         </Form.Item>
         <Form.Item
           label="Excerpt"
-          name={`excerpt${lang}`}
+          name={`excerpt_${lang}`}
           rules={[
             {
               required: true,
@@ -188,7 +272,7 @@ export function NewsForm(props) {
         </Form.Item>
         <Form.Item
           label="Content"
-          name={`content${lang}`}
+          name={`content_${lang}`}
           rules={[
             {
               required: true,
@@ -196,29 +280,23 @@ export function NewsForm(props) {
             },
           ]}
         >
-          <Editor />
+          <Input />
         </Form.Item>
       </>
     )
   }
-  const itemTab = [
-    {
-      key: 'vi',
-      label: 'Tieng Viet',
-      children: <>
-        <TabComponent lang='vi' />
-      </>,
-    },
-    {
-      key: 'en',
-      label: 'English',
-      children: <TabComponent lang='en' />,
-    },
-  ];
 
-  const handleChangeTab = (key) => {
-    console.log('>>> key tab ', key);
-  }
+  const itemTab = langTable?.map(item => (
+    {
+        key: item.code,
+        label: item.name,
+        children: <>
+          <TabComponent lang={item.code} />
+        </>
+    }
+  ))
+
+
 
   return (
     <>
@@ -302,7 +380,7 @@ export function NewsForm(props) {
 
                 className="p-2"
               >
-                <Button type="primary" htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_PUBLISH)} >
+                <Button type="primary" htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_PUBLISH, true)} >
                   Publish
                 </Button>
 
@@ -316,8 +394,8 @@ export function NewsForm(props) {
           label="Priority"
           name="news_position"
         >
-          <Tooltip title="Can active when status is publish">
-            <Switch checked={newsPosition == 1 ? true : false} onChange={onChangePosition} />
+          <Tooltip title="Can only be active when publishing the news">
+            <Switch  onChange={onChangePosition} />
           </Tooltip>
         </Form.Item>
 
@@ -334,7 +412,7 @@ export function NewsForm(props) {
         <Form.Item label="Author" name="post_author" rules={[
           {
             required: true,
-            message: 'Please select your category!',
+            message: 'Please select the author!',
           },
         ]}
         >
@@ -356,22 +434,18 @@ export function NewsForm(props) {
         ]}
         >
           <Select mode="multiple" placeholder="Please category" allowClear filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
-            {cate && cate.map((item, index) => (
-              <Option key={index} value={item.id}>{item.category_code}</Option>
-            ))}
+            {/*cate && cate.map((item, index) => (
+              <Option key={index} value={item.category_code}>{item.name}</Option>
+            ))*/
+            catTree?.map((category) => renderCategoryOptions(category))
+            }
           </Select>
         </Form.Item>
 
-        <Form.Item label="Tags" name="tags" rules={[
-          {
-            required: true,
-            message: 'Please add your tags!',
-          },
-        ]}
-        >
+        <Form.Item label="Tags" name="tags" >
           <Select mode="multiple" placeholder="Please tags" allowClear filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
             {tags && tags.map((item, index) => (
-              <Option key={index} value={item.id}>{item.tag_code}</Option>
+              <Option key={index} value={item.tag_code}>{item.name}</Option>
             ))}
           </Select>
         </Form.Item>
@@ -386,6 +460,14 @@ export function NewsForm(props) {
         // or className="hidden-field" // Apply a CSS class to hide the field
       >
         <Input />
+      </Form.Item>
+
+      <Form.Item
+        name="publish"
+        style={{ display: 'none' }} // Hide the field using CSS
+        // or className="hidden-field" // Apply a CSS class to hide the field
+      >
+        <Switch />
       </Form.Item>
 
       </Form>

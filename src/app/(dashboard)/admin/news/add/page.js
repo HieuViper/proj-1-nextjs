@@ -20,8 +20,11 @@ async function AddNews() {
       message = `Fail to add a news, try again or inform your admin: ${error.message}`;
     }
     console.log("id:", id);
+    if (id) {
+      redirect(`/admin/news/edit/${id}?message=${message}`);
+    }
 
-    id && redirect(`/admin/news/edit/${id}?message=${message}`);
+    return message;
   }
   const cate = await newsMHandle.getCategories(process.env.DEFAULT_LANGUAGE);
   const tags = await newsMHandle.getTags(process.env.DEFAULT_LANGUAGE);

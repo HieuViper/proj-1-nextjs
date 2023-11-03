@@ -1,4 +1,4 @@
-"use server";
+//"use server";
 import { db } from "@/config/db";
 import { Op, QueryTypes } from "sequelize";
 
@@ -13,7 +13,6 @@ function getStatusQuery(post_status) {
       return `post_status='${post_status}'`;
   }
 }
-
 //get search query from search parameter
 function getSearchQuery(search) {
   return search == ""
@@ -21,7 +20,21 @@ function getSearchQuery(search) {
     : `AND (title LIKE '%${search}%' OR content LIKE '%${search}%' OR categories LIKE '%${search}%')`;
 }
 
-//Getarticle for tab "All,published, trash"
+export const articleHandle = {
+  getAllArticle,
+  getTotalNumOfarticle,
+  trashArticle,
+  deleteBulkArticle,
+  recoverArticle,
+  deleteArticle,
+  getArticle,
+  getCategories,
+  getLanguages,
+  updateAarticle,
+  addAarticle,
+};
+
+//Get article for tab "All,published, trash"
 export async function getAllArticle(
   post_status,
   page,
@@ -54,7 +67,7 @@ export async function getAllArticle(
   }
 }
 
-//get total item of articles
+//Get total item of articles
 export async function getTotalNumOfarticle(
   post_status,
   search,
@@ -217,8 +230,7 @@ export async function deleteArticle(key) {
   }
 }
 
-//Get Article by id
-
+//Get Article by ID
 export async function getArticle(id) {
   try {
     let sqlquery = `SELECT * FROM articles_all WHERE id=${id}`;
@@ -231,28 +243,8 @@ export async function getArticle(id) {
     throw new Error("Fail to get articles");
   }
 }
-export async function editarticle(data, id) {
-  // try {
-  //   const sqlquery = "UPDATE articles SET ? WHERE id = ?";
-  //   await pool.query(sqlquery, [data, id]);
-  // } catch (error) {
-  //   throw new Error("Fail to edit articles");
-  // }
-}
 
-export async function addarticle(data) {
-  // try {
-  //   const sqlquery = "INSERT INTO articles SET ?";
-  //   const result = await pool.query(sqlquery, data);
-  //   if (result.insertId) {
-  //     // redirect(`/admin/articles/edit/${result.insertId}`);
-  //   }
-  //   // return result
-  // } catch (error) {
-  //   throw new Error("Fail to add articles");
-  // }
-}
-
+//Get All Categories
 export async function getCategories() {
   try {
     const results = await db.Article_categories.findAll();
@@ -260,5 +252,84 @@ export async function getCategories() {
   } catch (error) {
     console.log(error);
     throw new Error("Fail to get categories");
+  }
+}
+
+//Get All Languages
+export async function getLanguages() {
+  //console.log('db in language:', db);
+  try {
+    const results = await db.Languages.findAll({
+      order: db.seq.literal(`code='${process.env.DEFAULT_LANGUAGE}' DESC`),
+    });
+    return results;
+  } catch (error) {
+    throw new Error("Fail to get languages: " + error.message);
+  }
+}
+
+//Add a new article from Add form
+//parameter: data: contain updated value for article Table
+//           articleLangs: contain updated value for article_languages Table
+export async function addAarticle(data, articleLangs) {
+  const t = await db.seq.transaction();
+  try {
+    //update into article Table
+    const currentLoginUser = "huy"; //we add information of modifier huy
+    if (data.post_date) data.post_date = db.seq.literal("now()"); //user has press publish button, set time for post_date
+    console.log("data :", data);
+    const article = await db.Articles.create(data, { transaction: t });
+    //add articleId property to the articleLangs
+    for (const element of articleLangs) {
+      element.articleId = article.id;
+    }
+    //create records in article_languages Table
+    await db.Article_languages.bulkCreate(articleLangs, {
+      validate: true,
+      transaction: t,
+    });
+
+    await t.commit();
+    return article.id;
+  } catch (error) {
+    await t.rollback();
+    throw new Error("Cannot create article:" + error.message);
+  }
+}
+
+//Update new information of a article from Edit form
+//parameter: data: contain updated value for article Table
+//           articleLangs: contain updated value for article_languages Table
+//           id:  contain id of the article that need to be updated
+export async function updateAarticle(data, articleLangs, id) {
+  const t = await db.seq.transaction();
+  try {
+    //update into article Table
+    const currentLoginUser = "huy"; //we add information of modifier huy
+    data = { ...data, modified_by: currentLoginUser };
+    if (data.post_date) data.post_date = db.seq.literal("now()"); //user has press publish button, set time for post_date
+    console.log("data :", data);
+    await db.Articles.update(data, {
+      where: {
+        id: id,
+      },
+      transaction: t,
+    });
+    //update into article_languages Table
+    for (const element of articleLangs) {
+      console.log("element:", element);
+      const { languageCode, articleId, ...articleLangRow } = element;
+      await db.Article_languages.update(articleLangRow, {
+        where: {
+          [Op.and]: [{ articleId: id }, { languageCode: languageCode }],
+        },
+        transaction: t,
+      });
+    }
+
+    await t.commit();
+  } catch (error) {
+    await t.rollback();
+    throw new Error("Cannot update article:" + error.message);
   }
 }

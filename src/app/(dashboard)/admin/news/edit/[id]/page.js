@@ -28,7 +28,6 @@ async function EditNews({ params, searchParams }) {
   const cate = await newsMHandle.getCategories(process.env.DEFAULT_LANGUAGE);
   const tags = await newsMHandle.getTags(process.env.DEFAULT_LANGUAGE);
   const langTable = await newsMHandle.getLanguages();
-
   return (
     <div className="">
       Edit new

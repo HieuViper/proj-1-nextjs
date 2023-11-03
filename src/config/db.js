@@ -12,21 +12,35 @@ import { newsLanguageModel } from "./models/news_languages";
 import { tagsModel } from "./models/tags";
 import { tagLangsModel } from "./models/tag_langs";
 
+const sequelize = new Sequelize(
+  process.env.DB_DBNAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  { host: process.env.DB_HOST, dialect: process.env.DB_DIALECT, pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
+  },
+  timezone: '+07:00',
+ },
+);
+
 export const db = {
   initialized: false,
   initialize,
-  seq: null,
-  News: null,
-  News_languages: null,
-  Languages: null,
-  Articles: null,
-  Article_languages: null,
-  Article_categories: null,
-  Article_cate_langs: null,
-  News_categories: null,
-  News_cate_langs: null,
-  Tags: null,
-  Tag_langs: null,
+  seq: sequelize,
+  News: newsModel(sequelize),
+  News_languages: newsLanguageModel(sequelize),
+  Languages: languagesModel(sequelize),
+  Articles: articleModel(sequelize),
+  Article_languages: articleLanguageModel(sequelize),
+  Article_categories: articleCategoriesModel(sequelize),
+  Article_cate_langs: articleCateLanguageModel(sequelize),
+  News_categories: newsCategoriesModel(sequelize),
+  News_cate_langs: newsCateLanguageModel(sequelize),
+  Tags: tagsModel(sequelize),
+  Tag_langs: tagLangsModel(sequelize),
 };
 
 // initialize db and models, called on first api request from /helpers/api/api-handler.js
@@ -46,34 +60,33 @@ async function initialize() {
   );
 
   // connect to db
-  const sequelize = new Sequelize(
-    process.env.DB_DBNAME,
-    process.env.DB_USER,
-    process.env.DB_PASSWORD,
-    { host: process.env.DB_HOST, dialect: process.env.DB_DIALECT, pool: {
-      max: 5,
-      min: 0,
-      acquire: 30000,
-      idle: 10000
-    },
-    timezone: '+07:00',
-   },
+  // const sequelize = new Sequelize(
+  //   process.env.DB_DBNAME,
+  //   process.env.DB_USER,
+  //   process.env.DB_PASSWORD,
+  //   { host: process.env.DB_HOST, dialect: process.env.DB_DIALECT, pool: {
+  //     max: 5,
+  //     min: 0,
+  //     acquire: 30000,
+  //     idle: 10000
+  //   },
+  //   timezone: '+07:00',
+  //  },
+  // );
 
-  );
-
-  // init models and add them to the exported db object
-  db.seq = sequelize;
-  db.News = newsModel(sequelize);
-  db.News_languages = newsLanguageModel(sequelize);
-  db.Languages = languagesModel(sequelize);
-  db.Articles = articleModel(sequelize);
-  db.Article_languages = articleLanguageModel(sequelize);
-  db.Article_categories = articleCategoriesModel(sequelize);
-  db.Article_cate_langs = articleCateLanguageModel(sequelize);
-  db.News_categories = newsCategoriesModel(sequelize);
-  db.News_cate_langs = newsCateLanguageModel(sequelize);
-  db.Tags = tagsModel(sequelize);
-  db.Tag_langs = tagLangsModel(sequelize);
+  // // init models and add them to the exported db object
+  // db.seq = sequelize;
+  // db.News = newsModel(sequelize);
+  // db.News_languages = newsLanguageModel(sequelize);
+  // db.Languages = languagesModel(sequelize);
+  // db.Articles = articleModel(sequelize);
+  // db.Article_languages = articleLanguageModel(sequelize);
+  // db.Article_categories = articleCategoriesModel(sequelize);
+  // db.Article_cate_langs = articleCateLanguageModel(sequelize);
+  // db.News_categories = newsCategoriesModel(sequelize);
+  // db.News_cate_langs = newsCateLanguageModel(sequelize);
+  // db.Tags = tagsModel(sequelize);
+  // db.Tag_langs = tagLangsModel(sequelize);
 
   //relationship
   db.News.belongsToMany(db.Languages, { through: db.News_languages });

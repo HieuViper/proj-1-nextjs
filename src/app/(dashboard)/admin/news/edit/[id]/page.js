@@ -31,8 +31,8 @@ async function EditNews({ params, searchParams }) {
             Edit new
             <NewsForm data={ JSON.stringify(data) }
                       cate={ JSON.stringify(cate) }
-                      tags = { JSON.stringify( tags ) }
-                      langTable = { JSON.stringify( langTable ) }
+                      tags = {  JSON.stringify(tags) }
+                      langTable = {  JSON.stringify(langTable)  }
                       {...{ dell,editNews }}
              />
         </div>

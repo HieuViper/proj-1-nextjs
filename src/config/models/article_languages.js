@@ -29,6 +29,23 @@ export function articleLanguageModel(sequelize) {
       allowNull: true,
       defaultValue: "undefined",
     },
+    articleId: {
+      type: DataTypes.BIGINT(20).UNSIGNED,
+      primaryKey: true,
+      references: {
+        model: 'articles',
+        key: 'id'
+      },
+    },
+    languageCode: {
+        type: DataTypes.STRING(10),
+        primaryKey: true,
+        references: {
+             model: 'languages',
+             key: 'code'
+        }
+    }
+
     // language_code: {
     //     type: DataTypes.STRING(10),
     //     collate: 'utf8mb4_unicode_520_ci',

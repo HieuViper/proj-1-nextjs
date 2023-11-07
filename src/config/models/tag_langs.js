@@ -14,6 +14,22 @@ export function tagLangsModel(sequelize) {
             allowNull: true,
             comment: 'Description',
         },
+        tagId: {
+            type: DataTypes.BIGINT(20).UNSIGNED,
+            primaryKey: true,
+            references: {
+                model: 'tags',
+                key: 'id'
+            }
+        },
+        languageCode: {
+            type: DataTypes.STRING(10),
+            primaryKey: true,
+            references: {
+                model: 'languages',
+                key: 'code'
+            }
+        }
     };
 
     const options = {

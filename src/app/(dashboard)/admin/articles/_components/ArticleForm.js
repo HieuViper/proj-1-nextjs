@@ -13,11 +13,13 @@ import {
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export function ArticleForm(props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const params = useParams();
   const [form] = Form.useForm();
   const { Option } = Select;
@@ -27,8 +29,8 @@ export function ArticleForm(props) {
   console.log("🚀 ~ file: ArticleForm.js:25 ~ ArticleForm ~ data:", data);
   const [lang, setLang] = useState("vi");
   const [picName, setPicName] = useState("");
+  console.log("🚀 ~ file: ArticleForm.js:32 ~ ArticleForm ~ picName:", picName);
   const [previewPic, setPreviewPic] = useState(null);
-  const [catTree, setCatTree] = useState([]);
   const [langTable, setLangTable] = useState([]);
 
   const authors = [
@@ -109,41 +111,19 @@ export function ArticleForm(props) {
     form.setFieldValue("article_code", articleCode);
   }
 
-  // CATEGORY
-  //Build category tree from category table
-  function buildCategoryTree(categories, parent = null) {
-    const categoryTree = [];
-
-    for (const category of categories) {
-      if (category.parent === parent) {
-        const children = buildCategoryTree(categories, category.id);
-        if (children.length > 0) {
-          category.children = children;
-        }
-        categoryTree.push(category);
-      }
-    }
-    return categoryTree;
-  }
-
-  //render <option> for select box from category tree
-  function renderCategoryOptions(category, level = 0) {
-    const options = [];
-
-    options.push(
-      <Option key={category.id} value={category.category_code}>
-        {Array(level).fill("—").join(" ")} {category.name}
-      </Option>
-    );
-
-    if (category.children) {
-      for (const childCategory of category.children) {
-        options.push(...renderCategoryOptions(childCategory, level + 1));
-      }
-    }
-
-    return options;
-  }
+  //CATEGORY
+  //Render option cate
+  const renderCateOptions = () => {
+    const rs = [];
+    cate &&
+      cate.map((item) => {
+        rs.push({
+          label: item.name,
+          value: item.category_code,
+        });
+      });
+    return rs;
+  };
 
   //Tab handle
   const TabComponent = ({ lang }) => {
@@ -191,24 +171,91 @@ export function ArticleForm(props) {
     console.log(key);
   };
 
+  const uploadPicToServer = async (event) => {
+    const body = new FormData();
+    // console.log("file", image)
+    body.append("file", previewPic);
+    const response = await fetch("/api/articles/image", {
+      method: "POST",
+      body,
+    });
+  };
+
   // Handle SUBMIT FORM
   async function handleSubmit(value) {
-    if (postStatus == "publish") {
-      const postDate =
-        new Date().toISOString().slice(0, 10) +
-        " " +
-        new Date().toLocaleTimeString("en-GB");
-      Object.assign(value, { post_date: postDate, article_position: 1 });
-    } else {
-      Object.assign(value, { article_position: 0 });
+    value.categories = value.categories.toString();
+    //value.news_position = newsPosition ? 1 : 0;
+    console.log("news_position 2: ", form.getFieldValue("article_position"));
+    value.article_position = form.getFieldValue("article_position") ?? false;
+    value.article_position = value.article_position ? 1 : 0;
+    if (form.getFieldValue("publish")) {
+      value = { ...value, post_date: "1" }; //add property post_date into the value object
     }
-    Object.assign(value, {
-      post_status: postStatus,
-      article_code: articleCode,
+    delete value["publish"];
+    //Creating an array of records for inserting into article_lamguages table
+    const articleLangs = langTable.map((lang) => {
+      delete value[`title_${lang.code}`]; //delete unsused properties
+      delete value[`excerpt_${lang.code}`];
+      delete value[`content_${lang.code}`];
+      return {
+        title: form.getFieldValue(`title_${lang.code}`) ?? "",
+        excerpt: form.getFieldValue(`excerpt_${lang.code}`) ?? "",
+        content: form.getFieldValue(`excerpt_${lang.code}`) ?? "",
+        languageCode: lang.code,
+        articleId: params?.id,
+      };
     });
-    value.image = picName;
+
+    value.image = picName.replaceAll(" ", "_");
 
     console.log("value submit:", value);
+    console.log("articleLangs: ", articleLangs);
+
+    //editing article
+    if (params?.id) {
+      if (value.post_status == process.env.NEXT_PUBLIC_PS_TRASH)
+        await props.dell(value, articleLangs, params.id);
+      else {
+        await props
+          .editArticle(value, articleLangs, params.id)
+          .then((message) => {
+            uploadPicToServer();
+            if (message.message == 1) {
+              //signal of success edit on server
+              setPostStatus(form.getFieldValue("post_status")); //set postStatus state to rerender action buttons
+              let messageNotify =
+                form.getFieldValue("post_status") ==
+                process.env.NEXT_PUBLIC_PS_DRAFT
+                  ? "Save Draft Success"
+                  : "Save Publish Success";
+              toast.success(messageNotify, {
+                position: "top-center",
+              });
+            } else {
+              //signal of faillure on server
+              let messageNotify =
+                "Cannot update article, please try again or inform admin";
+              toast.success(messageNotify, {
+                position: "top-center",
+              });
+            }
+          });
+      }
+    }
+    //adding article
+    else {
+      await props.addArticle(value, articleLangs).then((message) => {
+        uploadPicToServer();
+        console.log("message from server:", message);
+        if (message && message != 1) {
+          let messageNotify =
+            "Cannot update article, please try again or inform admin" + message;
+          toast.success(messageNotify, {
+            position: "top-center",
+          });
+        }
+      });
+    }
   }
 
   const handleSubmitFailed = (errorInfo) => {
@@ -217,11 +264,16 @@ export function ArticleForm(props) {
 
   //USE EFFECT
   useEffect(() => {
-    setCatTree(buildCategoryTree(props.cate));
+    setCate(props.cate);
     setLangTable(props.langTable); //set languageTable for article
     if (params?.id) {
       //get the article, articledata is an array it's each row is a language's article
+
       let articleData = props.data;
+      console.log(
+        "🚀 ~ file: ArticleForm.js:273 ~ useEffect ~ articleData:",
+        articleData
+      );
       //Build the data for title, excerpt, content
       let mainArticleContent = {};
 
@@ -252,6 +304,7 @@ export function ArticleForm(props) {
       };
       form.setFieldsValue(data1); //the data for the all the fields of form is done formating
       setData(data1); //set state for article
+      setPicName(data1.image);
       setPostStatus(data1.post_status);
       notifyAddArticleSuccess();
     }
@@ -382,33 +435,6 @@ export function ArticleForm(props) {
         </Form.Item>
 
         <Form.Item
-          label="Category"
-          name="categories"
-          rules={[
-            {
-              required: true,
-              message: "Please select your category!",
-            },
-          ]}
-        >
-          <Select
-            mode="multiple"
-            placeholder="Please category"
-            allowClear
-            filterOption={(input, option) =>
-              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-          >
-            {cate &&
-              cate.map((item, index) => (
-                <Option key={index} value={item.id}>
-                  {item.category_code}
-                </Option>
-              ))}
-          </Select>
-        </Form.Item>
-
-        <Form.Item
           label="Author"
           name="post_author"
           rules={[
@@ -440,12 +466,8 @@ export function ArticleForm(props) {
             mode="multiple"
             placeholder="Please category"
             allowClear
-            filterOption={(input, option) =>
-              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-          >
-            {catTree?.map((category) => renderCategoryOptions(category))}
-          </Select>
+            options={renderCateOptions()}
+          ></Select>
         </Form.Item>
 
         <Form.Item name="image" label="Image" getValueFromEvent={getFile}>
@@ -454,7 +476,7 @@ export function ArticleForm(props) {
             maxCount={1}
             // action="/api/articles/image"
             customRequest={(info) => {
-              console.log(info.file.name);
+              console.log(info);
               setPreviewPic(info.file);
               setPicName(info.file.name);
             }}

@@ -1,13 +1,12 @@
-import { db } from "@/config/db";
 import { newsMHandle } from "@/library/getNews";
 import { redirect } from "next/navigation";
 import { NewsForm } from "../../_components/NewsForm";
 
 export const dynamic = "force-dynamic";
 async function EditNews({ params, searchParams }) {
-  if (!db.initialized) {
-    await db.initialize();
-  }
+  // if (!db.initialized) {
+  //   await db.initialize();
+  // }
   async function dell(data, newsLangs, id) {
     "use server";
     await newsMHandle.updateANews(data, newsLangs, id);

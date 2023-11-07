@@ -1,15 +1,13 @@
 /* eslint-disable @next/next/no-async-client-component */
 
-import { useRouter } from 'next/navigation';
-import { newsMHandle } from '@/library/getNews';
-import { db } from '@/config/db';
-import NewsList from './_components/NewsList';
+import { newsMHandle } from "@/library/getNews";
+import NewsList from "./_components/NewsList";
 
 // This part is important!
 export const dynamic = "force-dynamic";
 
 async function NewsPage({ searchParams }) {
-   if(!db.initialized) await db.initialize();
+  //  if(!db.initialized) await db.initialize();
 
   const trash = searchParams?.trash ?? "";
   const keys = searchParams?.keys ?? "";
@@ -28,23 +26,23 @@ async function NewsPage({ searchParams }) {
 
   // console.log('searchparams: ', searchParams);
 
-  if (trash != '') {
+  if (trash != "") {
     await newsMHandle.trashNews(trash);
   }
-  if (keys != '') {
+  if (keys != "") {
     await newsMHandle.deleteBulkNews(keys, status);
   }
-  if (recover != '') {
+  if (recover != "") {
     await newsMHandle.recoverNews(recover);
   }
-  if (del != '') {
+  if (del != "") {
     await newsMHandle.deleteNews(del);
   }
   if (Object.keys(searchParams).length == 0) {
     orderby = "post_modified";
     order = "desc";
   }
-console.log('news list page');
+  console.log("news list page");
   const newsData = await newsMHandle.getAllNews(
     status,
     page,

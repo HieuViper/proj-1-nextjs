@@ -245,13 +245,17 @@ export async function getArticle(id) {
 }
 
 //Get All Categories
-export async function getCategories() {
+export async function getCategories(lang) {
   try {
-    const results = await db.Article_categories.findAll();
+    let strquery;
+    if (lang)
+      strquery = `SELECT * FROM article_cat_all WHERE languageCode='${lang}'`;
+    else strquery = "SELECT * FROM article_cat_all";
+    const results = await db.seq.query(strquery, { type: QueryTypes.SELECT });
+
     return results;
   } catch (error) {
-    console.log(error);
-    throw new Error("Fail to get categories");
+    throw new Error("Fail to get categories: " + error.message);
   }
 }
 
@@ -278,12 +282,20 @@ export async function addAarticle(data, articleLangs) {
     const currentLoginUser = "huy"; //we add information of modifier huy
     if (data.post_date) data.post_date = db.seq.literal("now()"); //user has press publish button, set time for post_date
     console.log("data :", data);
+
     const article = await db.Articles.create(data, { transaction: t });
+    console.log(
+      "🚀 ~ file: getArticles.js:287 ~ addAarticle ~ article:",
+      article
+    );
+
     //add articleId property to the articleLangs
     for (const element of articleLangs) {
       element.articleId = article.id;
     }
+    console.log(articleLangs);
     //create records in article_languages Table
+
     await db.Article_languages.bulkCreate(articleLangs, {
       validate: true,
       transaction: t,

@@ -1,12 +1,11 @@
-import { db } from "@/config/db";
 import { articleHandle } from "@/library/getArticles";
 import { ArticleForm } from "../../_components/ArticleForm";
 
 export const dynamic = "force-dynamic";
 const EditArticlePage = async ({ params, searchParams }) => {
-  if (!db.initialized) {
-    await db.initialize();
-  }
+  // if (!db.initialized) {
+  //   await db.initialize();
+  // }
   async function dellArticle(data, articleLangs, id) {
     "use server";
     await articleHandle.updateAarticle(data, articleLangs, id);

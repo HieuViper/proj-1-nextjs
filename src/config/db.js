@@ -10,6 +10,7 @@ import { newsCateLanguageModel } from "./models/news_cate_langs";
 import { newsCategoriesModel } from "./models/news_categories";
 import { newsLanguageModel } from "./models/news_languages";
 import { tagLangsModel } from "./models/tag_langs";
+import { tagsModel } from "./models/tags";
 
 const sequelize = new Sequelize(
   process.env.DB_DBNAME,
@@ -111,7 +112,7 @@ async function initialize() {
   db.Tags.belongsToMany(db.Languages, { through: db.Tag_langs });
   db.Languages.belongsToMany(db.Tags, { through: db.Tag_langs });
   // sync all models with database
-  // await sequelize.sync({ alter: true });
+  await sequelize.sync({ alter: true });
 
   db.initialized = true;
   console.log("Initializing database is done");

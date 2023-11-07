@@ -18,7 +18,7 @@ export function NewsForm(props) {
   const searchParams = useSearchParams();
   const [form] = Form.useForm();
 
- // const [cate, setCate] = useState([]);
+  // const [cate, setCate] = useState([]);
   const [tags, setTags] = useState([]);
   const [langTable, setLangTable] = useState([]);
   const [postStatus, setPostStatus] = useState('');
@@ -39,13 +39,12 @@ export function NewsForm(props) {
   //property: name of the column  you want to get the value
   //lang: language of the content
   // news: an array of news_lang
-  function getNewsValue( property, news, lang ) {
+  function getNewsValue(property, news, lang) {
     // console.log('vao day');
     let rs
     news.forEach(element => {
-      if( element.languageCode == lang )
-      {
-        rs=  element[property];
+      if (element.languageCode == lang) {
+        rs = element[property];
       }
     });
     return rs
@@ -57,32 +56,33 @@ export function NewsForm(props) {
 
     //setCate( props.cate );
     //const  catTree  = buildCategoryTree( cate );
-    setCatTree( buildCategoryTree( JSON.parse( props.cate )) );
+    setCatTree(buildCategoryTree(JSON.parse(props.cate)));
     //const tags = (props.tags);
-    setTags( JSON.parse(props.tags) );
+    setTags(JSON.parse(props.tags));
     //get languages Table
     //const langTable = (props.langTable);
-    setLangTable( JSON.parse(props.langTable) ); //set languageTable for news
+    setLangTable(JSON.parse(props.langTable)); //set languageTable for news
     if (params?.id) {
       //get the news, newsdata is an array it's each row is a language's news
-      let newsData = (props.data);
+      let newsData = (JSON.parse(props.data));
       //Build the data for title, excerpt, content
       let mainNewsContent = {};
 
-      langTable?.forEach((lang) => {
+      JSON.parse(props.langTable)?.forEach((lang) => {
         mainNewsContent[`title_${lang.code}`] = getNewsValue('title', newsData, lang.code);
         mainNewsContent[`excerpt_${lang.code}`] = getNewsValue('excerpt', newsData, lang.code);
         mainNewsContent[`content_${lang.code}`] = getNewsValue('content', newsData, lang.code);
       })
       //format data to be suitable for the form fields
-      let data1 = {...newsData[0], ...mainNewsContent};    //get the first row of news to join with the new properties
+      let data1 = { ...newsData[0], ...mainNewsContent };    //get the first row of news to join with the new properties
 
-      data1= {...data1,
+      data1 = {
+        ...data1,
         categories: data1.categories?.split(','),  //set an array of category code to the field categories
         tags: data1?.tags?.split(','),                 //set an array of tag code to the field tags
         news_position: data1?.news_position == 1 ? true : false,
       }
-      form.setFieldsValue( data1 );  //the data for the all the fields of form is done formating
+      form.setFieldsValue(data1);  //the data for the all the fields of form is done formating
       setData(data1);        //set state for news
       setPostStatus(data1.post_status);
       notifyAddNewsSuccess();
@@ -113,63 +113,63 @@ export function NewsForm(props) {
     console.log('news_position 2: ', form.getFieldValue('news_position'));
     value.news_position = form.getFieldValue('news_position') ?? false;
     value.news_position = value.news_position ? 1 : 0;
-    if(form.getFieldValue('publish')){
-      value = {...value, post_date: '1'}; //add property post_date into the value object
+    if (form.getFieldValue('publish')) {
+      value = { ...value, post_date: '1' }; //add property post_date into the value object
     }
     delete value['publish'];
     //Creating an array of records for inserting into news_lamguages table
-    const newsLangs = langTable.map( lang => {
+    const newsLangs = langTable.map(lang => {
       delete value[`title_${lang.code}`];    //delete unsused properties
       delete value[`excerpt_${lang.code}`];
       delete value[`content_${lang.code}`];
       return {
         title: form.getFieldValue(`title_${lang.code}`) ?? '',
         excerpt: form.getFieldValue(`excerpt_${lang.code}`) ?? '',
-        content: form.getFieldValue(`excerpt_${lang.code}`) ?? '',
+        content: form.getFieldValue(`content_${lang.code}`) ?? '',
         languageCode: lang.code,
         newsId: params?.id,
       };
     });
 
-   // try {
-      //editing news
-      if (params?.id) {
-        if(value.post_status == process.env.NEXT_PUBLIC_PS_TRASH)
-          //await delNews(value, newsLangs, params.id);
-          await props.dell(value, newsLangs, params.id);
-        else{
-          await props.editNews(value, newsLangs, params.id).then((message) => {
-            if( message.message == 1 ) { //signal of success edit on server
-              setPostStatus(form.getFieldValue('post_status')); //set postStatus state to rerender action buttons
-              let messageNotify = form.getFieldValue('post_status') == process.env.NEXT_PUBLIC_PS_DRAFT ?
-                  'Save Draft Success'
-                  :
-                  'Save Publish Success';
-              toast.success(messageNotify, {
-                position: "top-center",
-              });
-            } else {  //signal of faillure on server
-              let messageNotify = 'Cannot update news, please try again or inform admin';
-              toast.success(messageNotify, {
-                position: "top-center",
-              });
-            }
+    // try {
+    //editing news
+    if (params?.id) {
+      if (value.post_status == process.env.NEXT_PUBLIC_PS_TRASH)
+        //await delNews(value, newsLangs, params.id);
+        await props.dell(value, newsLangs, params.id);
+      else {
+        await props.editNews(value, newsLangs, params.id).then((message) => {
+          if (message.message == 1) { //signal of success edit on server
+            setPostStatus(form.getFieldValue('post_status')); //set postStatus state to rerender action buttons
+            let messageNotify = form.getFieldValue('post_status') == process.env.NEXT_PUBLIC_PS_DRAFT ?
+              'Save Draft Success'
+              :
+              'Save Publish Success';
+            toast.success(messageNotify, {
+              position: "top-center",
+            });
+          } else {  //signal of faillure on server
+            let messageNotify = 'Cannot update news, please try again or inform admin';
+            toast.success(messageNotify, {
+              position: "top-center",
+            });
+          }
+        });
+      }
+    }
+    //adding news
+    else {
+      await props.addNews(value, newsLangs).then((message) => {
+        console.log('message from server:', message);
+        if (message && message != 1) {
+          let messageNotify = 'Cannot update news, please try again or inform admin' + message;
+          toast.success(messageNotify, {
+            position: "top-center",
           });
         }
       }
-      //adding news
-      else {
-        await props.addNews(value, newsLangs).then(( message ) => {
-          console.log('message from server:', message);
-          if( message && message != 1) {
-            let messageNotify = 'Cannot update news, please try again or inform admin' + message;
-              toast.success(messageNotify, {
-                position: "top-center",
-              });
-          }
-        }
-        );
-      }
+      );
+    }
   }
 
   const handleSubmitFailed = (errorInfo) => {
@@ -183,9 +183,9 @@ export function NewsForm(props) {
   //Notify success adding new from /admin/add
   function notifyAddNewsSuccess() {
     //get message redirected from add news route
-    if(searchParams.get('message')){
+    if (searchParams.get('message')) {
       const message = searchParams.get('message') ?? '';
-      if( message == 1 ){ //signal of success edit on server
+      if (message == 1) { //signal of success edit on server
         let messageNotify = 'Add news successfully';
         toast.success(messageNotify, {
           position: "top-center",
@@ -204,7 +204,7 @@ export function NewsForm(props) {
   //Set value for post_status field
   //parameters: value: the state of post_status
   //            publish: boolean, is publish button pressed?
-  const setStatusHidden = ( value, publish = false ) => {
+  const setStatusHidden = (value, publish = false) => {
     form.setFieldValue('post_status', value);
     form.setFieldValue('publish', publish);
   }
@@ -244,12 +244,12 @@ export function NewsForm(props) {
     return options;
   }
 
-// tab handle
+  // tab handle
 
-  const TabComponent = ({lang}) => {
+  const TabComponent = ({ lang }) => {
     return (
       <>
-      <Form.Item
+        <Form.Item
           label="Title"
           name={`title_${lang}`}
           rules={[
@@ -260,11 +260,11 @@ export function NewsForm(props) {
           ]}
         >
           {//only generate news_code when post status is not published
-          lang == process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE && data?.post_status != process.env.NEXT_PUBLIC_PS_PUBLISH ?
-            <Input onChange={() => generateNewsCode()} />
-            :
-            <Input />
-         }
+            lang == process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE && data?.post_status != process.env.NEXT_PUBLIC_PS_PUBLISH ?
+              <Input onChange={() => generateNewsCode()} />
+              :
+              <Input />
+          }
 
 
         </Form.Item>
@@ -298,11 +298,11 @@ export function NewsForm(props) {
 
   const itemTab = langTable?.map(item => (
     {
-        key: item.code,
-        label: item.name,
-        children: <>
-          <TabComponent lang={item.code} />
-        </>
+      key: item.code,
+      label: item.name,
+      children: <>
+        <TabComponent lang={item.code} />
+      </>
     }
   ))
 
@@ -340,64 +340,64 @@ export function NewsForm(props) {
       >
         {
           //Handle display Action buttons
-        postStatus == "publish" ?
-          ( <div className="flex justify-around">
-            <div className="flex">
+          postStatus == "publish" ?
+            (<div className="flex justify-around">
+              <div className="flex">
+                <Form.Item
+                  className="p-2"
+                >
+                  <Button type="primary" ghost htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_DRAFT)}>
+                    Switch to Draft
+                  </Button>
+                </Form.Item>
+                <Form.Item
+                  className="p-2"
+                >
+                  <Button danger htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_TRASH)}>
+                    Move to trash
+                  </Button>
+                </Form.Item>
+              </div>
               <Form.Item
                 className="p-2"
               >
-                <Button type="primary" ghost htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_DRAFT)}>
-                  Switch to Draft
-                </Button>
-              </Form.Item>
-              <Form.Item
-                className="p-2"
-              >
-                <Button danger htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_TRASH)}>
-                  Move to trash
+                <Button type="primary" htmlType="submit" onClick={() => setStatusHidden(postStatus)}>
+                  Update
                 </Button>
               </Form.Item>
             </div>
-            <Form.Item
-              className="p-2"
-            >
-              <Button type="primary" htmlType="submit" onClick={() => setStatusHidden(postStatus)}>
-                Update
-              </Button>
-            </Form.Item>
-          </div>
-          )
-          :
-          (
-          <div className={`flex  ${params.id ? 'justify-around' : 'justify-end'}`}>
-            {
-            params.id &&
-            <Form.Item className="p-2">
-              <Button danger htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_TRASH)}>
-                Move to trash
-              </Button>
-            </Form.Item>
-            }
-            <div className="flex">
-              <Form.Item
-                className="p-2"
-              >
-                <Button type="dashed" htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_DRAFT)}>
-                  Save Draft
-                </Button>
-              </Form.Item>
-              <Form.Item
+            )
+            :
+            (
+              <div className={`flex  ${params.id ? 'justify-around' : 'justify-end'}`}>
+                {
+                  params.id &&
+                  <Form.Item className="p-2">
+                    <Button danger htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_TRASH)}>
+                      Move to trash
+                    </Button>
+                  </Form.Item>
+                }
+                <div className="flex">
+                  <Form.Item
+                    className="p-2"
+                  >
+                    <Button type="dashed" htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_DRAFT)}>
+                      Save Draft
+                    </Button>
+                  </Form.Item>
+                  <Form.Item
 
-                className="p-2"
-              >
-                <Button type="primary" htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_PUBLISH, true)} >
-                  Publish
-                </Button>
+                    className="p-2"
+                  >
+                    <Button type="primary" htmlType="submit" onClick={() => setStatusHidden(process.env.NEXT_PUBLIC_PS_PUBLISH, true)} >
+                      Publish
+                    </Button>
 
-              </Form.Item>
-            </div>
-          </div>
-          )
+                  </Form.Item>
+                </div>
+              </div>
+            )
         }
 
         <Form.Item
@@ -447,7 +447,7 @@ export function NewsForm(props) {
             {/*cate && cate.map((item, index) => (
               <Option key={index} value={item.category_code}>{item.name}</Option>
             ))*/
-            catTree?.map((category) => renderCategoryOptions(category))
+              catTree?.map((category) => renderCategoryOptions(category))
             }
           </Select>
         </Form.Item>
@@ -460,26 +460,26 @@ export function NewsForm(props) {
           </Select>
         </Form.Item>
 
-           {/* Manage multilanguages here */}
+        {/* Manage multilanguages here */}
 
-           <Tabs defaultActiveKey="1" items={itemTab} onChange={handleChangeTab} />
+        <Tabs defaultActiveKey="1" items={itemTab} onChange={handleChangeTab} />
 
-      <Form.Item
-        name="post_status"
-        style={{ display: 'none' }} // Hide the field using CSS
+        <Form.Item
+          name="post_status"
+          style={{ display: 'none' }} // Hide the field using CSS
         // or className="hidden-field" // Apply a CSS class to hide the field
-      >
-        <Input />
-      </Form.Item>
+        >
+          <Input />
+        </Form.Item>
 
-      <Form.Item
-        name="publish"
-        style={{ display: 'none' }} // Hide the field using CSS
-        valuePropName="checked"
+        <Form.Item
+          name="publish"
+          style={{ display: 'none' }} // Hide the field using CSS
+          valuePropName="checked"
         // or className="hidden-field" // Apply a CSS class to hide the field
-      >
-        <Switch />
-      </Form.Item>
+        >
+          <Switch />
+        </Form.Item>
 
       </Form>
     </>

@@ -6,7 +6,7 @@ import {
   EyeOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
-import { Button, Radio, Select, Space, Table } from "antd";
+import { Button, Radio, Select, Space, Table, Tag } from "antd";
 import Search from "antd/es/input/Search";
 import { format } from "date-fns";
 import Link from "next/link";
@@ -17,13 +17,16 @@ export default function NewsList(props) {
   const router = useRouter();
   const pathName = usePathname();
   const searchParams = useSearchParams();
-  let orderParaDefault = "";
-  let orderParaInit = "";
+  // console.log('search', searchParams.get('status'));
+
+  console.log('orderParaDefaultsdasd :');
+  let orderParaDefault = '';
+  let orderParaInit = '';
   const initSort = {
     order: "descend",
     columnKey: "date",
   };
-  const [paginationServer, setPagination] = useState({
+  const [paginationServer, setPaginationServer] = useState({
     pageSize: 10,
     total: 0,
     current: 1,
@@ -42,32 +45,31 @@ export default function NewsList(props) {
   const [langTable, setLangTable] = useState([])
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState("");
-  const [search, setSearch] = useState("");
-  const [author, setAuthor] = useState("");
-  const [category, setCategory] = useState("");
-  const [tag, setTag] = useState("");
+  const [status, setStatus] = useState(searchParams.get('status') ?? '');
+  const [search, setSearch] = useState('');
+  const [author, setAuthor] = useState('');
+  const [category, setCategory] = useState('');
+  const [tag, setTag] = useState('');
   const [loadingStatus, setLoadingStatus] = useState(false);
-  const [lang, setLang] = useState("vi");
-
-
+  const [lang, setLang] = useState(process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE);
 
   useEffect(() => {
     const newsData = JSON.parse(props.dataTable);
     const langData = JSON.parse(props.langTable);
     setLangTable(langData);
     setNews(newsData);
-    setPagination(props.pagination);
+    setPaginationServer(props.pagination);
     setTotals(props.totals);
     setSelectedRowKeys([]);
     setLoadingStatus(false);
+    // setStatus(searchParams.get('status') ?? '')
   }, [props]);
 
   const onSearchChange = (e) => {
     setSearch(e.target.value);
   };
   const onSelectChange = (newSelectedRowKeys) => {
-    console.log("selectedRowKeys changed: ", newSelectedRowKeys);
+    // console.log("selectedRowKeys changed: ", newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
   };
   const rowSelection = {
@@ -104,7 +106,7 @@ export default function NewsList(props) {
 
   const handleSearch = async (value) => {
     //set state sorter to init state, that means sort follow the date column
-
+    setSearch(value)
     const orderPara = orderParaInit;
     router.push(
       `${pathName}?status=${status}&lang=${lang}&size=${paginationServer.pageSize}&search=${value}${orderPara}`
@@ -159,17 +161,17 @@ export default function NewsList(props) {
     setCategory(cat);
   };
 
-  const handleTagFilter = (tag1) => {
+  const handleTagFilter = (tag) => {
     const orderPara = orderParaInit;
     router.push(
-      `${pathName}?status=${status}&lang=${lang}&size=${paginationServer.pageSize}&tag=${tag1}${orderPara}`
+      `${pathName}?status=${status}&lang=${lang}&size=${paginationServer.pageSize}&tag=${tag}${orderPara}`
     );
     //reset the other filters
     setSortedInfo(initSort);
-    setSearch("");
-    setAuthor("");
-    setCategory("");
-    setTag(tag1);
+    setSearch('');
+    setAuthor('');
+    setCategory('');
+    setTag(tag);
   };
 
 
@@ -200,12 +202,13 @@ export default function NewsList(props) {
   orderParaDefault = getOrderPara(sortedInfo, status, true);
   orderParaInit = getOrderPara(initSort, status, true);
   //set languages for the languages select box
-  let langOptions = langTable.map( (lang) => {
+  let langOptions = langTable.map((lang) => {
     return { value: lang.code, label: lang.name };
   });
 
 
-const handleChange = (pagination, filters, sorter) => {
+  const handleChange = (pagination, filters, sorter) => {
+    setLoadingStatus(true)
     setSortedInfo(sorter);
     const orderPara = getOrderPara(sorter, status, true);
     router.push(
@@ -219,7 +222,7 @@ const handleChange = (pagination, filters, sorter) => {
     router.push(
       `${pathName}?status=${status}&size=${paginationServer.pageSize}${orderPara}&lang=${langValue}`
     );
-   //reset the other filters
+    //reset the other filters
 
     setSearch("");
     setAuthor("");
@@ -231,17 +234,21 @@ const handleChange = (pagination, filters, sorter) => {
   //console.log('props.cate :', props.cate);
   const columns = [
     {
-      title: "Title",
-      dataIndex: "title",
-      key: "title",
-      sorter: () => {},
-      sortOrder: sortedInfo.columnKey === "title" ? sortedInfo.order : null,
+      title: 'Title',
+      dataIndex: 'title',
+      key: 'title',
+      fixed: 'left',
+      sorter: () => { },
+      sortOrder: sortedInfo.columnKey === 'title' ? sortedInfo.order : null,
       render: (_, record) => {
         //let orderPara = orderParaDefault;
-        //console.log('title render');
         return (
           <>
-            <div className="text-base font-medium pb-2">{record.title}</div>
+            <div className="text-base font-medium pb-2">
+              {record.title}
+              {record.post_status == "draft" && searchParams.get('status') == '' && <span className='text-xs'> (Draft)</span>}
+              {record.news_position == 1 && searchParams.get('status') == '' && <span className='text-xs'> (Sticky)</span>}
+            </div>
             <div className="flex gap-2">
               {record.post_status !== process.env.NEXT_PUBLIC_PS_TRASH ? (
                 <>
@@ -295,9 +302,10 @@ const handleChange = (pagination, filters, sorter) => {
       },
     },
     {
-      title: "Post Author",
-      dataIndex: "post_author",
-      key: "post_author",
+      title: 'Post Author',
+      dataIndex: 'post_author',
+      key: 'post_author',
+      width: 100,
       render: (_, record) => {
         return (
           <a href="#" onClick={() => handleAuthorFilter(record.post_author)}>
@@ -307,32 +315,32 @@ const handleChange = (pagination, filters, sorter) => {
       },
     },
     {
-      title: "Categories",
-      dataIndex: "categories",
-      key: "categories",
-      width: 300,
+      title: 'Categories',
+      dataIndex: 'categories',
+      key: 'categories',
+      width: 200,
       render: (_, record) => {
         const categories = record.categories
           ? record.categories.split(",").map((cat) => cat.trim())
           : [];
         return (
           <>
-            {categories.map((cat1, index) => (
-              <div key={index}>
-                <a href="#" onClick={() => handleCategoryFilter(cat1)}>
-                  {cat1}
-                </a>
-                {index < categories.length - 1 && ", "}
-              </div>
+            {categories.map((cat, index) => (
+              <a href="#" onClick={() => handleCategoryFilter(cat)} key={index}>
+                <Tag color='green' style={{ marginBottom: '4px' }}>
+                  {cat}
+                </Tag>
+              </a>
             ))}
           </>
         );
       },
     },
     {
-      title: "Tags",
-      dataIndex: "tags",
-      key: "tags",
+      title: 'Tags',
+      dataIndex: 'tags',
+      key: 'tags',
+      width: 200,
       render: (_, record) => {
         const tags = record.tags
           ? record.tags.split(",").map((cat) => cat.trim())
@@ -340,24 +348,38 @@ const handleChange = (pagination, filters, sorter) => {
 
         return (
           <>
-            {tags.map((tag1, index) => (
-              <div key={index}>
-                <a href="#" onClick={() => handleTagFilter(tag1)}>
-                  {tag1}
-                </a>
-                {index < tags.length - 1 && ", "}
-              </div>
+            {tags.map((tag, index) => (
+              <a href="#" onClick={() => handleTagFilter(tag)} key={index}>
+                <Tag color='blue' style={{ marginBottom: '4px' }}>
+                  {tag}
+                </Tag>
+              </a>
             ))}
           </>
         );
       },
     },
     {
-      title: "Date",
-      dataIndex: "post_modified",
-      key: "date",
-      sorter: () => {},
-      sortOrder: sortedInfo.columnKey === "date" ? sortedInfo.order : null,
+      title: 'Short',
+      dataIndex: 'excerpt',
+      key: 'excerpt',
+      render: (_, record) => {
+        return (
+          <div>
+            {record.excerpt}
+          </div>
+        );
+      },
+    },
+
+    {
+      title: 'Date',
+      dataIndex: 'post_modified',
+      key: 'date',
+      fixed: 'right',
+      width: 200,
+      sorter: () => { },
+      sortOrder: sortedInfo.columnKey === 'date' ? sortedInfo.order : null,
       render: (_, record) => {
         return (
           <div>
@@ -388,33 +410,33 @@ const handleChange = (pagination, filters, sorter) => {
       <div className="flex justify-between mb-4 gap-x-4">
         <div className="flex gap-x-5">
           <p className="font-semibold text-xl pr-4">News</p>
-          <Button className="">
-            <Link href={`/admin/news/add`}>Add News</Link>
-          </Button>
+
+          <Link href={`/admin/news/add`}><Button >Add News </Button></Link>
+
           <Select
-            defaultValue="vi"
+            defaultValue={process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE}
             value={lang}
             style={{
               width: 120,
             }}
             onChange={handleChangeLanguage}
             options={langOptions}
-            /*[
-              {
-                value: 'vi',
-                label: 'Tiếng Việt',
-              },
-              {
-                value: 'en',
-                label: 'English',
-              },
-            ]*/
+          /*[
+            {
+              value: 'vi',
+              label: 'Tiếng Việt',
+            },
+            {
+              value: 'en',
+              label: 'English',
+            },
+          ]*/
           />
         </div>
         <Search
           placeholder="input search text"
-          value={search}
-          onChange={(e) => onSearchChange(e)}
+          // value={search}
+          // onChange={(e) => onSearchChange(e)}
           onSearch={(e) => handleSearch(e)}
           enterButton
           style={{
@@ -444,15 +466,15 @@ const handleChange = (pagination, filters, sorter) => {
         <Space>
           <Radio.Group
             disabled={loadingStatus}
-            defaultValue={""}
+            defaultValue={searchParams.get('status') ?? ''}
             onChange={(e) => {
               handlePostStatus(e.target.value), setLoadingStatus(true);
             }}
             optionType="button"
             buttonStyle="solid"
           >
-            <Radio.Button value="">All ({totals.all})</Radio.Button>
-            <Radio.Button value={process.env.NEXT_PUBLIC_PS_DRAFT}>
+            <Radio.Button value="" >All ({totals.all})</Radio.Button>
+            <Radio.Button value={process.env.NEXT_PUBLIC_PS_DRAFT} >
               Draft({totals.draft})
             </Radio.Button>
             <Radio.Button value={process.env.NEXT_PUBLIC_PS_PUBLISH}>
@@ -474,8 +496,12 @@ const handleChange = (pagination, filters, sorter) => {
         dataSource={news}
         rowKey="id"
         onChange={handleChange}
-        pagination={paginationServer}
+        pagination={{ ...paginationServer, disabled: loadingStatus }}
         // bordered={true}
+        scroll={{
+          x: 1300,
+        }}
+
       />
     </>
   );

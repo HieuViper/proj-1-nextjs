@@ -14,6 +14,22 @@ export function newsCateLanguageModel(sequelize) {
             allowNull: true,
             comment: 'Description',
         },
+        newsCategoryId: {
+            type: DataTypes.BIGINT(20).UNSIGNED,
+            primaryKey: true,
+            references: {
+                model: 'news_categories',
+                key: 'id'
+            }
+        },
+        languageCode: {
+            type: DataTypes.STRING(10),
+            primaryKey: true,
+            references: {
+                model: 'languages',
+                key: 'code'
+            }
+        }
     };
 
     const options = {

@@ -39,6 +39,22 @@ export function newsLanguageModel(sequelize) {
             allowNull: true,
             defaultValue: 'undefined',
         },
+        newsId: {
+            type: DataTypes.BIGINT.UNSIGNED,
+            primaryKey: true,
+            references: {
+                model: 'news', // 'Movies' would also work
+                key: 'id'
+            }
+        },
+        languageCode: {
+            type: DataTypes.STRING(10),
+            primaryKey: true,
+            references: {
+                model: 'languages',
+                key: 'code'
+            }
+        }
         // language_code: {
         //     type: DataTypes.STRING(10),
         //     collate: 'utf8mb4_unicode_520_ci',

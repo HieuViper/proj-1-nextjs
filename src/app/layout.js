@@ -1,5 +1,4 @@
 import Layout from "@/components/Layout";
-import { db } from "@/config/db";
 import { Inter } from "next/font/google";
 import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
@@ -9,9 +8,9 @@ const inter = Inter({ subsets: ["latin"] });
 // };
 
 export default async function RootLayout({ children }) {
-  if (!db.initialized) {
-    await db.initialize();
-  }
+  // if (!db.initialized) {
+  //   await db.initialize();
+  // }
 
   return <Layout child={children} />;
 }

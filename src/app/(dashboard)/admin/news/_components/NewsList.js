@@ -19,9 +19,9 @@ export default function NewsList(props) {
   const searchParams = useSearchParams();
   // console.log('search', searchParams.get('status'));
 
-  console.log('orderParaDefaultsdasd :');
-  let orderParaDefault = '';
-  let orderParaInit = '';
+  console.log("orderParaDefaultsdasd :");
+  let orderParaDefault = "";
+  let orderParaInit = "";
   const initSort = {
     order: "descend",
     columnKey: "date",
@@ -42,14 +42,14 @@ export default function NewsList(props) {
   });
   const [sortedInfo, setSortedInfo] = useState(initSort);
   const [news, setNews] = useState();
-  const [langTable, setLangTable] = useState([])
+  const [langTable, setLangTable] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState(searchParams.get('status') ?? '');
-  const [search, setSearch] = useState('');
-  const [author, setAuthor] = useState('');
-  const [category, setCategory] = useState('');
-  const [tag, setTag] = useState('');
+  const [status, setStatus] = useState(searchParams.get("status") ?? "");
+  const [search, setSearch] = useState("");
+  const [author, setAuthor] = useState("");
+  const [category, setCategory] = useState("");
+  const [tag, setTag] = useState("");
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [lang, setLang] = useState(process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE);
 
@@ -106,7 +106,7 @@ export default function NewsList(props) {
 
   const handleSearch = async (value) => {
     //set state sorter to init state, that means sort follow the date column
-    setSearch(value)
+    setSearch(value);
     const orderPara = orderParaInit;
     router.push(
       `${pathName}?status=${status}&lang=${lang}&size=${paginationServer.pageSize}&search=${value}${orderPara}`
@@ -168,15 +168,11 @@ export default function NewsList(props) {
     );
     //reset the other filters
     setSortedInfo(initSort);
-    setSearch('');
-    setAuthor('');
-    setCategory('');
+    setSearch("");
+    setAuthor("");
+    setCategory("");
     setTag(tag);
   };
-
-
-
-
 
   //getOrderParameter for URL
   //parameter: sorter: sort state of the table
@@ -206,9 +202,8 @@ export default function NewsList(props) {
     return { value: lang.code, label: lang.name };
   });
 
-
   const handleChange = (pagination, filters, sorter) => {
-    setLoadingStatus(true)
+    setLoadingStatus(true);
     setSortedInfo(sorter);
     const orderPara = getOrderPara(sorter, status, true);
     router.push(
@@ -234,20 +229,26 @@ export default function NewsList(props) {
   //console.log('props.cate :', props.cate);
   const columns = [
     {
-      title: 'Title',
-      dataIndex: 'title',
-      key: 'title',
-      fixed: 'left',
-      sorter: () => { },
-      sortOrder: sortedInfo.columnKey === 'title' ? sortedInfo.order : null,
+      title: "Title",
+      dataIndex: "title",
+      key: "title",
+      fixed: "left",
+      sorter: () => {},
+      sortOrder: sortedInfo.columnKey === "title" ? sortedInfo.order : null,
       render: (_, record) => {
         //let orderPara = orderParaDefault;
         return (
           <>
             <div className="text-base font-medium pb-2">
               {record.title}
-              {record.post_status == "draft" && searchParams.get('status') == '' && <span className='text-xs'> (Draft)</span>}
-              {record.news_position == 1 && searchParams.get('status') == '' && <span className='text-xs'> (Sticky)</span>}
+              {record.post_status == "draft" &&
+                searchParams.get("status") == "" && (
+                  <span className="text-xs"> (Draft)</span>
+                )}
+              {record.news_position == 1 &&
+                searchParams.get("status") == "" && (
+                  <span className="text-xs"> (Sticky)</span>
+                )}
             </div>
             <div className="flex gap-2">
               {record.post_status !== process.env.NEXT_PUBLIC_PS_TRASH ? (
@@ -302,9 +303,9 @@ export default function NewsList(props) {
       },
     },
     {
-      title: 'Post Author',
-      dataIndex: 'post_author',
-      key: 'post_author',
+      title: "Post Author",
+      dataIndex: "post_author",
+      key: "post_author",
       width: 100,
       render: (_, record) => {
         return (
@@ -315,9 +316,9 @@ export default function NewsList(props) {
       },
     },
     {
-      title: 'Categories',
-      dataIndex: 'categories',
-      key: 'categories',
+      title: "Categories",
+      dataIndex: "categories",
+      key: "categories",
       width: 200,
       render: (_, record) => {
         const categories = record.categories
@@ -327,7 +328,7 @@ export default function NewsList(props) {
           <>
             {categories.map((cat, index) => (
               <a href="#" onClick={() => handleCategoryFilter(cat)} key={index}>
-                <Tag color='green' style={{ marginBottom: '4px' }}>
+                <Tag color="green" style={{ marginBottom: "4px" }}>
                   {cat}
                 </Tag>
               </a>
@@ -337,9 +338,9 @@ export default function NewsList(props) {
       },
     },
     {
-      title: 'Tags',
-      dataIndex: 'tags',
-      key: 'tags',
+      title: "Tags",
+      dataIndex: "tags",
+      key: "tags",
       width: 200,
       render: (_, record) => {
         const tags = record.tags
@@ -350,7 +351,7 @@ export default function NewsList(props) {
           <>
             {tags.map((tag, index) => (
               <a href="#" onClick={() => handleTagFilter(tag)} key={index}>
-                <Tag color='blue' style={{ marginBottom: '4px' }}>
+                <Tag color="blue" style={{ marginBottom: "4px" }}>
                   {tag}
                 </Tag>
               </a>
@@ -360,26 +361,22 @@ export default function NewsList(props) {
       },
     },
     {
-      title: 'Short',
-      dataIndex: 'excerpt',
-      key: 'excerpt',
+      title: "Short",
+      dataIndex: "excerpt",
+      key: "excerpt",
       render: (_, record) => {
-        return (
-          <div>
-            {record.excerpt}
-          </div>
-        );
+        return <div>{record.excerpt}</div>;
       },
     },
 
     {
-      title: 'Date',
-      dataIndex: 'post_modified',
-      key: 'date',
-      fixed: 'right',
+      title: "Date",
+      dataIndex: "post_modified",
+      key: "date",
+      fixed: "right",
       width: 200,
-      sorter: () => { },
-      sortOrder: sortedInfo.columnKey === 'date' ? sortedInfo.order : null,
+      sorter: () => {},
+      sortOrder: sortedInfo.columnKey === "date" ? sortedInfo.order : null,
       render: (_, record) => {
         return (
           <div>
@@ -411,7 +408,9 @@ export default function NewsList(props) {
         <div className="flex gap-x-5">
           <p className="font-semibold text-xl pr-4">News</p>
 
-          <Link href={`/admin/news/add`}><Button >Add News </Button></Link>
+          <Link href={`/admin/news/add`}>
+            <Button>Add News </Button>
+          </Link>
 
           <Select
             defaultValue={process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE}
@@ -421,7 +420,7 @@ export default function NewsList(props) {
             }}
             onChange={handleChangeLanguage}
             options={langOptions}
-          /*[
+            /*[
             {
               value: 'vi',
               label: 'Tiếng Việt',
@@ -466,15 +465,15 @@ export default function NewsList(props) {
         <Space>
           <Radio.Group
             disabled={loadingStatus}
-            defaultValue={searchParams.get('status') ?? ''}
+            defaultValue={searchParams.get("status") ?? ""}
             onChange={(e) => {
               handlePostStatus(e.target.value), setLoadingStatus(true);
             }}
             optionType="button"
             buttonStyle="solid"
           >
-            <Radio.Button value="" >All ({totals.all})</Radio.Button>
-            <Radio.Button value={process.env.NEXT_PUBLIC_PS_DRAFT} >
+            <Radio.Button value="">All ({totals.all})</Radio.Button>
+            <Radio.Button value={process.env.NEXT_PUBLIC_PS_DRAFT}>
               Draft({totals.draft})
             </Radio.Button>
             <Radio.Button value={process.env.NEXT_PUBLIC_PS_PUBLISH}>
@@ -501,7 +500,6 @@ export default function NewsList(props) {
         scroll={{
           x: 1300,
         }}
-
       />
     </>
   );

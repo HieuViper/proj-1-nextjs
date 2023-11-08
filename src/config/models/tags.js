@@ -13,15 +13,15 @@ export function tagsModel(sequelize) {
       allowNull: false,
       validate: {
         notNull: {
-            msg: 'You have to insert tag code',
-        }
-    },
+          msg: "You have to insert tag code",
+        },
+      },
       comment: "code of tag",
     },
   };
 
   const options = {
-    //updatedAt: "post_modified",
+    updatedAt: "tag_modified",
     tableName: "tags",
     timestamps: false,
     //indexes: [{ unique: true, fields: ['someUnique'] }],

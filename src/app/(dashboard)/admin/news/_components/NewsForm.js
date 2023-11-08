@@ -3,7 +3,7 @@ import axios from "axios";
 import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Button, Form, Input, Select, Switch, Tooltip, Tabs } from 'antd';
+import { Button, Form, Input, Select, Switch, Tooltip, Tabs, TreeSelect } from 'antd';
 import { SwapLeftOutlined } from '@ant-design/icons';
 import Link from "next/link";
 
@@ -56,7 +56,7 @@ export function NewsForm(props) {
 
     //setCate( props.cate );
     //const  catTree  = buildCategoryTree( cate );
-    setCatTree(buildCategoryTree(JSON.parse(props.cate)));
+    setCatTree(JSON.parse(props.cate));
     //const tags = (props.tags);
     setTags(JSON.parse(props.tags));
     //get languages Table
@@ -75,6 +75,7 @@ export function NewsForm(props) {
       })
       //format data to be suitable for the form fields
       let data1 = { ...newsData[0], ...mainNewsContent };    //get the first row of news to join with the new properties
+      console.log('data1 :', data1);
 
       data1 = {
         ...data1,
@@ -86,6 +87,11 @@ export function NewsForm(props) {
       setData(data1);        //set state for news
       setPostStatus(data1.post_status);
       notifyAddNewsSuccess();
+
+      const resultItem = JSON.parse(props.cate).filter(item => data1.categories?.includes(item.category_code));
+      setCatArr(resultItem)
+      form.setFieldValue('mainCategory', data1.categories[0])
+      // setArrMainCat(data1.categories)
     }
 
     console.log('effect');
@@ -131,6 +137,15 @@ export function NewsForm(props) {
       };
     });
 
+    const stringCat = value.categories
+    const arrStringCat = stringCat.split(',')
+    const index = arrStringCat.indexOf(mainCat)
+    if (index !== -1) {
+      arrStringCat.splice(index, 1);
+      arrStringCat.unshift(mainCat);
+      const result = arrStringCat.join(',');
+      value = { ...value, categories: result }
+    }
     // try {
     //editing news
     if (params?.id) {
@@ -243,6 +258,42 @@ export function NewsForm(props) {
 
     return options;
   }
+
+  function buildTreeData(data, parent = null) {
+    return data
+      .filter((item) => item.parent === parent)
+      .map((item) => ({
+        title: item.name,
+        value: item.category_code,
+        children: buildTreeData(data, item.id),
+      }));
+  }
+  const treeData = catTree && buildTreeData(catTree, null);
+  console.log('catTree :', catTree);
+
+  const onChange1 = (newValue) => {
+    setValue(newValue);
+  };
+  const [mainCat, setMainCat] = useState()
+  const [catSelect, setCatSelect] = useState(false)
+  const [catArr, setCatArr] = useState([])
+
+
+  const onChangeCategory = (value) => {
+    // setArrMainCat(value)
+    value.length > 0 ? setCatSelect(false) : setCatSelect(true)
+    console.log('value :', value);
+    const resultItem = catTree.filter(item => value?.includes(item.category_code));
+    setCatArr(resultItem)
+    console.log('resultItem :', resultItem);
+  };
+  const onChangeMainCat = (value) => {
+    console.log('value :', value);
+    setMainCat(value)
+
+  }
+  // form.getFieldValue('category_code')
+  console.log('form.getFieldValue(\'categories\') :', form.getFieldValue('categories'));
 
   // tab handle
 
@@ -436,22 +487,37 @@ export function NewsForm(props) {
           />
         </Form.Item>
 
-        <Form.Item label="Category" name="categories" rules={[
-          {
-            required: true,
-            message: 'Please select your category!',
-          },
-        ]}
+        <Form.Item label="Category" name="categories"
+        // rules={[
+        //   {
+        //     required: true,
+        //     message: 'Please select your category!',
+        //   },
+        // ]}
         >
-          <Select mode="multiple" placeholder="Please category" allowClear filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
-            {/*cate && cate.map((item, index) => (
-              <Option key={index} value={item.category_code}>{item.name}</Option>
-            ))*/
-              catTree?.map((category) => renderCategoryOptions(category))
-            }
-          </Select>
+          <TreeSelect
+            multiple
+            showSearch
+            allowClear
+            treeDefaultExpandAll
+            treeData={treeData}
+            // value={value}
+            onChange={onChangeCategory}
+            dropdownStyle={{
+              maxHeight: 400,
+              overflow: 'auto',
+            }}
+            placeholder="Select parent"
+          />
         </Form.Item>
+        <Form.Item label="Main Category" name="mainCategory"
+        >
+          <Select disabled={catSelect} onChange={onChangeMainCat}>
+            {catArr && catArr.map((item, index) => (
+              <Option key={index} value={item.category_code}>{item.name}</Option>
+            ))}</Select>
 
+        </Form.Item>
         <Form.Item label="Tags" name="tags" >
           <Select mode="multiple" placeholder="Please tags" allowClear filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
             {tags && tags.map((item, index) => (

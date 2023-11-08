@@ -110,7 +110,7 @@ export function CategoryForm(props) {
             :
             <Input placeholder="Input name" />}
         </Form.Item>
-        <div className="py-2 px-6 text-[#646970] text-left">The name is how it appears on your site.</div>
+        <div className="py-2 px-6 text-[#646970] text-left text-xs">The name is how it appears on your site.</div>
         <Form.Item
           label={<span className="font-medium">Description:</span>}
           name={`description_${lang}`}
@@ -119,7 +119,7 @@ export function CategoryForm(props) {
         >
           <Input.TextArea rows={4} placeholder="Input description" />
         </Form.Item>
-        <div className="py-2 px-6 text-[#646970] text-left">The description is not prominent by default; however, some themes may show it.</div>
+        <div className="py-2 px-6 text-[#646970] text-left text-xs">The description is not prominent by default; however, some themes may show it.</div>
 
       </>
     )
@@ -144,7 +144,7 @@ export function CategoryForm(props) {
       .filter((item) => item.parent === parent)
       .map((item) => ({
         title: item.name,
-        value: item.id,
+        value: item.category_code,
         children: buildTreeData(data, item.id),
       }));
   }
@@ -206,7 +206,7 @@ export function CategoryForm(props) {
       >
         <Input onChange={(e) => changeCode(e.target.value)} placeholder="Input category code" />
       </Form.Item>}
-      {!id && <div className="py-2 px-6 text-[#646970] text-left">The “Category code” is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.</div>}
+      {!id && <div className="py-2 px-6 text-[#646970] text-left text-xs">The “Category code” is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.</div>}
 
       <Form.Item
         label={<span className="font-medium">Parent:</span>}
@@ -227,7 +227,7 @@ export function CategoryForm(props) {
           placeholder="Select parent"
         />
       </Form.Item>
-      <div className="py-2 px-6 text-[#646970] text-left">Categories, unlike tags, can have a hierarchy. You might have a Jazz category, and under that have children categories for Bebop and Big Band. Totally optional.</div>
+      <div className="py-2 px-6 text-[#646970] text-left text-xs">Categories, unlike tags, can have a hierarchy. You might have a Jazz category, and under that have children categories for Bebop and Big Band. Totally optional.</div>
 
       <Form.Item
         wrapperCol={{

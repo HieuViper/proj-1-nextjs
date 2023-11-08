@@ -1,8 +1,9 @@
 import { db } from "@/config/db";
 import { Op, QueryTypes } from "sequelize";
 
-export const tagsModel = {
+export const funcTags = {
     getAllTags,
+    getTotalTags,
     getTags,
     updateTags,
     addTags,
@@ -10,17 +11,15 @@ export const tagsModel = {
     deleteBulkTags,
     getSearchQuery
 }
-async function getAllTags(lang) {
+
+async function getAllTags(page, size, search, lang) {
+
     try {
-        // // const sqlquery = 'SELECT * FROM tags';
-        // const results = await db.Tags.findAll();
-        // console.log('resultsabc :', results);
-        // return results;
+        const fromTags = (page - 1) * size;
+        const searchQuery = getSearchQuery(search);
         let strquery;
         if (lang)
-            strquery = `SELECT * FROM tags_all WHERE languageCode='${lang}'`;
-        // else
-        //     strquery = 'SELECT * FROM tags_all';
+            strquery = `SELECT * FROM tags_all WHERE languageCode='${lang}' ${searchQuery} ORDER BY id DESC LIMIT ${fromTags}, ${size}`;
         const results = await db.seq.query(strquery, { type: QueryTypes.SELECT });
         return results;
     } catch (error) {
@@ -29,20 +28,38 @@ async function getAllTags(lang) {
     }
 }
 
+export async function getTotalTags(search, lang) {
+    let total
+    try {
+        const searchQuery = getSearchQuery(search);
+        let sqlquery = `SELECT count(*) AS total FROM tags_all WHERE languageCode='${lang}' ${searchQuery} `;
+        let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+        total = results[0].total;
+        return total
+    } catch (error) {
+        throw new Error("cannot get items Of Table:" + error.message);
+    }
+}
+function getSearchQuery(search) {
+    return search == ""
+        ? ""
+        : `AND (name LIKE '%${search}%' OR description LIKE '%${search}%')`;
+}
+
 async function getTags(id) {
     try {
         const sqlquery = `SELECT * FROM tags_all WHERE id=${id}`;
         const result = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
         return result;
     } catch (error) {
-        throw new Error("Fail to get news Tags:" + error.message);
+        throw new Error("Fail to get tag Tags:" + error.message);
     }
 }
 
 async function updateTags(data, tagLangs, id) {
     const t = await db.seq.transaction();
     try {
-        //update into news Table
+        //update into tag Table
         const currentLoginUser = 'huy'; //we add information of modifier huy
         data = { ...data, modified_by: currentLoginUser };
         if (data.post_date)
@@ -57,12 +74,12 @@ async function updateTags(data, tagLangs, id) {
                 transaction: t,
             },
         );
-        //update into news_languages Table
+        //update into tag_languages Table
         for (const element of tagLangs) {
             console.log('element:', element);
-            const { languageCode, tagId, ...newsLangRow } = element;
+            const { languageCode, tagId, ...tagLangRow } = element;
             await db.Tag_langs.update(
-                newsLangRow,
+                tagLangRow,
                 {
                     where: {
                         [Op.and]: [
@@ -78,42 +95,31 @@ async function updateTags(data, tagLangs, id) {
         await t.commit();
     } catch (error) {
         await t.rollback();
-        throw new Error('Cannot update news:' + error.message);
+        throw new Error('Cannot update tag:' + error.message);
     }
 }
 
 async function addTags(data, tagLangs) {
     const t = await db.seq.transaction();
     try {
-        //update into news Table
+        //update into tag Table
         const currentLoginUser = 'huy'; //we add information of modifier huy
         console.log('data :', data);
-        const news = await db.Tags.create(data, { transaction: t });
+        const tag = await db.Tags.create(data, { transaction: t });
         //add tagId property to the tagLangs
         for (const element of tagLangs) {
-            element.tagId = news.id;
+            element.tagId = tag.id;
         }
-        //create records in news_languages Table
+        //create records in tag_languages Table
         await db.Tag_langs.bulkCreate(tagLangs, { validate: true, transaction: t });
         await t.commit();
 
     } catch (error) {
         await t.rollback();
-        throw new Error('Cannot create news:' + error.message);
+        throw new Error('Cannot create tag:' + error.message);
     }
 
-    // try {
 
-    //     // const news = await db.Tags.create(data)
-    //     await db.Tags.create(data, { transaction: t });
-    //     // for (const element of tagLangs) {
-    //     //     element.tagsId = news.id;
-    //     // }
-    //     // await db.Tag_langs.bulkCreate(tagLangs)
-    // }
-    // catch (error) {
-    //     throw new Error('Cannot create news:' + error.message);
-    // }
 }
 
 async function deleteTags(key) {
@@ -124,7 +130,7 @@ async function deleteTags(key) {
             },
         });
     } catch (error) {
-        throw new Error(`Fail to delete news id = ${key}`);
+        throw new Error(`Fail to delete tag id = ${key}`);
     }
 }
 
@@ -141,24 +147,7 @@ async function deleteBulkTags(keys) {
 
     } catch (error) {
         console.log(error);
-        throw new Error("Fail to delete news");
+        throw new Error("Fail to delete tag");
     }
 }
 
-async function getSearchQuery(search, lang) {
-    // return search == ""
-    //     ? ""
-    //     : `AND (name LIKE '%${search}%' OR content LIKE '%${search}%' OR tags LIKE '%${search}%')`;
-    try {
-        let strquery = 'SELECT * FROM tags_all WHERE(';
-
-        strquery = strquery + ` (name LIKE '%${search}%' OR description LIKE '%${search}%')`;
-        if (lang)
-            strquery = strquery + ` AND languageCode='${lang}')`;
-        const results = await db.seq.query(strquery, { type: QueryTypes.SELECT });
-        return results;
-    } catch (error) {
-        console.log(error);
-        throw new Error('Fail to get tags');
-    }
-}

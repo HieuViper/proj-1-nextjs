@@ -1,7 +1,7 @@
 import { db } from "@/config/db";
 import { Op, QueryTypes } from "sequelize";
 
-export const articleCatModel = {
+export const funcArticleCategories = {
     getAllArticleCat,
     getArticleCat,
     updateArticleCat,
@@ -30,14 +30,14 @@ async function getArticleCat(id) {
         const result = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
         return result;
     } catch (error) {
-        throw new Error("Fail to get news ArticleCat:" + error.message);
+        throw new Error("Fail to get articleCat :" + error.message);
     }
 }
 
 async function updateArticleCat(data, articleLangs, id) {
     const t = await db.seq.transaction();
     try {
-        //update into news Table
+        //update into articleCat Table
         const currentLoginUser = 'huy'; //we add information of modifier huy
         data = { ...data, modified_by: currentLoginUser };
         if (data.post_date)
@@ -52,12 +52,12 @@ async function updateArticleCat(data, articleLangs, id) {
                 transaction: t,
             },
         );
-        //update into news_languages Table
+        //update into articleCat_languages Table
         for (const element of articleLangs) {
             console.log('element:', element);
-            const { languageCode, articleCategoryId, ...newsLangRow } = element;
+            const { languageCode, articleCategoryId, ...articleCatLangRow } = element;
             await db.Article_cate_langs.update(
-                newsLangRow,
+                articleCatLangRow,
                 {
                     where: {
                         [Op.and]: [
@@ -73,28 +73,28 @@ async function updateArticleCat(data, articleLangs, id) {
         await t.commit();
     } catch (error) {
         await t.rollback();
-        throw new Error('Cannot update news:' + error.message);
+        throw new Error('Cannot update articleCat:' + error.message);
     }
 }
 
 async function addArticleCat(data, articleLangs) {
     const t = await db.seq.transaction();
     try {
-        //update into news Table
+        //update into articleCat Table
         const currentLoginUser = 'huy'; //we add information of modifier huy
         console.log('data :', data);
-        const news = await db.Article_categories.create(data, { transaction: t });
+        const articleCat = await db.Article_categories.create(data, { transaction: t });
         //add articleCategoryId  property to the articleLangs
         for (const element of articleLangs) {
-            element.articleCategoryId = news.id;
+            element.articleCategoryId = articleCat.id;
         }
-        //create records in news_languages Table
+        //create records in articleCat_languages Table
         await db.Article_cate_langs.bulkCreate(articleLangs, { validate: true, transaction: t });
         await t.commit();
 
     } catch (error) {
         await t.rollback();
-        throw new Error('Cannot create news:' + error.message);
+        throw new Error('Cannot create articleCat:' + error.message);
     }
 
 }
@@ -107,7 +107,7 @@ async function delArticleCat(key) {
             },
         });
     } catch (error) {
-        throw new Error(`Fail to del news id = ${key}`);
+        throw new Error(`Fail to del articleCat id = ${key}`);
     }
 }
 
@@ -124,7 +124,7 @@ async function delBulkArticleCat(keys) {
 
     } catch (error) {
         console.log(error);
-        throw new Error("Fail to del news");
+        throw new Error("Fail to del articleCat");
     }
 }
 

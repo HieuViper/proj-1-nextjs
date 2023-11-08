@@ -105,7 +105,7 @@ function CategoryList(props) {
             dataIndex: "name",
             key: "name",
             fixed: 'left',
-            width: 150,
+            minWidth: 200,
             sorter: (a, b) => a.name.length - b.name.length,
             render: (_, record) => {
                 return (

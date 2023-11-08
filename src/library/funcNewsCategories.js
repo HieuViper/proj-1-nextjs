@@ -1,7 +1,7 @@
 import { db } from "@/config/db";
 import { Op, QueryTypes } from "sequelize";
 
-export const newsCategoriesModel = {
+export const funcNewsCategories = {
     getAllNewsCategories,
     getNewsCategories,
     updateNewsCategories,

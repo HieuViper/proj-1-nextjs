@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-async-client-component */
 
 import { useRouter } from 'next/navigation';
-import { newsMHandle } from '@/library/getNews';
+import { funcNews } from '@/library/funcNews';
 import { db } from '@/config/db';
 import NewsList from './_components/NewsList';
 
@@ -29,23 +29,23 @@ async function NewsPage({ searchParams }) {
   // console.log('searchparams: ', searchParams);
 
   if (trash != '') {
-    await newsMHandle.trashNews(trash);
+    await funcNews.trashNews(trash);
   }
   if (keys != '') {
-    await newsMHandle.deleteBulkNews(keys, status);
+    await funcNews.deleteBulkNews(keys, status);
   }
   if (recover != '') {
-    await newsMHandle.recoverNews(recover);
+    await funcNews.recoverNews(recover);
   }
   if (del != '') {
-    await newsMHandle.deleteNews(del);
+    await funcNews.deleteNews(del);
   }
   if (Object.keys(searchParams).length == 0) {
     orderby = "post_modified";
     order = "desc";
   }
   console.log('news list page');
-  const newsData = await newsMHandle.getAllNews(
+  const newsData = await funcNews.getAllNews(
     status,
     page,
     size,
@@ -57,7 +57,7 @@ async function NewsPage({ searchParams }) {
     tag,
     lang
   );
-  const totals = await newsMHandle.getTotalNumOfNews(
+  const totals = await funcNews.getTotalNumOfNews(
     status,
     search,
     author,
@@ -71,7 +71,7 @@ async function NewsPage({ searchParams }) {
     current: parseInt(page),
     // disabled: true
   };
-  const langTable = await newsMHandle.getLanguages();
+  const langTable = await funcNews.getLanguages();
   return (
     <>
       <NewsList

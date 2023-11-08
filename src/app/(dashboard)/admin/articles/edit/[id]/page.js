@@ -1,4 +1,5 @@
 import { articleHandle } from "@/library/getArticles";
+import { redirect } from "next/navigation";
 import { ArticleForm } from "../../_components/ArticleForm";
 
 export const dynamic = "force-dynamic";

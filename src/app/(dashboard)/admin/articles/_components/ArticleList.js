@@ -4,9 +4,10 @@ import {
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
+  QuestionCircleOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
-import { Button, Radio, Select, Space, Table } from "antd";
+import { Button, Popconfirm, Radio, Select, Space, Table } from "antd";
 import Search from "antd/es/input/Search";
 import { format } from "date-fns";
 import Link from "next/link";
@@ -184,6 +185,7 @@ const ArticleList = (props) => {
   };
 
   useEffect(() => {
+    console.log("vao day");
     const articlesData = JSON.parse(props.dataTable);
     setArticles(articlesData);
     setPagination(props.pagination);
@@ -251,19 +253,35 @@ const ArticleList = (props) => {
                     </span>
                   </Link>
                   |{" "}
-                  <Link
-                    href={`${pathName}?del=${record.id}&size=${
-                      paginationServer.pageSize
-                    }&status=${status}&author=${author}&category=${category}&search=${search}${getOrderPara(
-                      sortedInfo,
-                      true
-                    )}`}
+                  <Popconfirm
+                    title="Delete the task"
+                    icon={
+                      <QuestionCircleOutlined
+                        style={{
+                          color: "red",
+                        }}
+                      />
+                    }
+                    description="Are you sure to delete this article?"
+                    onConfirm={() =>
+                      router.push(
+                        `${pathName}?del=${record.id}&size=${
+                          paginationServer.pageSize
+                        }&status=${status}&author=${author}&category=${category}&search=${search}${getOrderPara(
+                          sortedInfo,
+                          true
+                        )}`
+                      )
+                    }
+                    onCancel={(e) => console.log(e)}
+                    okText="Yes"
+                    cancelText="Cancel"
                   >
-                    <span className="btn-delete">
+                    <span className="btn-delete cursor-pointer">
                       <DeleteOutlined className="pr-1" />
                       Delete
                     </span>
-                  </Link>
+                  </Popconfirm>
                 </>
               )}
             </div>

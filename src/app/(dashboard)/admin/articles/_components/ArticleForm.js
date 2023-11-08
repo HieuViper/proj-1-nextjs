@@ -186,8 +186,6 @@ export function ArticleForm(props) {
     value.categories = value.categories.toString();
     //value.news_position = newsPosition ? 1 : 0;
     console.log("news_position 2: ", form.getFieldValue("article_position"));
-    value.article_position = form.getFieldValue("article_position") ?? false;
-    value.article_position = value.article_position ? 1 : 0;
     if (form.getFieldValue("publish")) {
       value = { ...value, post_date: "1" }; //add property post_date into the value object
     }
@@ -214,7 +212,7 @@ export function ArticleForm(props) {
     //editing article
     if (params?.id) {
       if (value.post_status == process.env.NEXT_PUBLIC_PS_TRASH)
-        await props.dell(value, articleLangs, params.id);
+        await props.dellArticle(value, articleLangs, params.id);
       else {
         await props
           .editArticle(value, articleLangs, params.id)
@@ -300,7 +298,6 @@ export function ArticleForm(props) {
       data1 = {
         ...data1,
         categories: data1.categories?.split(","), //set an array of category code to the field categories
-        article_position: data1?.article_position == 1 ? true : false,
       };
       form.setFieldsValue(data1); //the data for the all the fields of form is done formating
       setData(data1); //set state for article
@@ -516,6 +513,7 @@ export function ArticleForm(props) {
           <InputNumber
             min={1}
             max={10}
+            defaultValue={1}
             onChange={(e) => form.setFieldValue({ article_position: e.value })}
           />
         </Form.Item>

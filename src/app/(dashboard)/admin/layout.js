@@ -31,14 +31,18 @@ const DashboardLayout = ({ children }) => {
       if (location.includes("news")) {
         setCurrent("news");
       }
-      if (location.includes("categories")) {
-        setCurrent("categories");
+      if (location.includes("news_categories")) {
+        setCurrent("news_categories");
       }
-      if (location.includes("products")) {
-        setCurrent("products");
-      }
+
       if (location.includes("articles")) {
         setCurrent("articles");
+      }
+      if (location.includes("article")) {
+        setCurrent("article_categories");
+      }
+      if (location.includes("tags")) {
+        setCurrent("tags");
       }
     }
   }, [location, current]);
@@ -52,23 +56,25 @@ const DashboardLayout = ({ children }) => {
     };
   }
   const items = [
-    getItem(
-      "products",
-      <Link href="/admin/products">Products</Link>,
-      <MailOutlined />
-    ),
-    getItem(
-      "categories",
-      <Link href="/admin/categories">Categories</Link>,
-      <MailOutlined />
-    ),
-    getItem("news", <Link href="/admin/news">News</Link>, <MailOutlined />),
 
+
+    getItem("news", <Link href="/admin/news">News</Link>, <MailOutlined />),
+    getItem(
+      "news_categories",
+      <Link href="/admin/news_categories">News Categories</Link>,
+      <MailOutlined />
+    ),
     getItem(
       "articles",
       <Link href="/admin/articles">Articles</Link>,
       <MailOutlined />
     ),
+    getItem(
+      "article_categories",
+      <Link href="/admin/article_categories">Article Categories</Link>,
+      <MailOutlined />
+    ),
+    getItem("tags", <Link href="/admin/tags">Tags</Link>, <MailOutlined />),
   ];
 
   return (

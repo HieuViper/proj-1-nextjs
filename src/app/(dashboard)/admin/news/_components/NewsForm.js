@@ -139,7 +139,7 @@ export function NewsForm(props) {
       return {
         title: form.getFieldValue(`title_${lang.code}`) ?? "",
         excerpt: form.getFieldValue(`excerpt_${lang.code}`) ?? "",
-        content: form.getFieldValue(`excerpt_${lang.code}`) ?? "",
+        content: form.getFieldValue(`content_${lang.code}`) ?? "",
         languageCode: lang.code,
         newsId: params?.id,
       };

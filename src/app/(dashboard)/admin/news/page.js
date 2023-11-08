@@ -67,6 +67,7 @@ async function NewsPage({ searchParams }) {
     pageSize: parseInt(size),
     total: totals.itemsOfTable,
     current: parseInt(page),
+    // disabled: true
   };
   const langTable = await newsMHandle.getLanguages();
   return (

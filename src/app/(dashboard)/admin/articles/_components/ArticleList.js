@@ -7,7 +7,7 @@ import {
   QuestionCircleOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
-import { Button, Popconfirm, Radio, Select, Space, Table } from "antd";
+import { Button, Popconfirm, Radio, Select, Space, Table, Tag } from "antd";
 import Search from "antd/es/input/Search";
 import { format } from "date-fns";
 import Link from "next/link";
@@ -313,12 +313,15 @@ const ArticleList = (props) => {
         return (
           <>
             {categories.map((cat1, index) => (
-              <div key={index}>
-                <a href="#" onClick={() => handleCategoryFilter(cat1)}>
+              <a
+                href="#"
+                onClick={() => handleCategoryFilter(cat1)}
+                key={index}
+              >
+                <Tag color="green" style={{ marginBottom: "4px" }}>
                   {cat1}
-                </a>
-                {index < categories.length - 1 && ", "}
-              </div>
+                </Tag>
+              </a>
             ))}
           </>
         );

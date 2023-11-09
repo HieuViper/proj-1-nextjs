@@ -1,86 +1,56 @@
-import React from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 
-const modules = {
-    toolbar: [
-        [{ header: [1, 2, 3, 4, 5, 6, false] }],
-        [{ 'font': [] }],
-        [{ size: ['small', false, 'large', 'huge'] }]
-        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-        [{ 'color': [] }, { 'background': [] }],
-        [
-            { list: 'ordered' },
-            { list: 'bullet' },
-            { indent: '-1' },
-            { indent: '+1' },
-        ],
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import DecoupledEditor from '@ckeditor/ckeditor5-build-decoupled-document';
 
-        [{ 'align': [] }],
-        ['link', 'code', "image", "video"],
-    ],
-    // imageUploader: {
-    //     upload: (file) => {
-    //         return new Promise((resolve, reject) => {
-    //             const formData = new FormData();
-    //             formData.append("image", file);
-
-    //             fetch(
-    //                 "https://web-api.zadez.vn/articles/upload/",
-    //                 {
-    //                     method: "POST",
-    //                     body: formData
-    //                 }
-    //             )
-    //                 .then((response) => response.json())
-    //                 .then((result) => {
-    //                     console.log(result);
-    //                     resolve(result.data.url);
-    //                 })
-    //                 .catch((error) => {
-    //                     reject("Upload failed");
-    //                     console.error("Error:", error);
-    //                 });
-    //         });
-    //     }
-    // },
-
-};
-
-const formats = [
-    'header',
-    'bold',
-    'italic',
-    'underline',
-    'strike',
-    'blockquote',
-    'list',
-    'bullet',
-    'indent',
-    'link',
-    'code',
-    "font",
-    "size",
-    "image",
-    "video",
-    'color',
-    'background',
-    'align'
-];
-
-const Editor = ({ value, onChange, placeholder }) => {
+const Editor = ({ value, onChange }) => {
     return (
-        <>
-            <ReactQuill
-                theme="snow"
-                value={value || ''}
-                modules={modules}
-                formats={formats}
-                onChange={onChange}
-                placeholder={placeholder}
-
-            />
-        </>
+        <CKEditor
+            onReady={(editor) => {
+                editor.ui
+                    .getEditableElement()
+                    .parentElement.insertBefore(editor.ui.view.toolbar.element, editor.ui.getEditableElement());
+                editor.editing.view.change((writer) => {
+                    writer.setStyle('height', '500px', editor.editing.view.document.getRoot());
+                });
+                const uploadAdapter = (loader) => {
+                    return {
+                        upload: () => {
+                            return new Promise((resolve, reject) => {
+                                console.log('reject :', reject);
+                                console.log('resolve :', resolve);
+                                const body = new FormData();
+                                loader.file.then(async (file) => {
+                                    body.append('file', file);
+                                    await fetch("/api/image", {
+                                        method: "POST",
+                                        body,
+                                    })
+                                        .then(async (res) => {
+                                            const image = await res.json();
+                                            resolve({ default: `${image.url}` })
+                                        })
+                                        .catch((err) => {
+                                            reject(err);
+                                        });
+                                });
+                            });
+                        },
+                    };
+                };
+                editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+                    return uploadAdapter(loader);
+                };
+            }}
+            onChange={(event, editor) => {
+                const data = editor.getData();
+                onChange(data)
+            }}
+            editor={DecoupledEditor}
+            data={value}
+            config={{
+                enterMode: 2,
+            }}
+        />
     );
 };
 

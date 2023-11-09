@@ -7,7 +7,7 @@ import {
   getTotalNumOfarticle,
   recoverArticle,
   trashArticle,
-} from "@/library/getArticles";
+} from "@/library/funcArticles";
 import ArticleList from "./_components/ArticleList";
 
 // This part is important!

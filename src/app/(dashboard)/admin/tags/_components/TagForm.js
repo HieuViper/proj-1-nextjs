@@ -39,9 +39,9 @@ export function TagForm(props) {
     try {
       if (id) {
         await editTag(value, tagLangs, id, lang).then((res) => {
-          setTags(res.tagList.reverse());
+          setTags(res.tagList);
           handleModal();
-          toast.success("Update Tag successfully ");
+          toast.success("Update Tag success ");
           setLoading(false);
         });
       } else {
@@ -57,10 +57,11 @@ export function TagForm(props) {
               .replace(/\s/g, "-"),
           };
         }
+
+        console.log("value :", value);
         await addTag(value, tagLangs, lang).then((res) => {
-          console.log("🚀 ~ file: TagForm.js:61 ~ awaitaddTag ~ res:", res);
-          setTags(res.tagList.reverse());
-          toast.success("Create Tag successfully");
+          setTags(res.tagList);
+          toast.success("Create Tag success");
           setLoading(false);
           form.resetFields();
         });
@@ -118,7 +119,7 @@ export function TagForm(props) {
             <Input placeholder="Input name" />
           )}
         </Form.Item>
-        <div className="py-2 px-6 text-[#646970] text-left">
+        <div className="py-2 px-6 text-[#646970] text-left text-xs">
           The name is how it appears on your site.
         </div>
         <Form.Item
@@ -128,7 +129,7 @@ export function TagForm(props) {
         >
           <Input.TextArea rows={4} placeholder="Input description" />
         </Form.Item>
-        <div className="py-2 px-6 text-[#646970] text-left">
+        <div className="py-2 px-6 text-[#646970] text-left text-xs">
           The description is not prominent by default; however, some themes may
           show it.
         </div>
@@ -210,7 +211,7 @@ export function TagForm(props) {
         </Form.Item>
       )}
       {!id && (
-        <div className="py-2 px-6 text-[#646970] text-left">
+        <div className="py-2 px-6 text-[#646970] text-left text-xs">
           The “Tag code” is the URL-friendly version of the name. It is usually
           all lowercase and contains only letters, numbers, and hyphens.
         </div>

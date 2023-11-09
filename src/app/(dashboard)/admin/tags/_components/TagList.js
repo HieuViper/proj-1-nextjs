@@ -11,16 +11,18 @@ import {
   Select,
   Table,
 } from "antd";
-import Search from "antd/es/input/Search";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { TagForm } from "./TagForm";
 
 function TagList(props) {
+  console.log("props :", props);
   const { getAllTag, getTag, addTag, editTag, delTag, delBulkTag, searchTag } =
     props;
   const router = useRouter();
+  const pathName = usePathname();
+  const searchParams = useSearchParams();
   const [tags, setTags] = useState();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loadingDelete, setLoadingDelete] = useState(false);
@@ -29,36 +31,46 @@ function TagList(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dataTag, setDataTag] = useState();
   const [lang, setLang] = useState(process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE);
-
+  const [search, setSearch] = useState("");
+  const [pagination, setPagination] = useState({
+    pageSize: 10,
+    total: 0,
+    current: 1,
+  });
+  // PAGINATION
+  const handleChangePagination = (pagination, filters, sorter) => {
+    console.log("pagination :", pagination);
+    router.push(
+      `${pathName}?page=${pagination.current}&size=${pagination.pageSize}&lang=${lang}&search=${search}`
+    );
+  };
   // SEARCH TAG
   const handleSearch = async (search) => {
-    const rs = await searchTag(search, lang);
-    setTags(rs);
+    // const rs = await searchTag(search, lang)
+    // setTags(rs)
+    setSearch(search);
+    router.push(
+      `${pathName}?page=${pagination.current}&size=${pagination.pageSize}&lang=${lang}&search=${search}`
+    );
   };
 
   //  GET ALL TAG
   const getAllTags = async (langValue) => {
     const result = await getAllTag(langValue);
-    setTags(result.reverse());
+    setTags(result);
   };
   // HANDLE POPUP CONFIRM BULK DELETE
   const confirmBulkDelete = () => {
     setLoadingDelete(true);
-    delBulkTag(
-      rowSelection.selectedRowKeys
-        .map((item) => `${item},`)
-        .join("")
-        .slice(0, -1)
-    ).then(() => {
-      setTags((prevItem) =>
-        prevItem.filter(
-          (item) => !rowSelection.selectedRowKeys.includes(item.id)
-        )
-      );
-      setSelectedRowKeys([]);
-      toast.success("Tasks deleted");
-      setLoadingDelete(false);
-    });
+    const bulkdel = selectedRowKeys
+      .map((item) => `${item},`)
+      .join("")
+      .slice(0, -1);
+    router.push(
+      `${pathName}?page=${pagination.current}&size=${pagination.pageSize}&lang=${lang}&search=${search}&bulkdel=${bulkdel}`
+    );
+    toast.success("Tasks deleted");
+    setLoadingDelete(false);
   };
   const onSelectChange = (tagSelectedRowKeys) => {
     setSelectedRowKeys(tagSelectedRowKeys);
@@ -71,9 +83,9 @@ function TagList(props) {
 
   // HANDLE POPUP CONFIRM DELETE
   const confirmDelete = (id) => {
-    delTag(id).then((res) => {
-      setTags((prevItem) => prevItem.filter((item) => item.id !== id));
-    });
+    router.push(
+      `${pathName}?page=${pagination.current}&size=${pagination.pageSize}&lang=${lang}&search=${search}&del=${id}`
+    );
     toast.success("Task deleted");
   };
 
@@ -93,22 +105,24 @@ function TagList(props) {
 
   // CHANGE LANG
   const handleChangeLanguage = async (lang) => {
-    getAllTags(lang);
+    // getAllTags(lang)
+    router.push(
+      `${pathName}?page=${pagination.current}&size=${pagination.pageSize}&lang=${lang}&search=${search}`
+    );
     setLang(lang);
   };
   let langOptions = langTable.map((lang) => {
     return { value: lang.code, label: lang.name };
   });
 
-  // PAGINATION
-
   //
   useEffect(() => {
     setLangTable(JSON.parse(props.langTable));
     setTags(JSON.parse(props.dataTable));
+    setPagination(props.pagination);
     setLoading(false);
     // getAllTags(lang)
-  }, []);
+  }, [props]);
 
   // COLUMNS TABLE
   const columns = [
@@ -174,8 +188,11 @@ function TagList(props) {
         <div className="text-lg font-semibold px-4">Tags</div>
         <div className="flex gap-4">
           <Select
-            defaultValue={process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE}
-            value={lang}
+            defaultValue={
+              searchParams.get("lang") ??
+              process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE
+            }
+            // value={lang}
             style={{
               width: 120,
             }}
@@ -237,7 +254,10 @@ function TagList(props) {
             scroll={{
               x: 700,
             }}
+            key={tags?.length}
             loading={loading}
+            onChange={handleChangePagination}
+            pagination={pagination}
           />
         </Col>
       </Row>

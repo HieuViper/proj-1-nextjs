@@ -1,6 +1,4 @@
-import { db } from "@/config/db";
-import { newsCategoriesModel } from "@/library/NewsCategories";
-import { getLanguages } from "@/library/funcLanguages";
+import { funcNewsCategories } from "@/library/funcNewsCategories";
 import CategoryList from "./_components/NewsCatList";
 
 async function CategoriesPage() {
@@ -10,12 +8,12 @@ async function CategoriesPage() {
 
   async function getAllNewsCate(lang) {
     "use server";
-    const newsCategories = await newsCategoriesModel.getAllNewsCategories(lang);
+    const newsCategories = await funcNewsCategories.getAllNewsCategories(lang);
     return newsCategories;
   }
   async function getNewsCate(id) {
     "use server";
-    const newsCategories = await newsCategoriesModel.getNewsCategories(id);
+    const newsCategories = await funcNewsCategories.getNewsCategories(id);
     return newsCategories;
   }
   async function addNewsCate(data, newsLangs, lang) {
@@ -23,8 +21,8 @@ async function CategoriesPage() {
     let message = "";
     let id;
     try {
-      await newsCategoriesModel.addNewsCategories(data, newsLangs);
-      const rs = await newsCategoriesModel.getAllNewsCategories(lang);
+      await funcNewsCategories.addNewsCategories(data, newsLangs);
+      const rs = await funcNewsCategories.getAllNewsCategories(lang);
       return { message: 1, cateList: rs };
     } catch (error) {
       message = `Fail to add a news, try again or inform your admin: ${error.message}`;
@@ -35,8 +33,8 @@ async function CategoriesPage() {
   async function editNewsCate(data, newsLangs, id, lang) {
     "use server";
     try {
-      await newsCategoriesModel.updateNewsCategories(data, newsLangs, id);
-      const rs = await newsCategoriesModel.getAllNewsCategories(lang);
+      await funcNewsCategories.updateNewsCategories(data, newsLangs, id);
+      const rs = await funcNewsCategories.getAllNewsCategories(lang);
       return { message: 1, cateList: rs };
     } catch (error) {
       return {
@@ -46,21 +44,21 @@ async function CategoriesPage() {
   }
   async function delNewsCate(id) {
     "use server";
-    await newsCategoriesModel.deleteNewsCategories(id);
+    await funcNewsCategories.deleteNewsCategories(id);
   }
   async function delBulkNewsCate(arrId) {
     "use server";
-    await newsCategoriesModel.deleteBulkNewsCategories(arrId);
+    await funcNewsCategories.deleteBulkNewsCategories(arrId);
   }
   async function searchNewsCate(search, lang) {
     "use server";
-    const newsCategories = await newsCategoriesModel.getSearchQuery(
+    const newsCategories = await funcNewsCategories.getSearchQuery(
       search,
       lang
     );
     return newsCategories;
   }
-  const allNewsCategories = await newsCategoriesModel.getAllNewsCategories(
+  const allNewsCategories = await funcNewsCategories.getAllNewsCategories(
     process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE
   );
   const langTable = await getLanguages();

@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@ant-design/cssinjs": "^1.17.0",
+    "@ckeditor/ckeditor5-build-decoupled-document": "^40.0.0",
+    "@ckeditor/ckeditor5-react": "^6.1.0",
     "@types/node": "20.5.1",
     "@types/react": "18.2.22",
     "@types/react-dom": "18.2.7",

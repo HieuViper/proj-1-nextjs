@@ -364,9 +364,9 @@ const ArticleList = (props) => {
       <div className="flex justify-between mb-4 gap-x-4">
         <div className="flex gap-x-5">
           <p className="font-semibold text-xl pr-4">Articles</p>
-          <Button className="">
-            <Link href={`/admin/articles/add`}>Add Article</Link>
-          </Button>
+          <Link href={`/admin/articles/add`}>
+            <Button className="">Add Article</Button>
+          </Link>
           <Select
             defaultValue="vi"
             value={lang}

@@ -1,15 +1,13 @@
 "use client";
-import { SwapLeftOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Select, Switch, Tabs, Tooltip } from "antd";
-import Link from "next/link";
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
-import { useEffect, useState } from "react";
+import axios from "axios";
+import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { Button, Form, Input, Select, Switch, Tooltip, Tabs, TreeSelect } from 'antd';
+import { SwapLeftOutlined } from '@ant-design/icons';
+import Link from "next/link";
+// import Editor from "@/components/Editor";
+import dynamic from "next/dynamic";
 
 export function NewsForm(props) {
   const { TextArea } = Input;
@@ -26,7 +24,7 @@ export function NewsForm(props) {
   const [postStatus, setPostStatus] = useState("");
   const [data, setData] = useState([]);
   const [catTree, setCatTree] = useState([]);
-
+  const Editor = dynamic(() => import("@/components/Editor"), { ssr: false });
   const authors = [
     {
       value: "huy",
@@ -57,7 +55,7 @@ export function NewsForm(props) {
     //const cate = (props.cate);
     //setCate( props.cate );
     //const  catTree  = buildCategoryTree( cate );
-    setCatTree(buildCategoryTree(JSON.parse(props.cate)));
+    setCatTree(JSON.parse(props.cate));
     //const tags = (props.tags);
     setTags(JSON.parse(props.tags));
     //get languages Table
@@ -87,7 +85,8 @@ export function NewsForm(props) {
         );
       });
       //format data to be suitable for the form fields
-      let data1 = { ...newsData[0], ...mainNewsContent }; //get the first row of news to join with the new properties
+      let data1 = { ...newsData[0], ...mainNewsContent };    //get the first row of news to join with the new properties
+      console.log('data1 :', data1);
 
       data1 = {
         ...data1,
@@ -99,6 +98,10 @@ export function NewsForm(props) {
       setData(data1); //set state for news
       setPostStatus(data1.post_status);
       notifyAddNewsSuccess();
+
+      const resultItem = JSON.parse(props.cate).filter(item => data1.categories?.includes(item.category_code));
+      setCatArr(resultItem)
+      form.setFieldValue('mainCategory', data1.categories[0])
     }
 
     console.log("effect");
@@ -145,6 +148,15 @@ export function NewsForm(props) {
       };
     });
 
+    const stringCat = value.categories
+    const arrStringCat = stringCat.split(',')
+    const index = arrStringCat.indexOf(mainCat)
+    if (index !== -1) {
+      arrStringCat.splice(index, 1);
+      arrStringCat.unshift(mainCat);
+      const result = arrStringCat.join(',');
+      value = { ...value, categories: result }
+    }
     // try {
     //editing news
     if (params?.id) {
@@ -158,7 +170,7 @@ export function NewsForm(props) {
             setPostStatus(form.getFieldValue("post_status")); //set postStatus state to rerender action buttons
             let messageNotify =
               form.getFieldValue("post_status") ==
-              process.env.NEXT_PUBLIC_PS_DRAFT
+                process.env.NEXT_PUBLIC_PS_DRAFT
                 ? "Save Draft Success"
                 : "Save Publish Success";
             toast.success(messageNotify, {
@@ -264,6 +276,45 @@ export function NewsForm(props) {
     return options;
   }
 
+  function buildTreeData(data, parent = null) {
+    return data
+      .filter((item) => item.parent === parent)
+      .map((item) => ({
+        title: item.name,
+        value: item.category_code,
+        children: buildTreeData(data, item.id),
+      }));
+  }
+  const treeData = catTree && buildTreeData(catTree, null);
+  console.log('catTree :', catTree);
+
+  const onChange1 = (newValue) => {
+    setValue(newValue);
+  };
+  const [mainCat, setMainCat] = useState()
+  const [catSelect, setCatSelect] = useState(false)
+  const [catArr, setCatArr] = useState([])
+
+
+  const onChangeCategory = (value) => {
+    value.length > 0 ? setCatSelect(false) : setCatSelect(true)
+    console.log('value :', value);
+    const resultItem = catTree.filter(item => value?.includes(item.category_code));
+    setCatArr(resultItem)
+    console.log('resultItem :', resultItem);
+  };
+  const onChangeMainCat = (value) => {
+    setMainCat(value)
+  }
+
+  const clearSelectmainCat = (value) => {
+    console.log('value :', value);
+    if (value == mainCat) {
+      setMainCat("")
+    }
+
+
+  }
   // tab handle
 
   const TabComponent = ({ lang }) => {
@@ -282,7 +333,7 @@ export function NewsForm(props) {
           {
             //only generate news_code when post status is not published
             lang == process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE &&
-            data?.post_status != process.env.NEXT_PUBLIC_PS_PUBLISH ? (
+              data?.post_status != process.env.NEXT_PUBLIC_PS_PUBLISH ? (
               <Input onChange={() => generateNewsCode()} />
             ) : (
               <Input />
@@ -311,7 +362,8 @@ export function NewsForm(props) {
             },
           ]}
         >
-          <Input />
+          {/* <Input /> */}
+          <Editor />
         </Form.Item>
       </>
     );
@@ -396,9 +448,8 @@ export function NewsForm(props) {
             </div>
           ) : (
             <div
-              className={`flex  ${
-                params.id ? "justify-around" : "justify-end"
-              }`}
+              className={`flex  ${params.id ? "justify-around" : "justify-end"
+                }`}
             >
               {params.id && (
                 <Form.Item className="p-2">
@@ -477,48 +528,43 @@ export function NewsForm(props) {
           />
         </Form.Item>
 
-        <Form.Item
-          label="Category"
-          name="categories"
-          rules={[
-            {
-              required: true,
-              message: "Please select your category!",
-            },
-          ]}
+        <Form.Item label="Category" name="categories"
+        // rules={[
+        //   {
+        //     required: true,
+        //     message: 'Please select your category!',
+        //   },
+        // ]}
         >
-          <Select
-            mode="multiple"
-            placeholder="Please category"
+          <TreeSelect
+            multiple
+            showSearch
             allowClear
-            filterOption={(input, option) =>
-              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-          >
-            {
-              /*cate && cate.map((item, index) => (
-              <Option key={index} value={item.category_code}>{item.name}</Option>
-            ))*/
-              catTree?.map((category) => renderCategoryOptions(category))
-            }
-          </Select>
+            treeDefaultExpandAll
+            treeData={treeData}
+            // value={value}
+            onChange={onChangeCategory}
+            dropdownStyle={{
+              maxHeight: 400,
+              overflow: 'auto',
+            }}
+            placeholder="Select parent"
+            onDeselect={clearSelectmainCat}
+          />
         </Form.Item>
+        <Form.Item label="Main Category" name="mainCategory"
+        >
+          <Select disabled={catSelect} onChange={onChangeMainCat} value={mainCat}>
+            {catArr && catArr.map((item, index) => (
+              <Option key={index} value={item.category_code}>{item.name}</Option>
+            ))}</Select>
 
-        <Form.Item label="Tags" name="tags">
-          <Select
-            mode="multiple"
-            placeholder="Please tags"
-            allowClear
-            filterOption={(input, option) =>
-              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-          >
-            {tags &&
-              tags.map((item, index) => (
-                <Option key={index} value={item.tag_code}>
-                  {item.name}
-                </Option>
-              ))}
+        </Form.Item>
+        <Form.Item label="Tags" name="tags" >
+          <Select mode="multiple" placeholder="Please tags" allowClear filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
+            {tags && tags.map((item, index) => (
+              <Option key={index} value={item.tag_code}>{item.name}</Option>
+            ))}
           </Select>
         </Form.Item>
 
@@ -529,7 +575,7 @@ export function NewsForm(props) {
         <Form.Item
           name="post_status"
           style={{ display: "none" }} // Hide the field using CSS
-          // or className="hidden-field" // Apply a CSS class to hide the field
+        // or className="hidden-field" // Apply a CSS class to hide the field
         >
           <Input />
         </Form.Item>
@@ -538,7 +584,7 @@ export function NewsForm(props) {
           name="publish"
           style={{ display: "none" }} // Hide the field using CSS
           valuePropName="checked"
-          // or className="hidden-field" // Apply a CSS class to hide the field
+        // or className="hidden-field" // Apply a CSS class to hide the field
         >
           <Switch />
         </Form.Item>

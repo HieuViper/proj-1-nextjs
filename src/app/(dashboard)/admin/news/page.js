@@ -1,7 +1,9 @@
 /* eslint-disable @next/next/no-async-client-component */
 
-import { newsMHandle } from "@/library/getNews";
-import NewsList from "./_components/NewsList";
+import { useRouter } from 'next/navigation';
+import { funcNews } from '@/library/funcNews';
+import { db } from '@/config/db';
+import NewsList from './_components/NewsList';
 
 // This part is important!
 export const dynamic = "force-dynamic";
@@ -26,24 +28,24 @@ async function NewsPage({ searchParams }) {
 
   // console.log('searchparams: ', searchParams);
 
-  if (trash != "") {
-    await newsMHandle.trashNews(trash);
+  if (trash != '') {
+    await funcNews.trashNews(trash);
   }
-  if (keys != "") {
-    await newsMHandle.deleteBulkNews(keys, status);
+  if (keys != '') {
+    await funcNews.deleteBulkNews(keys, status);
   }
-  if (recover != "") {
-    await newsMHandle.recoverNews(recover);
+  if (recover != '') {
+    await funcNews.recoverNews(recover);
   }
-  if (del != "") {
-    await newsMHandle.deleteNews(del);
+  if (del != '') {
+    await funcNews.deleteNews(del);
   }
   if (Object.keys(searchParams).length == 0) {
     orderby = "post_modified";
     order = "desc";
   }
-  console.log("news list page");
-  const newsData = await newsMHandle.getAllNews(
+  console.log('news list page');
+  const newsData = await funcNews.getAllNews(
     status,
     page,
     size,
@@ -55,7 +57,7 @@ async function NewsPage({ searchParams }) {
     tag,
     lang
   );
-  const totals = await newsMHandle.getTotalNumOfNews(
+  const totals = await funcNews.getTotalNumOfNews(
     status,
     search,
     author,
@@ -69,7 +71,7 @@ async function NewsPage({ searchParams }) {
     current: parseInt(page),
     // disabled: true
   };
-  const langTable = await newsMHandle.getLanguages();
+  const langTable = await funcNews.getLanguages();
   return (
     <>
       <NewsList

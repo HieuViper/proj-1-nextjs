@@ -109,7 +109,7 @@ export function ArticleForm(props) {
             :
             <Input placeholder="Input name" />}
         </Form.Item>
-        <div className="py-2 px-6 text-[#646970] text-left">The name is how it appears on your site.</div>
+        <div className="py-2 px-6 text-[#646970] text-left text-xs">The name is how it appears on your site.</div>
         <Form.Item
           label={<span className="font-medium">Description:</span>}
           name={`description_${lang}`}
@@ -118,7 +118,7 @@ export function ArticleForm(props) {
         >
           <Input.TextArea rows={4} placeholder="Input description" />
         </Form.Item>
-        <div className="py-2 px-6 text-[#646970] text-left">The description is not prominent by default; however, some themes may show it.</div>
+        <div className="py-2 px-6 text-[#646970] text-left text-xs">The description is not prominent by default; however, some themes may show it.</div>
 
       </>
     )
@@ -183,7 +183,7 @@ export function ArticleForm(props) {
       >
         <Input onChange={(e) => changeCode(e.target.value)} placeholder="Input Article code" />
       </Form.Item>}
-      {!id && <div className="py-2 px-6 text-[#646970] text-left">The “Article code” is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.</div>}
+      {!id && <div className="py-2 px-6 text-[#646970] text-left text-xs">The “Article code” is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.</div>}
 
       <Form.Item
         wrapperCol={{

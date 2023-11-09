@@ -102,6 +102,7 @@ const ArticleList = (props) => {
     //set state sorter to init state, that means sort follow the date column
     setSortedInfo(initSort);
     const orderPara = getOrderPara(initSort, true);
+    router.refresh();
     router.push(
       `${pathName}?status=${post_status}&lang=${lang}&size=${paginationServer.pageSize}${orderPara}`
     );
@@ -188,8 +189,8 @@ const ArticleList = (props) => {
     console.log("vao day");
     const articlesData = JSON.parse(props.dataTable);
     setArticles(articlesData);
-    setPagination(props.pagination);
-    setTotals(props.totals);
+    setPagination(JSON.parse(props.pagination));
+    setTotals(JSON.parse(props.totals));
     setSelectedRowKeys([]);
     setLoadingStatus(false);
   }, [props]);

@@ -122,7 +122,7 @@ export default function NewsList(props) {
     //set state sorter to init state, that means sort follow the date column
 
     const orderPara = getOrderPara(initSort, post_status, true);
-
+    router.refresh();
     router.push(
       `${pathName}?status=${post_status}&lang=${lang}&size=${paginationServer.pageSize}${orderPara}`
     );

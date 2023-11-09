@@ -9,7 +9,7 @@ import NewsList from './_components/NewsList';
 export const dynamic = "force-dynamic";
 
 async function NewsPage({ searchParams }) {
-  if (!db.initialized) await db.initialize();
+  //  if(!db.initialized) await db.initialize();
 
   const trash = searchParams?.trash ?? "";
   const keys = searchParams?.keys ?? "";

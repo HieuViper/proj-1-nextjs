@@ -9,22 +9,24 @@ import { newsModel } from "./models/news";
 import { newsCateLanguageModel } from "./models/news_cate_langs";
 import { newsCategoriesModel } from "./models/news_categories";
 import { newsLanguageModel } from "./models/news_languages";
-import { tagsModel } from "./models/tags";
 import { tagLangsModel } from "./models/tag_langs";
+import { tagsModel } from "./models/tags";
 
 const sequelize = new Sequelize(
   process.env.DB_DBNAME,
   process.env.DB_USER,
   process.env.DB_PASSWORD,
   {
-    host: process.env.DB_HOST, dialect: process.env.DB_DIALECT, pool: {
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT,
+    pool: {
       max: 5,
       min: 0,
       acquire: 30000,
-      idle: 10000
+      idle: 10000,
     },
-    timezone: '+07:00',
-  },
+    timezone: "+07:00",
+  }
 );
 
 export const db = {
@@ -94,7 +96,6 @@ async function initialize() {
   db.Languages.belongsToMany(db.News, { through: db.News_languages });
   db.Articles.belongsToMany(db.Languages, { through: db.Article_languages });
   db.Languages.belongsToMany(db.Articles, { through: db.Article_languages });
-
 
   db.Article_categories.belongsToMany(db.Languages, {
     through: db.Article_cate_langs,

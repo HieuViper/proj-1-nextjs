@@ -23,10 +23,8 @@ body {
   vertical-align: middle;
 }
 
-.ql-editor {
-  min-height: 400px !important;
-  max-height: 600px;
-  overflow: auto;
+.ck.ck-editor__editable_inline {
+  border: 1px solid #ccced1 !important;
 }
 
 /* button */

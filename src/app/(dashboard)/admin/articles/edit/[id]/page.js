@@ -1,15 +1,40 @@
-import { getArticle, getCategories } from "@/library/getArticles";
+import { articleHandle } from "@/library/getArticles";
+import { redirect } from "next/navigation";
 import { ArticleForm } from "../../_components/ArticleForm";
 
 export const dynamic = "force-dynamic";
 const EditArticlePage = async ({ params, searchParams }) => {
-  console.log("searchParams :", searchParams);
-  const data = await getArticle(params.id);
-  const cate = await getCategories();
+  // if (!db.initialized) {
+  //   await db.initialize();
+  // }
+  async function dellArticle(data, articleLangs, id) {
+    "use server";
+    await articleHandle.updateAarticle(data, articleLangs, id);
+    redirect("/admin/articles");
+  }
+  async function editArticle(data, articleLangs, id) {
+    "use server";
+    try {
+      await articleHandle.updateAarticle(data, articleLangs, id);
+      return { message: 1 };
+    } catch (error) {
+      return {
+        message: `Fail to update article, try again or inform your admin: ${error.message}`,
+      };
+    }
+  }
+  const data = await articleHandle.getArticle(params.id);
+  const cate = await articleHandle.getCategories(process.env.DEFAULT_LANGUAGE);
+  const langTable = await articleHandle.getLanguages();
   return (
-    <div className="">
+    <div>
       Edit new
-      <ArticleForm data={data} cate={cate} />
+      <ArticleForm
+        data={data}
+        cate={cate}
+        langTable={langTable}
+        {...{ dellArticle, editArticle }}
+      />
     </div>
   );
 };

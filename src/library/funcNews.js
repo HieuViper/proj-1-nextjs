@@ -1,7 +1,6 @@
 //'use server';
-import { db } from '@/config/db';
-import { QueryTypes, Op } from 'sequelize';
-
+import { db } from "@/config/db";
+import { Op, QueryTypes } from "sequelize";
 
 //get Status query from parameter post_status
 function getStatusQuery(post_status) {
@@ -65,7 +64,6 @@ export async function getAllNews(
 
     return results;
   } catch (error) {
-
     throw new Error("Fail to get news from database" + error.message);
   }
 }
@@ -102,7 +100,6 @@ export async function getTotalNumOfNews(
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.itemsOfTable = results[0].total;
   } catch (error) {
-
     throw new Error("cannot get items Of Table:" + error.message);
   }
   try {
@@ -112,7 +109,6 @@ export async function getTotalNumOfNews(
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.all = results[0].total;
   } catch (error) {
-
     throw new Error("cannot get number of news in All Tab:" + error.message);
   }
   try {
@@ -121,7 +117,6 @@ export async function getTotalNumOfNews(
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.draft = results[0].total;
   } catch (error) {
-
     throw new Error(
       "Cannot get total of news in Draft status:" + error.message
     );
@@ -132,7 +127,6 @@ export async function getTotalNumOfNews(
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.publish = results[0].total;
   } catch (error) {
-
     throw new Error(
       "Cannot get total of news in published status:" + error.message
     );
@@ -155,7 +149,6 @@ export async function getTotalNumOfNews(
 
     return totals;
   } catch (error) {
-
     throw new Error(
       "Cannot get total of news in priority status:" + error.message
     );
@@ -173,7 +166,6 @@ export async function trashNews(key) {
         },
       }
     );
-
   } catch (error) {
     throw new Error("Fail to move news to trash bin");
   }
@@ -202,7 +194,6 @@ export async function deleteBulkNews(keys, status) {
           },
         },
       });
-
   } catch (error) {
     console.log(error);
     throw new Error("Fail to delete news");
@@ -220,7 +211,6 @@ export async function recoverNews(key) {
         },
       }
     );
-
   } catch (error) {
     throw new Error(`Fail to recover news id = ${key}`);
   }
@@ -239,12 +229,9 @@ export async function deleteNews(key) {
   }
 }
 
-//
-//
-
+//Get News By ID
 export async function getNews(id) {
   try {
-
     const sqlquery = `SELECT * FROM news_all WHERE id=${id}`;
     const result = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     return result;
@@ -265,10 +252,11 @@ export async function getCategories(lang) {
     const results = await db.seq.query(strquery, { type: QueryTypes.SELECT });
     return results;
   } catch (error) {
-    throw new Error('Fail to get categories: ' + error.message);
+    throw new Error("Fail to get categories: " + error.message);
   }
 }
-//get all tags
+
+//Get all tags
 export async function getTags(lang) {
   try {
     let strquery;
@@ -279,10 +267,11 @@ export async function getTags(lang) {
     const results = await db.seq.query(strquery, { type: QueryTypes.SELECT });
     return results;
   } catch (error) {
-    throw new Error('Fail to get Tags: ' + error.message);
+    throw new Error("Fail to get Tags: " + error.message);
   }
 }
 
+//Get All Languages
 export async function getLanguages() {
   //console.log('db in language:', db);
   try {
@@ -291,7 +280,7 @@ export async function getLanguages() {
     });
     return results;
   } catch (error) {
-    throw new Error('Fail to get languages: ' + error.message);
+    throw new Error("Fail to get languages: " + error.message);
   }
 }
 
@@ -338,11 +327,9 @@ export async function updateANews(data, newsLangs, id) {
     await t.commit();
   } catch (error) {
     await t.rollback();
-    throw new Error('Cannot update news:' + error.message);
+    throw new Error("Cannot update news:" + error.message);
   }
 }
-
-
 
 //Add a new News from Add form
 //parameter: data: contain updated value for news Table
@@ -367,6 +354,6 @@ export async function addANews(data, newsLangs) {
     return news.id;
   } catch (error) {
     await t.rollback();
-    throw new Error('Cannot create news:' + error.message);
+    throw new Error("Cannot create news:" + error.message);
   }
 }

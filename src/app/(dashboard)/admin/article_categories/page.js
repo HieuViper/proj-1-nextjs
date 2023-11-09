@@ -1,9 +1,5 @@
-
-
 import { funcArticleCategories } from "@/library/funcArticleCategories";
 import ArticleList from "./_components/ArticleCatList";
-import { db } from '@/config/db';
-import { getLanguages } from "@/library/getLanguages";
 
 async function ArticlePage() {
   if (!db.initialized) {
@@ -11,24 +7,23 @@ async function ArticlePage() {
   }
 
   async function getAllArticle(lang) {
-    'use server'
-    const article = await funcArticleCategories.getAllArticleCat(lang)
-    return article
+    "use server";
+    const article = await funcArticleCategories.getAllArticleCat(lang);
+    return article;
   }
   async function getArticle(id) {
-    'use server'
-    const article = await funcArticleCategories.getArticleCat(id)
-    return article
+    "use server";
+    const article = await funcArticleCategories.getArticleCat(id);
+    return article;
   }
   async function addArticle(data, articleLangs, lang) {
-    'use server';
-    let message = '';
+    "use server";
+    let message = "";
     let id;
     try {
       await funcArticleCategories.addArticleCat(data, articleLangs);
       const rs = await funcArticleCategories.getAllArticleCat(lang);
-      return { message: 1, articleList: rs }
-
+      return { message: 1, articleList: rs };
     } catch (error) {
       message = `Fail to add a articles, try again or inform your admin: ${error.message}`;
     }
@@ -36,29 +31,33 @@ async function ArticlePage() {
   }
 
   async function editArticle(data, articleLangs, id, lang) {
-    'use server';
+    "use server";
     try {
       await funcArticleCategories.updateArticleCat(data, articleLangs, id);
       const rs = await funcArticleCategories.getAllArticleCat(lang);
-      return { message: 1, articleList: rs }
+      return { message: 1, articleList: rs };
     } catch (error) {
-      return { message: `Fail to update articles, try again or inform your admin: ${error.message}` };
+      return {
+        message: `Fail to update articles, try again or inform your admin: ${error.message}`,
+      };
     }
   }
   async function delArticle(id) {
-    'use server';
+    "use server";
     await funcArticleCategories.delArticleCat(id);
   }
   async function delBulkArticle(arrId) {
-    'use server';
+    "use server";
     await funcArticleCategories.delBulkArticleCat(arrId);
   }
   async function searchArticle(search, lang) {
-    'use server'
-    const article = await funcArticleCategories.getSearchQuery(search, lang)
-    return article
+    "use server";
+    const article = await funcArticleCategories.getSearchQuery(search, lang);
+    return article;
   }
-  const allArticleCat = await funcArticleCategories.getAllArticleCat(process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE)
+  const allArticleCat = await funcArticleCategories.getAllArticleCat(
+    process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE
+  );
   const langTable = await getLanguages();
 
   return (
@@ -66,7 +65,16 @@ async function ArticlePage() {
       <ArticleList
         dataTable={JSON.stringify(allArticleCat)}
         langTable={JSON.stringify(langTable)}
-        {...{ getAllArticle, getArticle, addArticle, editArticle, delArticle, delBulkArticle, searchArticle }} />
+        {...{
+          getAllArticle,
+          getArticle,
+          addArticle,
+          editArticle,
+          delArticle,
+          delBulkArticle,
+          searchArticle,
+        }}
+      />
     </>
   );
 }

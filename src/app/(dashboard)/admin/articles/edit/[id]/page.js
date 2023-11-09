@@ -1,4 +1,4 @@
-import { articleHandle } from "@/library/getArticles";
+import { funcArticle } from "@/library/funcArticles";
 import { redirect } from "next/navigation";
 import { ArticleForm } from "../../_components/ArticleForm";
 
@@ -9,13 +9,13 @@ const EditArticlePage = async ({ params, searchParams }) => {
   // }
   async function dellArticle(data, articleLangs, id) {
     "use server";
-    await articleHandle.updateAarticle(data, articleLangs, id);
+    await funcArticle.updateAarticle(data, articleLangs, id);
     redirect("/admin/articles");
   }
   async function editArticle(data, articleLangs, id) {
     "use server";
     try {
-      await articleHandle.updateAarticle(data, articleLangs, id);
+      await funcArticle.updateAarticle(data, articleLangs, id);
       return { message: 1 };
     } catch (error) {
       return {
@@ -23,9 +23,9 @@ const EditArticlePage = async ({ params, searchParams }) => {
       };
     }
   }
-  const data = await articleHandle.getArticle(params.id);
-  const cate = await articleHandle.getCategories(process.env.DEFAULT_LANGUAGE);
-  const langTable = await articleHandle.getLanguages();
+  const data = await funcArticle.getArticle(params.id);
+  const cate = await funcArticle.getCategories(process.env.DEFAULT_LANGUAGE);
+  const langTable = await funcArticle.getLanguages();
   return (
     <div>
       Edit new

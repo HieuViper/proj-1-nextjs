@@ -20,7 +20,7 @@ function getSearchQuery(search) {
     : `AND (title LIKE '%${search}%' OR content LIKE '%${search}%' OR categories LIKE '%${search}%')`;
 }
 
-export const articleHandle = {
+export const funcArticle = {
   getAllArticle,
   getTotalNumOfarticle,
   trashArticle,

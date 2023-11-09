@@ -1,11 +1,15 @@
 "use client";
 import {
   AppstoreOutlined,
+  GlobalOutlined,
   LogoutOutlined,
   MailOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  ReadOutlined,
+  TagsOutlined,
   UserOutlined,
+  UsergroupAddOutlined,
 } from "@ant-design/icons";
 import { Avatar, Button, Layout, Menu, theme } from "antd";
 import Link from "next/link";
@@ -32,7 +36,7 @@ const DashboardLayout = ({ children }) => {
     };
   }
   const items = [
-    getItem("/news", "News", <AppstoreOutlined />, [
+    getItem("/news", "News", <ReadOutlined />, [
       getItem(
         "/admin/news",
         <Link href="/admin/news">News List</Link>,
@@ -66,7 +70,7 @@ const DashboardLayout = ({ children }) => {
         <MailOutlined />
       ),
     ]),
-    getItem("/users", "Users", <AppstoreOutlined />, [
+    getItem("/users", "Users", <UsergroupAddOutlined />, [
       getItem(
         "/admin/users",
         <Link href="/admin/users">Users List</Link>,
@@ -81,7 +85,12 @@ const DashboardLayout = ({ children }) => {
     getItem(
       "/admin/tags",
       <Link href="/admin/tags">Tags</Link>,
-      <MailOutlined />
+      <TagsOutlined />
+    ),
+    getItem(
+      "/admin/languages",
+      <Link href="/admin/languages">Languages</Link>,
+      <GlobalOutlined />
     ),
   ];
 

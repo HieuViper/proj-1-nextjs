@@ -1,7 +1,5 @@
 /* eslint-disable @next/next/no-async-client-component */
 
-import { db } from "@/config/db";
-
 import {
   deleteArticle,
   deleteBulkArticle,
@@ -9,7 +7,7 @@ import {
   getTotalNumOfarticle,
   recoverArticle,
   trashArticle,
-} from "@/library/getArticles";
+} from "@/library/funcArticles";
 import ArticleList from "./_components/ArticleList";
 
 // This part is important!
@@ -78,16 +76,13 @@ async function ArticlePage({ searchParams }) {
     total: totals.itemsOfTable,
     current: parseInt(page),
   };
-  //const cate = await getCategories();
-  //console.log("data from getarticle:", articleData);
 
   return (
     <>
       <ArticleList
         dataTable={JSON.stringify(articleData)}
-        pagination={pagination}
-        totals={totals}
-        // cate={cate}
+        pagination={JSON.stringify(pagination)}
+        totals={JSON.stringify(totals)}
       />
       ;
     </>

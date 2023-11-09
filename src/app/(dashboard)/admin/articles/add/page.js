@@ -1,4 +1,4 @@
-import { addAarticle, articleHandle } from "@/library/getArticles";
+import { addAarticle, funcArticle } from "@/library/funcArticles";
 import { redirect } from "next/navigation";
 import { ArticleForm } from "../_components/ArticleForm";
 
@@ -24,8 +24,8 @@ const AddArticlePage = async () => {
 
     return message;
   }
-  const cate = await articleHandle.getCategories(process.env.DEFAULT_LANGUAGE);
-  const langTable = await articleHandle.getLanguages();
+  const cate = await funcArticle.getCategories(process.env.DEFAULT_LANGUAGE);
+  const langTable = await funcArticle.getLanguages();
   return (
     <div className="">
       Add new article

@@ -5,64 +5,66 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export function TagForm(props) {
-  const { addTag, editTag, handleModal, dataTag, langTable, lang, setTags } = props
-  const id = dataTag && dataTag[0]?.id
+  const { addTag, editTag, handleModal, dataTag, langTable, lang, setTags } =
+    props;
+  const id = dataTag && dataTag[0]?.id;
   const [loading, setLoading] = useState(false);
   const params = useParams();
   const [form] = Form.useForm();
-  const [isChangeCode, setIsChangeCode] = useState(false)
-
-
+  const [isChangeCode, setIsChangeCode] = useState(false);
 
   function getTagValue(property, tag, lang) {
-    let rs
-    tag.forEach(element => {
+    let rs;
+    tag.forEach((element) => {
       if (element.languageCode == lang) {
         rs = element[property];
       }
     });
-    return rs
+    return rs;
   }
 
   // SUBMIT FORM
   const handleSubmit = async (value) => {
-    const tagLangs = langTable.map(lang => {
-      delete value[`name_${lang.code}`];    //delete unsused properties
+    const tagLangs = langTable.map((lang) => {
+      delete value[`name_${lang.code}`]; //delete unsused properties
       delete value[`description_${lang.code}`];
       return {
-        name: form.getFieldValue(`name_${lang.code}`) ?? '',
-        description: form.getFieldValue(`description_${lang.code}`) ?? '',
+        name: form.getFieldValue(`name_${lang.code}`) ?? "",
+        description: form.getFieldValue(`description_${lang.code}`) ?? "",
         languageCode: lang.code,
         TagId: id,
       };
     });
-    setLoading(true)
+    setLoading(true);
     try {
       if (id) {
         await editTag(value, tagLangs, id, lang).then((res) => {
-          setTags(res.tagList)
-          handleModal()
-          toast.success("Update Tag success ",);
-          setLoading(false)
-        })
+          setTags(res.tagList);
+          handleModal();
+          toast.success("Update Tag success ");
+          setLoading(false);
+        });
       } else {
-        if (form.getFieldValue('tag_code').length <= 0) {
+        if (form.getFieldValue("tag_code").length <= 0) {
           value = {
-            ...value, tag_code: tagLangs[0].name.trim().normalize('NFD')
-              .replace(/[\u0300-\u036f]/g, '')
-              .replace(/đ/g, 'd')
-              .replace(/Đ/g, 'D')
-              .replace(/\s/g, "-")
-          }
+            ...value,
+            tag_code: tagLangs[0].name
+              .trim()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .replace(/đ/g, "d")
+              .replace(/Đ/g, "D")
+              .replace(/\s/g, "-"),
+          };
         }
 
-        console.log('value :', value);
+        console.log("value :", value);
         await addTag(value, tagLangs, lang).then((res) => {
-          setTags(res.tagList)
+          setTags(res.tagList);
           toast.success("Create Tag success");
-          setLoading(false)
-          form.resetFields()
-        })
+          setLoading(false);
+          form.resetFields();
+        });
       }
     } catch (error) {
       toast.error(error);
@@ -75,19 +77,21 @@ export function TagForm(props) {
   // CHANGE NAME TO CODE
   const changeCode = (e) => {
     if (e.length <= 0) {
-      setIsChangeCode(false)
+      setIsChangeCode(false);
     } else {
-      setIsChangeCode(true)
+      setIsChangeCode(true);
     }
-  }
+  };
   function generateTagCode(e) {
-    let tagCode = e.trim().normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/đ/g, 'd')
-      .replace(/Đ/g, 'D')
-      .replace(/\s/g, "-")
+    let tagCode = e
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d")
+      .replace(/Đ/g, "D")
+      .replace(/\s/g, "-");
     if (!isChangeCode) {
-      form.setFieldValue('tag_code', tagCode);
+      form.setFieldValue("tag_code", tagCode);
     }
   }
 
@@ -101,53 +105,67 @@ export function TagForm(props) {
           rules={[
             {
               required: true,
-              message: 'Please input your name!',
+              message: "Please input your name!",
             },
           ]}
           className="mb-0"
         >
-          {lang == process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE ?
-            <Input onChange={(e) => generateTagCode(e.target.value)} placeholder="Input name" />
-            :
-            <Input placeholder="Input name" />}
+          {lang == process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE ? (
+            <Input
+              onChange={(e) => generateTagCode(e.target.value)}
+              placeholder="Input name"
+            />
+          ) : (
+            <Input placeholder="Input name" />
+          )}
         </Form.Item>
-        <div className="py-2 px-6 text-[#646970] text-left text-xs">The name is how it appears on your site.</div>
+        <div className="py-2 px-6 text-[#646970] text-left text-xs">
+          The name is how it appears on your site.
+        </div>
         <Form.Item
           label={<span className="font-medium">Description:</span>}
           name={`description_${lang}`}
           className="mb-0"
-
         >
           <Input.TextArea rows={4} placeholder="Input description" />
         </Form.Item>
-        <div className="py-2 px-6 text-[#646970] text-left text-xs">The description is not prominent by default; however, some themes may show it.</div>
-
+        <div className="py-2 px-6 text-[#646970] text-left text-xs">
+          The description is not prominent by default; however, some themes may
+          show it.
+        </div>
       </>
-    )
-  }
-  const itemsTab = langTable?.map(item => (
-    {
-      key: item.code,
-      label: item.name,
-      children: <>
+    );
+  };
+  const itemsTab = langTable?.map((item) => ({
+    key: item.code,
+    label: item.name,
+    children: (
+      <>
         <TabComponent lang={item.code} />
       </>
-    }
-  ))
+    ),
+  }));
 
   useEffect(() => {
     if (dataTag) {
-      let tagData = (dataTag);
+      let tagData = dataTag;
       let mainTagContent = {};
 
       langTable?.forEach((lang) => {
-        mainTagContent[`name_${lang.code}`] = getTagValue('name', tagData, lang.code);
-        mainTagContent[`description_${lang.code}`] = getTagValue('description', tagData, lang.code);
-      })
+        mainTagContent[`name_${lang.code}`] = getTagValue(
+          "name",
+          tagData,
+          lang.code
+        );
+        mainTagContent[`description_${lang.code}`] = getTagValue(
+          "description",
+          tagData,
+          lang.code
+        );
+      });
       let data1 = { ...tagData[0], ...mainTagContent };
-      form.setFieldsValue(data1)
+      form.setFieldsValue(data1);
     }
-
   }, [props]);
   return (
     <Form
@@ -159,10 +177,12 @@ export function TagForm(props) {
         offset: 1,
         span: 21,
       }}
-      style={{
-        // maxWidth: 2000,
-        // width: '100%',
-      }}
+      style={
+        {
+          // maxWidth: 2000,
+          // width: '100%',
+        }
+      }
       initialValues={{
         remember: true,
       }}
@@ -178,15 +198,24 @@ export function TagForm(props) {
         indicatorSize={(origin) => origin - 16}
         centered
       />
-      {!id && <Form.Item
-        label={<span className="font-medium ">Tag code:</span>}
-        name="tag_code"
-        className="mb-0"
-
-      >
-        <Input onChange={(e) => changeCode(e.target.value)} placeholder="Input Tag code" />
-      </Form.Item>}
-      {!id && <div className="py-2 px-6 text-[#646970] text-left text-xs">The “Tag code” is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.</div>}
+      {!id && (
+        <Form.Item
+          label={<span className="font-medium ">Tag code:</span>}
+          name="tag_code"
+          className="mb-0"
+        >
+          <Input
+            onChange={(e) => changeCode(e.target.value)}
+            placeholder="Input Tag code"
+          />
+        </Form.Item>
+      )}
+      {!id && (
+        <div className="py-2 px-6 text-[#646970] text-left text-xs">
+          The “Tag code” is the URL-friendly version of the name. It is usually
+          all lowercase and contains only letters, numbers, and hyphens.
+        </div>
+      )}
 
       <Form.Item
         wrapperCol={{
@@ -194,13 +223,21 @@ export function TagForm(props) {
           span: 16,
         }}
       >
-        {id ? <Button type="primary" htmlType="submit" disabled={loading} loading={loading}>
-          Update
-        </Button> : <Button type="primary" htmlType="submit" loading={loading}>
-          Add New Tags
-        </Button>}
+        {id ? (
+          <Button
+            type="primary"
+            htmlType="submit"
+            disabled={loading}
+            loading={loading}
+          >
+            Update
+          </Button>
+        ) : (
+          <Button type="primary" htmlType="submit" loading={loading}>
+            Add New Tags
+          </Button>
+        )}
       </Form.Item>
-
     </Form>
   );
 }

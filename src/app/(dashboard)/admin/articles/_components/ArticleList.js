@@ -102,6 +102,7 @@ const ArticleList = (props) => {
     //set state sorter to init state, that means sort follow the date column
     setSortedInfo(initSort);
     const orderPara = getOrderPara(initSort, true);
+    router.refresh();
     router.push(
       `${pathName}?status=${post_status}&lang=${lang}&size=${paginationServer.pageSize}${orderPara}`
     );
@@ -188,8 +189,8 @@ const ArticleList = (props) => {
     console.log("vao day");
     const articlesData = JSON.parse(props.dataTable);
     setArticles(articlesData);
-    setPagination(props.pagination);
-    setTotals(props.totals);
+    setPagination(JSON.parse(props.pagination));
+    setTotals(JSON.parse(props.totals));
     setSelectedRowKeys([]);
     setLoadingStatus(false);
   }, [props]);
@@ -363,9 +364,9 @@ const ArticleList = (props) => {
       <div className="flex justify-between mb-4 gap-x-4">
         <div className="flex gap-x-5">
           <p className="font-semibold text-xl pr-4">Articles</p>
-          <Button className="">
-            <Link href={`/admin/articles/add`}>Add Article</Link>
-          </Button>
+          <Link href={`/admin/articles/add`}>
+            <Button className="">Add Article</Button>
+          </Link>
           <Select
             defaultValue="vi"
             value={lang}

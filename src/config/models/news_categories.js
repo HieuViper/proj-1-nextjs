@@ -11,11 +11,12 @@ export function newsCategoriesModel(sequelize) {
         },
         parent: {
             type: DataTypes.BIGINT(20).UNSIGNED,
-            allownNull: false,
+            allownNull: true,
         },
         category_code: {
             type: DataTypes.STRING(200),
             collate: 'utf8mb4_unicode_520_ci',
+            unique: true,
             defaultValue: '',
         },
     };

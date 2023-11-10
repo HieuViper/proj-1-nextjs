@@ -135,7 +135,7 @@ async function initialize() {
   // db.Articles.belongsTo( db.Imgs, { foreignKey: 'image' } );
 
   // sync all models with database
-   await sequelize.sync({ force: true });
+   await sequelize.sync({ alter: true });
 
   db.initialized = true;
   console.log("Initializing database is done");

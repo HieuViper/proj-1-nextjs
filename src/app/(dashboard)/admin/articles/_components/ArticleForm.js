@@ -79,18 +79,17 @@ export function ArticleForm(props) {
 
   //Notify success adding new from /admin/add
   function notifyAddArticleSuccess() {
-    //get message redirected from add news route
     if (searchParams.get("message")) {
       const message = searchParams.get("message") ?? "";
       if (message == 1) {
         //signal of success edit on server
-        let messageNotify = "Add news successfully";
+        let messageNotify = "Add article successfully";
         toast.success(messageNotify, {
           position: "top-center",
         });
       } else {
         //signal of faillure on server
-        let messageNotify = `Cannot add new news, please try again or inform admin: ${message}`;
+        let messageNotify = `Cannot add new article, please try again or inform admin: ${message}`;
         toast.success(messageNotify, {
           position: "top-center",
         });
@@ -158,7 +157,7 @@ export function ArticleForm(props) {
       </>
     );
   };
-  const itemsTab = props.langTable?.map((item) => ({
+  const itemsTab = JSON.parse(props.langTable)?.map((item) => ({
     key: item.code,
     label: item.name,
     children: (
@@ -174,7 +173,17 @@ export function ArticleForm(props) {
   const uploadPicToServer = async (event) => {
     const body = new FormData();
     // console.log("file", image)
+    // const compressedFile = await imageCompression(previewPic, {
+    //   maxSizeMB: 1,
+    //   maxWidthOrHeight: 1920,
+    //   useWebWorker: true,
+    // });
+    // console.log(
+    //   "🚀 ~ file: ArticleForm.js:178 ~ uploadPicToServer ~ compressedFile:",
+    //   compressedFile
+    // );
     body.append("file", previewPic);
+
     const response = await fetch("/api/articles/image", {
       method: "POST",
       body,
@@ -185,7 +194,7 @@ export function ArticleForm(props) {
   async function handleSubmit(value) {
     value.categories = value.categories.toString();
     //value.news_position = newsPosition ? 1 : 0;
-    console.log("news_position 2: ", form.getFieldValue("article_position"));
+    console.log("article_position 2: ", form.getFieldValue("article_position"));
     if (form.getFieldValue("publish")) {
       value = { ...value, post_date: "1" }; //add property post_date into the value object
     }
@@ -262,12 +271,12 @@ export function ArticleForm(props) {
 
   //USE EFFECT
   useEffect(() => {
-    setCate(props.cate);
-    setLangTable(props.langTable); //set languageTable for article
+    setCate(JSON.parse(props.cate));
+    setLangTable(JSON.parse(props.langTable)); //set languageTable for article
     if (params?.id) {
       //get the article, articledata is an array it's each row is a language's article
 
-      let articleData = props.data;
+      let articleData = JSON.parse(props.data);
       console.log(
         "🚀 ~ file: ArticleForm.js:273 ~ useEffect ~ articleData:",
         articleData
@@ -275,7 +284,7 @@ export function ArticleForm(props) {
       //Build the data for title, excerpt, content
       let mainArticleContent = {};
 
-      props.langTable?.forEach((lang) => {
+      JSON.parse(props.langTable)?.forEach((lang) => {
         mainArticleContent[`title_${lang.code}`] = getArticleValue(
           "title",
           articleData,

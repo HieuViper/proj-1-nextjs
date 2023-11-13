@@ -29,7 +29,11 @@ const AddArticlePage = async () => {
   return (
     <div className="">
       Add new article
-      <ArticleForm cate={cate} langTable={langTable} {...{ addArticle }} />
+      <ArticleForm
+        cate={JSON.stringify(cate)}
+        langTable={JSON.stringify(langTable)}
+        {...{ addArticle }}
+      />
     </div>
   );
 };

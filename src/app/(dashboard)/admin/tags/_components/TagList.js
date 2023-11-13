@@ -11,6 +11,7 @@ import {
   Select,
   Table,
 } from "antd";
+import Search from "antd/es/input/Search";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";

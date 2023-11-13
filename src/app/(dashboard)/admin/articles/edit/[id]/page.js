@@ -30,9 +30,9 @@ const EditArticlePage = async ({ params, searchParams }) => {
     <div>
       Edit new
       <ArticleForm
-        data={data}
-        cate={cate}
-        langTable={langTable}
+        data={JSON.stringify(data)}
+        cate={JSON.stringify(cate)}
+        langTable={JSON.stringify(langTable)}
         {...{ dellArticle, editArticle }}
       />
     </div>

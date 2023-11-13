@@ -11,12 +11,17 @@ export async function POST(req, res) {
   } else {
     const buffer = Buffer.from(await file.arrayBuffer());
     const filename = file.name.replaceAll(" ", "_");
+
     try {
       await writeFile(
         path.join(process.cwd(), "public/uploads/" + filename),
         buffer
       );
-      return NextResponse.json({ Message: "Success", status: 201 });
+      return NextResponse.json({
+        Message: "Success",
+        status: 201,
+        url: "/uploads/" + filename,
+      });
     } catch (error) {
       console.log("Error occured ", error);
       return NextResponse.json({ Message: "Failed", status: 500 });

@@ -12,6 +12,10 @@ export function articleModel(sequelize) {
       type: DataTypes.STRING(200),
       allowNull: true,
       comment: "feature image of the post",
+      references: {
+        model: 'imgs',
+        key: 'url'
+    }
     },
     categories: {
       type: DataTypes.STRING(200),
@@ -58,6 +62,7 @@ export function articleModel(sequelize) {
     article_code: {
       type: DataTypes.STRING(200),
       collate: "utf8mb4_unicode_520_ci",
+      unique: true,
       allowNull: false,
       comment: "article code is used to build URL",
     },

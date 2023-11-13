@@ -1,7 +1,7 @@
 
 import { DataTypes } from "sequelize";
 
-export function articleCategoriesModel(sequelize) {
+export function productCategoriesModel(sequelize) {
     const attributes = {
         id: {
             type: DataTypes.BIGINT(20).UNSIGNED,
@@ -9,18 +9,22 @@ export function articleCategoriesModel(sequelize) {
             primaryKey: true,
             allownNull: false,
         },
+        parent: {
+            type: DataTypes.BIGINT(20).UNSIGNED,
+            allownNull: true,
+        },
         category_code: {
             type: DataTypes.STRING(200),
-            collate: 'utf8mb4_unicode_520_ci',
             unique: true,
+            collate: 'utf8mb4_unicode_520_ci',
             defaultValue: '',
         },
     };
 
     const options = {
-        tableName: 'article_categories',
+        tableName: 'product_categories',
         timestamps: false,
     };
 
-    return sequelize.define('article_categories', attributes, options);
+    return sequelize.define('product_categories', attributes, options);
 }

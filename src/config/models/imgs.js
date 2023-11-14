@@ -31,7 +31,7 @@ export function imgsModel(sequelize) {
 
     const options = {
         tableName: 'imgs',
-        timestamps: false,
+        timestamps: true,
     };
 
     return sequelize.define('imgs', attributes, options);

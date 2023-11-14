@@ -78,7 +78,7 @@ const DashboardLayout = ({ children }) => {
       ),
       getItem(
         "/admin/users/add",
-        <Link href="/admin/articles/add">Add User</Link>,
+        <Link href="/admin/users/add">Add User</Link>,
         <MailOutlined />
       ),
     ]),

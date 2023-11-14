@@ -78,17 +78,17 @@ export async function POST(req, res) {
         url150:
           `/uploads/${nameFolderInCustom}/` +
           filenameWithoutExt +
-          "_150" +
+          "_150." +
           extfile,
         url350:
           `/uploads/${nameFolderInCustom}/` +
           filenameWithoutExt +
-          "_350" +
+          "_350." +
           extfile,
         url700:
           `/uploads/${nameFolderInCustom}/` +
           filenameWithoutExt +
-          "_700" +
+          "_700." +
           extfile,
       });
     } catch (error) {

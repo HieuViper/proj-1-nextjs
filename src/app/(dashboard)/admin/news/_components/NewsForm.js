@@ -174,47 +174,47 @@ export function NewsForm(props) {
     }
     // try {
     //editing news
-    if (params?.id) {
-      if (value.post_status == process.env.NEXT_PUBLIC_PS_TRASH)
-        //await delNews(value, newsLangs, params.id);
-        await props.dell(value, newsLangs, params.id);
-      else {
-        await props.editNews(value, newsLangs, params.id).then((message) => {
-          if (message.message == 1) {
-            //signal of success edit on server
-            setPostStatus(form.getFieldValue("post_status")); //set postStatus state to rerender action buttons
-            let messageNotify =
-              form.getFieldValue("post_status") ==
-              process.env.NEXT_PUBLIC_PS_DRAFT
-                ? "Save Draft Success"
-                : "Save Publish Success";
-            toast.success(messageNotify, {
-              position: "top-center",
-            });
-          } else {
-            //signal of faillure on server
-            let messageNotify =
-              "Cannot update news, please try again or inform admin";
-            toast.success(messageNotify, {
-              position: "top-center",
-            });
-          }
-        });
-      }
-    }
-    //adding news
-    else {
-      await props.addNews(value, newsLangs).then((message) => {
-        console.log("message from server:", message);
-        if (message && message != 1) {
-          let messageNotify =
-            "Cannot update news, please try again or inform admin" + message;
-          toast.success(messageNotify, {
-            position: "top-center",
-          });
-        }
-      });
-    }
+    // if (params?.id) {
+    //   if (value.post_status == process.env.NEXT_PUBLIC_PS_TRASH)
+    //     //await delNews(value, newsLangs, params.id);
+    //     await props.dell(value, newsLangs, params.id);
+    //   else {
+    //     await props.editNews(value, newsLangs, params.id).then((message) => {
+    //       if (message.message == 1) {
+    //         //signal of success edit on server
+    //         setPostStatus(form.getFieldValue("post_status")); //set postStatus state to rerender action buttons
+    //         let messageNotify =
+    //           form.getFieldValue("post_status") ==
+    //           process.env.NEXT_PUBLIC_PS_DRAFT
+    //             ? "Save Draft Success"
+    //             : "Save Publish Success";
+    //         toast.success(messageNotify, {
+    //           position: "top-center",
+    //         });
+    //       } else {
+    //         //signal of faillure on server
+    //         let messageNotify =
+    //           "Cannot update news, please try again or inform admin";
+    //         toast.success(messageNotify, {
+    //           position: "top-center",
+    //         });
+    //       }
+    //     });
+    //   }
+    // }
+    // //adding news
+    // else {
+    //   await props.addNews(value, newsLangs).then((message) => {
+    //     console.log("message from server:", message);
+    //     if (message && message != 1) {
+    //       let messageNotify =
+    //         "Cannot update news, please try again or inform admin" + message;
+    //       toast.success(messageNotify, {
+    //         position: "top-center",
+    //       });
+    //     }
+    //   });
+    // }
   }
 
   const handleSubmitFailed = (errorInfo) => {

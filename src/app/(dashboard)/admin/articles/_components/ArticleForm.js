@@ -172,16 +172,6 @@ export function ArticleForm(props) {
 
   const uploadPicToServer = async (event) => {
     const body = new FormData();
-    // console.log("file", image)
-    // const compressedFile = await imageCompression(previewPic, {
-    //   maxSizeMB: 1,
-    //   maxWidthOrHeight: 1920,
-    //   useWebWorker: true,
-    // });
-    // console.log(
-    //   "🚀 ~ file: ArticleForm.js:178 ~ uploadPicToServer ~ compressedFile:",
-    //   compressedFile
-    // );
     body.append("file", previewPic);
 
     const response = await fetch("/api/articles/image", {
@@ -489,7 +479,7 @@ export function ArticleForm(props) {
             showUploadList={false}
             beforeUpload={(file) => {
               return new Promise((resolve, reject) => {
-                if (file.size > 9000000) {
+                if (file.size > process.env.FILE_LIMITED_SIZE) {
                   reject("file size exceed");
                   message.error("File size exceed");
                 } else {
@@ -500,7 +490,9 @@ export function ArticleForm(props) {
             }}
             headers={{ authorization: "authorization-text" }}
           >
-            <Button icon={<UploadOutlined />}>Upload</Button>
+            <Button icon={<UploadOutlined />}>
+              {!picName ? "Upload" : "Change Picture"}
+            </Button>
           </Upload>
           {previewPic && (
             <img
@@ -518,11 +510,17 @@ export function ArticleForm(props) {
           )}
         </Form.Item>
 
+        <Form.Item name="caption" label="Caption">
+          <Input />
+        </Form.Item>
+        <Form.Item name="alt" label="Alt">
+          <Input />
+        </Form.Item>
+
         <Form.Item label="position" name="article_position">
           <InputNumber
             min={1}
             max={10}
-            defaultValue={1}
             onChange={(e) => form.setFieldValue({ article_position: e.value })}
           />
         </Form.Item>

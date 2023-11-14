@@ -67,11 +67,15 @@ const Editor = ({ value, onChange }) => {
                         "🚀 ~ file: Editor.js:66 ~ .then ~ image:",
                         image
                       );
+                      const sizes = "(max-width: 600px) 100vw, 50vw";
                       resolve({
                         default: `${image.url}`,
                         150: `${image.url150}`,
                         350: `${image.url350}`,
                         700: `${image.url700}`,
+                        attributes: {
+                          sizes: sizes,
+                        },
                       });
                     })
                     .catch((err) => {

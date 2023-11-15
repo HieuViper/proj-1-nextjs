@@ -2,7 +2,8 @@ import UserForm from "../_components/UserForm";
 import { userRoles } from "@/library/userRoles";
 import { funcUsers } from "@/library/funcUsers";
 import { redirect } from "next/navigation";
-import { request } from "http";
+import { headers, cookies } from "next/headers";
+import { log } from "console";
 
 export const dynamic = "force-dynamic";
 
@@ -24,9 +25,14 @@ const AddUserPage = () => {
 
     return message;
   }
-  request
-  console.log("request:", Request.headers);
-  // console.log("request:", request.arguments);
+  const headerInst = headers();
+  headerInst.forEach( (value, key) => {
+    console.log('key:', key, ' --- value: ', value);
+  });
+  console.log('cookie from header', headerInst.getSetCookie());
+  console.log('cookies: ', cookies().getAll());
+
+
   return (
     <>
       <div className="mb-3">

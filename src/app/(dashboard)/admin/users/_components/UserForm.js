@@ -361,7 +361,7 @@ const UserForm = (props) => {
                   />
                   <Button
                     onClick={() => generatePassword()}
-                    icon={<SyncOutlined spin />}
+                    icon={<SyncOutlined  />}
                   >
                     Generate Password
                   </Button>
@@ -532,7 +532,7 @@ const UserForm = (props) => {
                     </Button>
                     <Button
                       onClick={() => generatePassword()}
-                      icon={<SyncOutlined spin />}
+                      icon={<SyncOutlined  />}
                     >
                       Generate Password
                     </Button>

@@ -13,6 +13,10 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import http, { request } from 'http';
+import Head from "next/head";
+import { Header } from "antd/es/layout/layout";
+//import { setCookie  } from 'js-cookie';
 
 const UserList = ( props ) => {
   const router = useRouter();
@@ -158,6 +162,61 @@ const UserList = ( props ) => {
     );
   };
 
+
+  // var options = {
+  //   port: 3000,
+  //   host: 'localhost',
+  // };
+  // let request = http.request(options);
+  // request.setHeader('Authorization', 'my Token');
+  // console.log('Request:', request);
+  // request.end();
+/*
+  const header1 = new Headers();
+  header1.set('Authorization','huy token');
+  console.log("header1:", header1.get('Authorization'));
+  */
+/*
+  const postData = JSON.stringify({
+    'msg': 'Hello World!',
+  });
+
+  const options = {
+    hostname: 'localhost',
+    port: 3000,
+    path: '/admin/users/add',
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(postData),
+      'Authorization': 'huy Token'
+    },
+  };
+
+  const options2 = new URL('http://abc:xyz@example.com');
+
+  const req = http.request(options2, (res) => {
+    console.log(`STATUS: ${res.statusCode}`);
+    console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+    res.setEncoding('utf8');
+    res.on('data', (chunk) => {
+      console.log(`BODY: ${chunk}`);
+    });
+    res.on('end', () => {
+      console.log('No more data in response.');
+    });
+  });
+
+  req.on('error', (e) => {
+    console.error(`problem with request: ${e.message}`);
+  });
+
+  // Write data to request body
+  req.write(postData);
+  req.end()
+*/
+
+
   //Table Columns
   const columns = [
     {
@@ -254,6 +313,8 @@ const UserList = ( props ) => {
       },
     },
   ];
+
+
 
   return (
     <>

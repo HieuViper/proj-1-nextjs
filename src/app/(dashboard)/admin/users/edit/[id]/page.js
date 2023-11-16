@@ -4,6 +4,7 @@ import Link from "next/link";
 import UserForm from "../../_components/UserForm";
 import { funcUsers } from "@/library/funcUsers";
 import { userRoles } from "@/library/userRoles";
+import { headers, cookies } from "next/headers";
 
 const EditUserPage = async ({ params }) => {
   console.log('params: ', params.id);
@@ -12,6 +13,16 @@ const EditUserPage = async ({ params }) => {
   //update user information
   async function updateUser(userPara) {
     'use server';
+    //test cookie
+    cookies().set({
+      name: 'Authorization',
+      value: 'Huy Token',
+      httpOnly: true,
+      path: '/',
+      sameSite: 'lax',  //Strict
+      maxAge: 300,
+    })
+
     let message;
     try {
       await funcUsers.updateAUser(userPara);
@@ -21,6 +32,11 @@ const EditUserPage = async ({ params }) => {
     }
     return message
   }
+
+  const headerInst = headers();
+  headerInst.forEach( (value, key) => {
+    console.log('key:', key, ' --- value: ', value);
+  });
 
   return (
     <>

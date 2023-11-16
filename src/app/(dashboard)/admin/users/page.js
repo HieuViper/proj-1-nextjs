@@ -1,5 +1,6 @@
 import UserList from "./_components/UserList";
 import { funcUsers } from "@/library/funcUsers";
+import { headers, cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,8 @@ const UserPage = async ({ searchParams }) => {
     current: parseInt(page),
     // disabled: true
   };
+
+  console.log('cookies: ', cookies().getAll());
   return (
     <>
       <UserList dataTable={JSON.stringify(usersData)}

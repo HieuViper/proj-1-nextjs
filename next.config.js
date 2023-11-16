@@ -5,6 +5,9 @@ const nextConfig = {
     serverActions: true,
   },
   reactStrictMode: false,
+  serverRuntimeConfig: {
+    secret: 'my secret word CaO HieU HuY',
+}
 };
 
 module.exports = nextConfig;

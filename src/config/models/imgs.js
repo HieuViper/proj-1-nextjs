@@ -26,6 +26,27 @@ export function imgsModel(sequelize) {
             collate: 'utf8mb4_unicode_520_ci',
             defaultValue: '',
             allownNull: true,
+        },
+        author: {
+            type: DataTypes.STRING(200),
+            collate: "utf8mb4_unicode_520_ci",
+            comment: "It contains username that is used to login",
+            allowNull: true,
+        },
+        type: {
+            type: DataTypes.STRING(50),
+            comment: "image type",
+            allowNull: true,
+        },
+        size: {
+            type: DataTypes.STRING(50),
+            commnent: "image size",
+            allowNull: true,
+        },
+        dimensons: {
+            type: DataTypes.STRING(50),
+            comment: "image dimensions",
+            allowNull: true,
         }
     };
 

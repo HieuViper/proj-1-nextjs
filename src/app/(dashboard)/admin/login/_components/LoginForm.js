@@ -42,6 +42,7 @@ const LoginForm = () => {
         <Input.Password
           prefix={<LockOutlined className="site-form-item-icon" />}
           placeholder="Password"
+          autoComplete="true"
         />
       </Form.Item>
       <Form.Item>
@@ -50,7 +51,7 @@ const LoginForm = () => {
             <Checkbox>Remember me</Checkbox>
           </Form.Item>
 
-          <a className="#" href="">
+          <a className="#" href={null}>
             Forgot password
           </a>
         </div>

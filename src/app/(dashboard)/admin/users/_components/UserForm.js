@@ -8,7 +8,7 @@ import {
   UploadOutlined,
   WarningTwoTone,
 } from "@ant-design/icons";
-import { Button, Form, Input, Select, Upload } from "antd";
+import { AutoComplete, Button, Form, Input, Select, Upload } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -18,8 +18,10 @@ import toast from "react-hot-toast";
 
 
 import PasswordStrengthBar from "react-password-strength-bar";
+import { useRouter } from "next/navigation";
 
 const UserForm = (props) => {
+  const router = useRouter();
   const [form] = Form.useForm();
   const params = useParams();
   const searchParams = useSearchParams();
@@ -142,6 +144,14 @@ const UserForm = (props) => {
     ]);
   }
 
+  function goBackUserList(event) {
+    console.log('comer here link');
+    event.preventDefault();
+    router.refresh();
+    // const decoratePath = new URL('http://localhost:3000/admin');
+    router.push('/admin/users');
+  }
+
   //Handle upload picture
   const getFile = (e) => {
     console.log("Upload event:", e);
@@ -155,7 +165,7 @@ const UserForm = (props) => {
   return (
     <div>
       <div className="flex justify-start mb-4">
-        <Link href={`/admin/users`}>
+        <Link href={`/admin/users`} onClick={(e) => goBackUserList(e)}>
           <Button type="dashed" icon={<SwapLeftOutlined />}>
             Back to User List
           </Button>
@@ -198,13 +208,13 @@ const UserForm = (props) => {
             name="username"
             rules={[
               {
-                required: true,
+                required: "true",
                 message: "Please input username!",
               },
             ]}
             extra={`${params?.id ? "Usernames cannot be changed." : ""}`}
           >
-            <Input disabled={params?.id} />
+            <Input disabled={params?.id} key="usernameIn" />
           </Form.Item>
 
           <Form.Item
@@ -212,12 +222,12 @@ const UserForm = (props) => {
             name="first_name"
             rules={[
               {
-                required: true,
+                required: "true",
                 message: "Please input first name!",
               },
             ]}
           >
-            <Input placeholder="Văn Anh"
+            <Input key="firstName" placeholder="Văn Anh"
               onChange={(e) => generateDisplay()}
             />
           </Form.Item>
@@ -227,12 +237,12 @@ const UserForm = (props) => {
             name="last_name"
             rules={[
               {
-                required: true,
+                required: "true",
                 message: "Please input last name!",
               },
             ]}
           >
-            <Input placeholder="Nguyễn"
+            <Input key="lastName" placeholder="Nguyễn"
              onChange={(e) => generateDisplay()}
              />
           </Form.Item>
@@ -242,12 +252,12 @@ const UserForm = (props) => {
             name="nick_name"
             rules={[
               {
-                required: true,
+                required: "true",
                 message: "Please input nick name!",
               },
             ]}
           >
-            <Input placeholder="Nguyễn"
+            <Input key="nickName" placeholder="Nguyễn"
              onChange={(e) => generateDisplay()} />
           </Form.Item>
 
@@ -256,7 +266,7 @@ const UserForm = (props) => {
             name="display_name"
             rules={[
               {
-                required: true,
+                required: "true",
                 message: "Please select display name for user!",
               },
             ]}
@@ -278,7 +288,7 @@ const UserForm = (props) => {
             name="role"
             rules={[
               {
-                required: true,
+                required: "true",
                 message: "Please select role for user!",
               },
             ]}
@@ -304,24 +314,24 @@ const UserForm = (props) => {
                 message: "The input is not valid E-mail!",
               },
               {
-                required: true,
+                required: "true",
                 message: "Please input your E-mail!",
               },
             ]}
           >
-            <Input placeholder="example@gmail.com" />
+            <Input key="emailIn" placeholder="example@gmail.com" />
           </Form.Item>
 
           <Form.Item name="old_email" style={{ display: "none" }} >
-            <Input />
+            <Input key="oldEmail" />
           </Form.Item>
 
           <Form.Item label="Website" name="website">
-            <Input placeholder="https://my-website.com" />
+            <Input key="websiteIn" placeholder="https://my-website.com" />
           </Form.Item>
 
           <Form.Item label="Phone" name="phone">
-            <Input placeholder="0906627987" />
+            <Input key="phoneIn" placeholder="0906627987" />
           </Form.Item>
 
           {!params?.id ? (
@@ -331,7 +341,7 @@ const UserForm = (props) => {
                 label="Password"
                 rules={[
                   {
-                    required: true,
+                    required: "true",
                     message: "Please input your password!",
                   },
                 ]}
@@ -339,11 +349,14 @@ const UserForm = (props) => {
               >
                 <>
                   <Input.Password
+                    key="pass"
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
                      // form.setFieldsValue({ password: e.target.value }); //may be no need
+
                     }}
+                    autoComplete="false"
                   />
 
                 </>
@@ -373,7 +386,7 @@ const UserForm = (props) => {
                 hasFeedback
                 rules={[
                   {
-                    required: true,
+                    required: "true",
                     message: "Please confirm your password!",
                   },
                   ({ getFieldValue }) => ({
@@ -390,19 +403,19 @@ const UserForm = (props) => {
                   }),
                 ]}
               >
-                <Input.Password />
+                <Input.Password key="confirmPass" autoComplete="false"/>
               </Form.Item>
             </>
           ) : (
             <>
               <Form.Item label="Facebook profile URL" name="facebook_profile">
-                <Input prefix={<FacebookOutlined />} />
+                <Input key="Facebook" prefix={<FacebookOutlined />} />
               </Form.Item>
               <Form.Item label="Instagram profile URL" name="instagram_profile">
-                <Input prefix={<InstagramOutlined />} />
+                <Input key="Instagram" prefix={<InstagramOutlined />} />
               </Form.Item>
               <Form.Item label="LinkedIn profile URL" name="linkedin_profile">
-                <Input prefix={<LinkedinOutlined />} />
+                <Input key="linkedIn" prefix={<LinkedinOutlined />} />
               </Form.Item>
 
               <p className="text-xl font-semibold my-3">About the user</p>
@@ -412,6 +425,7 @@ const UserForm = (props) => {
                 extra="Share a little biographical information to fill out your profile. This may be shown publicly."
               >
                 <TextArea
+                  key="bio"
                   rows={4}
                   placeholder="My name is Alex Drysdale and I am a junior web developer for Oswald Technologies..."
                   className="placeholder:text-xs"
@@ -424,7 +438,7 @@ const UserForm = (props) => {
                 getValueFromEvent={getFile}
               >
 
-                <Input style={{ display: "none" }} />
+                <Input key="img" style={{ display: "none" }} />
               </Form.Item>
 
               <Upload
@@ -484,7 +498,7 @@ const UserForm = (props) => {
                     label="Old Password"
                     rules={[
                       {
-                        required: true,
+                        required: "true",
                         message: "Please input your old password!",
                       },
                     ]}
@@ -497,14 +511,16 @@ const UserForm = (props) => {
                     label="New Password"
                     rules={[
                       {
-                        required: true,
+                        required: "true",
                         message: "Please input new password!",
                       },
                     ]}
                   >
                     <Input.Password
+                      key="new_pass"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      autoComplete="false"
                     />
 
                   </Form.Item>

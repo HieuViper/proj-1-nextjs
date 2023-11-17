@@ -340,6 +340,7 @@ const UserForm = (props) => {
 
           <Form.Item label="Website" name="website">
             <Input key="websiteIn" placeholder="https://my-website.com" />
+            <Input key="websiteIn" placeholder="https://my-website.com" />
           </Form.Item>
 
           <Form.Item label="Phone" name="phone">

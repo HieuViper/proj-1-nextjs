@@ -1,9 +1,25 @@
 import UserList from "./_components/UserList";
 import { funcUsers } from "@/library/funcUsers";
+import { headers, cookies } from "next/headers";
+import { funcLogin } from "@/library/funcLogin";
+import { userRoles } from "@/library/userRoles";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 const UserPage = async ({ searchParams }) => {
+
+  // let token = cookies().get('Authorization');
+  // console.log('token from cookie:', token);
+  // if ( !token )
+  //   redirect(`/admin/login`);
+  // const loginInfo = funcLogin.isLogin ( token.value );
+  // if ( !loginInfo.isLogin ) {
+  //   redirect(`/admin/login?message=${loginInfo.message}`);
+  // }
+  const loginInfo = funcLogin.checkAuthentication();
+
+
    const keys = searchParams?.keys ?? "";
    const del = searchParams?.del ?? "";
    const role = searchParams?.role ?? "";
@@ -39,9 +55,11 @@ const UserPage = async ({ searchParams }) => {
     current: parseInt(page),
     // disabled: true
   };
+
+  console.log('cookies: ', cookies().getAll());
   return (
     <>
-      <UserList dataTable={JSON.stringify(usersData)}
+      <UserList dataTable={JSON.stringify(usersData)} user={loginInfo.user} roles={userRoles}
         pagination={pagination}
         totals={totals} />
     </>

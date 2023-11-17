@@ -8,9 +8,6 @@ const inter = Inter({ subsets: ["latin"] });
 // };
 
 export default async function RootLayout({ children }) {
-  // if (!db.initialized) {
-  //   await db.initialize();
-  // }
 
   return <Layout child={children} />;
 }

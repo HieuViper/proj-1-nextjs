@@ -14,14 +14,14 @@ const EditUserPage = async ({ params }) => {
   async function updateUser(userPara) {
     'use server';
     //test cookie
-    cookies().set({
-      name: 'Authorization',
-      value: 'Huy Token',
-      httpOnly: true,
-      path: '/',
-      sameSite: 'lax',  //Strict
-      maxAge: 300,
-    })
+    // cookies().set({
+    //   name: 'Authorization',
+    //   value: 'Huy Token',
+    //   httpOnly: true,
+    //   path: '/',
+    //   sameSite: 'lax',  //Strict
+    //   maxAge: 300,
+    // })
 
     let message;
     try {

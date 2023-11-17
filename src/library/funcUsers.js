@@ -12,6 +12,7 @@ export const funcUsers = {
   getUser,
   updateAUser,
   addAUser,
+  getUserByEmail,
 };
 
 
@@ -42,44 +43,6 @@ export async function getUsers(
     let sqlquery = `SELECT * FROM users ${whereQuery} ${orderQuery} LIMIT ${fromNews}, ${size}`;
 
     const results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
-    // let results;
-    // if( role != "" && search != ""){
-    //   results = await db.Users.findAll({
-    //     where: {
-    //       [Op.and]: {
-    //         role: role,
-    //         [Op.or]: {
-    //           username: {
-    //             like: `%${search}%`
-    //           },
-    //           first_name: {
-    //             like: `%${search}%`
-    //           },
-    //           last_name: {
-    //             like: `%${search}%`
-    //           },
-    //           role: {
-    //             like: `%${search}%`
-    //           },
-    //         }
-    //       }
-    //     },
-    //     offset: fromNews,
-    //     limit: size,
-    //     order: [
-    //       [orderby, order]
-    //     ]
-    //   });
-    // }else{
-    //   results = await db.Users.findAll({
-    //     offset: fromNews,
-    //     limit: size,
-    //     order: [
-    //       [orderby, order]
-    //     ]
-    //   });
-    // }
-
 
     return results;
   } catch (error) {
@@ -179,6 +142,20 @@ export async function getUser(username) {
   }
 }
 
+//Get user By Email
+export async function getUserByEmail(email) {
+  try {
+    const user = await db.Users.findOne({
+      where: {
+        email: 'email'
+      }
+     });
+    return user;
+  } catch (error) {
+    throw new Error(`Fail to get user: ${email} - ` +  error.message);
+  }
+}
+
 
 //Update new information of a user from Edit form
 //parameter: data: contain updated value for user Table
@@ -252,3 +229,5 @@ export async function addAUser(data) {
     throw new Error("Cannot create user: " + error.message);
   }
 }
+
+

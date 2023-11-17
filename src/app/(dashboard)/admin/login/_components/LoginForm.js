@@ -1,13 +1,21 @@
 "use client";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input } from "antd";
+import { useState } from "react";
 
-const LoginForm = () => {
-  const onFinish = (values) => {
+const LoginForm = (props) => {
+  const [err, setErr] = useState('');
+
+  const onFinish = async (values) => {
     console.log("Received values of form: ", values);
+    //proccess login
+    await props.login( values.username, values.password ).then( ( message ) => {
+      setErr(message);
+    } );
   };
 
   return (
+
     <Form
       name="login"
       className=""
@@ -16,6 +24,7 @@ const LoginForm = () => {
       }}
       onFinish={onFinish}
     >
+      <div>{err}</div>
       <Form.Item
         name="username"
         rules={[

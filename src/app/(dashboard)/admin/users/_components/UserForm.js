@@ -51,7 +51,7 @@ const UserForm = (props) => {
   }, [props])
 
   //submit value
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
 
 
     if(params.id){
@@ -59,7 +59,7 @@ const UserForm = (props) => {
       let {new_password, ...user} = values;
       if( isSetNewPassword )
         user.password = new_password;
-      props.updateUser( user ).then(( message ) => {
+      await props.updateUser( user ).then(( message ) => {
         //success update user
         if( message == 1 ) {
           let messageNotify =
@@ -81,7 +81,7 @@ const UserForm = (props) => {
       //add new user
       let { confirmPassword, ...user } = values;
       console.log("Received values of form: ", user);
-      props.addUser( user ).then(( message ) => {
+      await props.addUser( user ).then(( message ) => {
         //console.log("message from server:", message);
         if (message && message != 1) {
           let messageNotify =

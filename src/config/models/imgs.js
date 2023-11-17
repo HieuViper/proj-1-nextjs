@@ -3,9 +3,15 @@ import { DataTypes } from "sequelize";
 
 export function imgsModel(sequelize) {
     const attributes = {
+        id: {
+            type: DataTypes.BIGINT(20).UNSIGNED,
+            autoIncrement: true,
+            primaryKey: true,
+            allownNull: false,
+        },
         url: {
             type: DataTypes.STRING(200),
-            primaryKey: true,
+            unique: true,
             allownNull: false,
             comment: 'url has format: /upload/jan2023'
         },

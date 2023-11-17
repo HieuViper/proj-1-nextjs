@@ -6,7 +6,7 @@ const nextConfig = {
   },
   reactStrictMode: false,
   serverRuntimeConfig: {
-    secret: 'my secret word CaO HieU HuY',
+    secret: 'my-32-character-ultra-secure-and-ultra-long-secret',
 }
 };
 

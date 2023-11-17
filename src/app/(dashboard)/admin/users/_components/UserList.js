@@ -56,6 +56,7 @@ const UserList = ( props ) => {
     setLoadingStatus( false );
     setLoading( false );
     notifyAddUserSuccess();
+    console.log('user: ', props.user);
   }, [props]);
 
   //Notify success adding new from /admin/add
@@ -122,7 +123,7 @@ const UserList = ( props ) => {
   const handleRole = async ( role ) => {
     //set state sorter to init state
 
-    const orderPara = getOrderPara(initSort, true);
+    const orderPara = orderParaInit;
     router.refresh();
     router.push(
       `${pathName}?role=${role}&size=${paginationServer.pageSize}${orderPara}`
@@ -253,10 +254,12 @@ const UserList = ( props ) => {
                   okText="Yes"
                   cancelText="Cancel"
                 > */}
+                 <Link href={`/admin/users?del=${record.username}&page=${paginationServer.current}&size=${paginationServer.pageSize}&role=${role}&search=${search}${orderParaDefault}`}>
                   <span className="btn-delete cursor-pointer">
                     <DeleteOutlined className="pr-1" />
                     Delete
                   </span>
+                </Link>
                 {/* </Popconfirm> */}
                 |{" "}
                 <Link href={`/vi/users/preview/${record.username}`}>
@@ -321,6 +324,7 @@ const UserList = ( props ) => {
       <div className="flex justify-between mb-4 gap-x-4">
         <div className="flex gap-x-5">
           <p className="font-semibold text-2xl pr-4">Users</p>
+          { props.roles[ props.user.role ]?.users?.add  === true && (
           <Link href={`/admin/users/add`}>
             <Button className="">
               <div className="flex justify-center items-center gap-2">
@@ -329,6 +333,7 @@ const UserList = ( props ) => {
               </div>
             </Button>
           </Link>
+          )}
         </div>
         <Search
           placeholder="input search text"

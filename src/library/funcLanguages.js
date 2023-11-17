@@ -54,7 +54,7 @@ async function addLanguage(data) {
     const result = await db.Languages.create(data);
     return result;
   } catch (error) {
-    throw new Error("Cannot create news:" + error.message);
+    throw new Error("Cannot create languages:" + error.message);
   }
 }
 
@@ -66,7 +66,7 @@ async function deleteLanguage(key) {
       },
     });
   } catch (error) {
-    throw new Error(`Fail to delete news code = ${key}`);
+    throw new Error(`Fail to delete languages code = ${key}`);
   }
 }
 
@@ -81,7 +81,7 @@ async function deleteBulkLanguages(arr) {
     });
   } catch (error) {
     console.log(error);
-    throw new Error("Fail to delete news", error);
+    throw new Error("Fail to delete languages", error);
   }
 }
 
@@ -101,6 +101,6 @@ async function getSearchQuery(search) {
     return result;
   } catch (error) {
     console.log(error);
-    throw new Error("Fail to get tags");
+    throw new Error("Fail to get languages");
   }
 }

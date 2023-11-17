@@ -240,15 +240,13 @@ export async function getNews(id) {
   }
 }
 
-
 //get all Categories
 export async function getCategories(lang) {
   try {
     let strquery;
     if (lang)
       strquery = `SELECT * FROM news_cat_all WHERE languageCode='${lang}'`;
-    else
-      strquery = 'SELECT * FROM news_cat_all';
+    else strquery = "SELECT * FROM news_cat_all";
     const results = await db.seq.query(strquery, { type: QueryTypes.SELECT });
     return results;
   } catch (error) {
@@ -260,10 +258,8 @@ export async function getCategories(lang) {
 export async function getTags(lang) {
   try {
     let strquery;
-    if (lang)
-      strquery = `SELECT * FROM tags_all WHERE languageCode='${lang}'`;
-    else
-      strquery = 'SELECT * FROM tags_all';
+    if (lang) strquery = `SELECT * FROM tags_all WHERE languageCode='${lang}'`;
+    else strquery = "SELECT * FROM tags_all";
     const results = await db.seq.query(strquery, { type: QueryTypes.SELECT });
     return results;
   } catch (error) {
@@ -292,36 +288,26 @@ export async function updateANews(data, newsLangs, id) {
   const t = await db.seq.transaction();
   try {
     //update into news Table
-    const currentLoginUser = 'huy'; //we add information of modifier huy
+    const currentLoginUser = "huy"; //we add information of modifier huy
     data = { ...data, modified_by: currentLoginUser };
-    if (data.post_date)
-      data.post_date = db.seq.literal('now()');   //user has press publish button, set time for post_date
-    console.log('data :', data);
-    await db.News.update(
-      data,
-      {
-        where: {
-          id: id,
-        },
-        transaction: t,
+    if (data.post_date) data.post_date = db.seq.literal("now()"); //user has press publish button, set time for post_date
+    console.log("data :", data);
+    await db.News.update(data, {
+      where: {
+        id: id,
       },
-    );
+      transaction: t,
+    });
     //update into news_languages Table
     for (const element of newsLangs) {
-      console.log('element:', element);
+      console.log("element:", element);
       const { languageCode, newsId, ...newsLangRow } = element;
-      await db.News_languages.update(
-        newsLangRow,
-        {
-          where: {
-            [Op.and]: [
-              { newsId: id },
-              { languageCode: languageCode }
-            ]
-          },
-          transaction: t,
-        }
-      );
+      await db.News_languages.update(newsLangRow, {
+        where: {
+          [Op.and]: [{ newsId: id }, { languageCode: languageCode }],
+        },
+        transaction: t,
+      });
     }
 
     await t.commit();
@@ -338,22 +324,25 @@ export async function addANews(data, newsLangs) {
   const t = await db.seq.transaction();
   try {
     //update into news Table
-    const currentLoginUser = 'huy'; //we add information of modifier huy
-    if (data.post_date)
-      data.post_date = db.seq.literal('now()');   //user has press publish button, set time for post_date
-    console.log('data :', data);
+    const currentLoginUser = "huy"; //we add information of modifier huy
+    if (data.post_date) data.post_date = db.seq.literal("now()"); //user has press publish button, set time for post_date
+    console.log("data :", data);
     const news = await db.News.create(data, { transaction: t });
     //add newsId property to the newsLangs
     for (const element of newsLangs) {
       element.newsId = news.id;
     }
     //create records in news_languages Table
-    await db.News_languages.bulkCreate(newsLangs, { validate: true, transaction: t });
+    await db.News_languages.bulkCreate(newsLangs, {
+      validate: true,
+      transaction: t,
+    });
 
     await t.commit();
     return news.id;
   } catch (error) {
     await t.rollback();
+    console.log(error);
     throw new Error("Cannot create news:" + error.message);
   }
 }

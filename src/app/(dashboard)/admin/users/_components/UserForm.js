@@ -12,38 +12,85 @@ import { Button, Form, Input, Select, Upload } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
+
+
 import PasswordStrengthBar from "react-password-strength-bar";
 
-const roles = [
-  {
-    value: "subcriber",
-    label: "Subcriber",
-  },
-  {
-    value: "contributor",
-    label: "Contributor",
-  },
-  {
-    value: "editor",
-    label: "Editor",
-  },
-  {
-    value: "admin",
-    label: "Administrator",
-  },
-];
-
-const UserForm = () => {
+const UserForm = (props) => {
   const [form] = Form.useForm();
   const params = useParams();
+  const searchParams = useSearchParams();
+
   const [isSetNewPassword, setIsSetNewPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [picName, setPicName] = useState("");
   const [previewPic, setPreviewPic] = useState(null);
+  const [displayName, setDisplayName] = useState([]);
+  const [roles, setRoles] = useState([]);
 
+  useEffect(()=>{
+    //set role options for the field role
+    const rolesData = props.roles;
+    setRoles( Object.keys( rolesData ).map((role) => ({
+      value: role,
+      key: role,
+      label: role,
+    })) );
+    //set user data for the form
+    if( props.data ){
+     // console.log('user: ', JSON.parse(props.data));
+      let formdata = JSON.parse(props.data);
+      formdata.old_email = formdata.email;    //add new value for new field old_email. We keep this value to make sure user has change their email
+      form.setFieldsValue(formdata);
+    }
+  }, [props])
+
+  //submit value
   const onFinish = (values) => {
-    console.log("Received values of form: ", values);
+
+
+    if(params.id){
+      //update current user
+      let {new_password, ...user} = values;
+      if( isSetNewPassword )
+        user.password = new_password;
+      props.updateUser( user ).then(( message ) => {
+        //success update user
+        if( message == 1 ) {
+          let messageNotify =
+            "Update user successfully - ";
+          toast.success(messageNotify, {
+            position: "top-center",
+            duration: 5000
+          });
+        } else {  //fail to update user
+          let messageNotify =
+          "Fail to update user. Try again or inform system's admin - " + message;
+        toast.error(messageNotify, {
+          position: "top-center",
+          duration: 5000,
+        });
+        }
+      }) ;
+    } else {
+      //add new user
+      let { confirmPassword, ...user } = values;
+      console.log("Received values of form: ", user);
+      props.addUser( user ).then(( message ) => {
+        //console.log("message from server:", message);
+        if (message && message != 1) {
+          let messageNotify =
+            "Cannot add user, please try again or inform admin - " + message;
+          toast.error(messageNotify, {
+            position: "top-center",
+            duration: 5000,
+          });
+        }
+      });
+    }
   };
 
   //Generate Password
@@ -61,8 +108,39 @@ const UserForm = () => {
     );
     setPassword(newPass);
     form.setFieldsValue({ new_password: newPass });
-    form.setFieldsValue({ password: newPass });
+    form.setFieldsValue({ password: newPass }); //no need
   };
+
+  //generate display options for the field display_name
+  function generateDisplay( ) {
+    setDisplayName([
+      {
+        value: form.getFieldValue('nick_name'),
+        key:  'nickName',
+        label: form.getFieldValue('nick_name'),
+      },
+      {
+        value: form.getFieldValue('first_name'),
+        key: 'firstName',
+        label: form.getFieldValue('first_name'),
+      },
+      {
+        value: form.getFieldValue('last_name'),
+        key: 'lastName',
+        label: form.getFieldValue('last_name'),
+      },
+      {
+        value: form.getFieldValue('last_name') + " " + form.getFieldValue('first_name'),
+        key: "LastFirstName",
+        label: form.getFieldValue('last_name') + " " + form.getFieldValue('first_name'),
+      },
+      {
+        value: form.getFieldValue('first_name') + " " + form.getFieldValue('last_name'),
+        key: "firstLastName",
+        label: form.getFieldValue('first_name') + " " + form.getFieldValue('last_name'),
+      },
+    ]);
+  }
 
   //Handle upload picture
   const getFile = (e) => {
@@ -86,7 +164,7 @@ const UserForm = () => {
 
       <div className="mx-auto">
         <Form
-          className="w-full"
+          //className="w-full"
           style={
             {
               // maxWidth: 600,
@@ -121,12 +199,100 @@ const UserForm = () => {
             rules={[
               {
                 required: true,
-                message: "Please input your username!",
+                message: "Please input username!",
               },
             ]}
             extra={`${params?.id ? "Usernames cannot be changed." : ""}`}
           >
             <Input disabled={params?.id} />
+          </Form.Item>
+
+          <Form.Item
+            label="First Name"
+            name="first_name"
+            rules={[
+              {
+                required: true,
+                message: "Please input first name!",
+              },
+            ]}
+          >
+            <Input placeholder="Văn Anh"
+              onChange={(e) => generateDisplay()}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Last Name"
+            name="last_name"
+            rules={[
+              {
+                required: true,
+                message: "Please input last name!",
+              },
+            ]}
+          >
+            <Input placeholder="Nguyễn"
+             onChange={(e) => generateDisplay()}
+             />
+          </Form.Item>
+
+          <Form.Item
+            label="Nick Name"
+            name="nick_name"
+            rules={[
+              {
+                required: true,
+                message: "Please input nick name!",
+              },
+            ]}
+          >
+            <Input placeholder="Nguyễn"
+             onChange={(e) => generateDisplay()} />
+          </Form.Item>
+
+          <Form.Item
+            label="Display name"
+            name="display_name"
+            rules={[
+              {
+                required: true,
+                message: "Please select display name for user!",
+              },
+            ]}
+          >
+            <Select
+              style={{
+                width: 200,
+              }}
+              //options={displayName}
+            >
+              {displayName && displayName.map((item) => (
+                <Select.Option key={ item.key } value={ item.value }>{ item.label }</Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="Role"
+            name="role"
+            rules={[
+              {
+                required: true,
+                message: "Please select role for user!",
+              },
+            ]}
+          >
+            <Select
+              style={{
+                width: 200,
+              }}
+             // options={roles}
+            >
+              { roles && roles.map((item) => (
+                <Select.Option key={ item.key } value={ item.value }>{ item.label }</Select.Option>
+              )) }
+            </Select>
           </Form.Item>
 
           <Form.Item
@@ -146,52 +312,16 @@ const UserForm = () => {
             <Input placeholder="example@gmail.com" />
           </Form.Item>
 
-          <Form.Item
-            label="First Name"
-            name="firstName"
-            rules={[
-              {
-                required: true,
-                message: "Please input your first name!",
-              },
-            ]}
-          >
-            <Input placeholder="Văn Anh" />
-          </Form.Item>
-
-          <Form.Item
-            label="Last Name"
-            name="lastName"
-            rules={[
-              {
-                required: true,
-                message: "Please input your last name!",
-              },
-            ]}
-          >
-            <Input placeholder="Nguyễn" />
+          <Form.Item name="old_email" style={{ display: "none" }} >
+            <Input />
           </Form.Item>
 
           <Form.Item label="Website" name="website">
             <Input placeholder="https://my-website.com" />
           </Form.Item>
 
-          <Form.Item
-            label="Role"
-            name="role"
-            rules={[
-              {
-                required: true,
-                message: "Please select role for user!",
-              },
-            ]}
-          >
-            <Select
-              style={{
-                width: 200,
-              }}
-              options={roles}
-            />
+          <Form.Item label="Phone" name="phone">
+            <Input placeholder="0906627987" />
           </Form.Item>
 
           {!params?.id ? (
@@ -212,10 +342,13 @@ const UserForm = () => {
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
-                      form.setFieldsValue({ password: e.target.value });
+                     // form.setFieldsValue({ password: e.target.value }); //may be no need
                     }}
                   />
-                  <PasswordStrengthBar
+
+                </>
+              </Form.Item>
+              <PasswordStrengthBar
                     password={password}
                     scoreWords={[
                       "Very Weak",
@@ -232,8 +365,6 @@ const UserForm = () => {
                   >
                     Generate Password
                   </Button>
-                </>
-              </Form.Item>
 
               <Form.Item
                 name="confirmPassword"
@@ -264,20 +395,20 @@ const UserForm = () => {
             </>
           ) : (
             <>
-              <Form.Item label="Facebook profile URL" name="facebook_url">
+              <Form.Item label="Facebook profile URL" name="facebook_profile">
                 <Input prefix={<FacebookOutlined />} />
               </Form.Item>
-              <Form.Item label="Instagram profile URL" name="instagram_url">
+              <Form.Item label="Instagram profile URL" name="instagram_profile">
                 <Input prefix={<InstagramOutlined />} />
               </Form.Item>
-              <Form.Item label="LinkedIn profile URL" name="linkedin_url">
+              <Form.Item label="LinkedIn profile URL" name="linkedin_profile">
                 <Input prefix={<LinkedinOutlined />} />
               </Form.Item>
 
               <p className="text-xl font-semibold my-3">About the user</p>
               <Form.Item
                 label="Biographical Info"
-                name="bio"
+                name="biographical"
                 extra="Share a little biographical information to fill out your profile. This may be shown publicly."
               >
                 <TextArea
@@ -292,7 +423,11 @@ const UserForm = () => {
                 label="Profile Picture"
                 getValueFromEvent={getFile}
               >
-                <Upload
+
+                <Input style={{ display: "none" }} />
+              </Form.Item>
+
+              <Upload
                   name="file"
                   maxCount={1}
                   // action="/api/articles/image"
@@ -331,21 +466,20 @@ const UserForm = () => {
                     alt={`${picName}`}
                   />
                 )}
-              </Form.Item>
 
               <p className="text-xl font-semibold my-3">Account Management</p>
-              <Form.Item name="new_pass" label="Password Reset">
+              {/* <Form.Item name="new_pass" label="Password Reset"> */}
                 <Button
                   onClick={() => setIsSetNewPassword(true)}
                   icon={<WarningTwoTone twoToneColor="#ffcc00 " />}
                 >
                   Set New Password
                 </Button>
-              </Form.Item>
+              {/* </Form.Item> */}
 
               {isSetNewPassword && (
                 <div className="mt-4">
-                  <Form.Item
+                  {/* <Form.Item
                     name="old_password"
                     label="Old Password"
                     rules={[
@@ -356,7 +490,7 @@ const UserForm = () => {
                     ]}
                   >
                     <Input.Password />
-                  </Form.Item>
+                  </Form.Item> */}
 
                   <Form.Item
                     name="new_password"
@@ -364,7 +498,7 @@ const UserForm = () => {
                     rules={[
                       {
                         required: true,
-                        message: "Please input your new password!",
+                        message: "Please input new password!",
                       },
                     ]}
                   >
@@ -372,7 +506,9 @@ const UserForm = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
-                    <PasswordStrengthBar
+
+                  </Form.Item>
+                  <PasswordStrengthBar
                       password={password}
                       scoreWords={[
                         "Very Weak",
@@ -383,13 +519,14 @@ const UserForm = () => {
                       ]}
                       shortScoreWord="Too short"
                     />
-                  </Form.Item>
-
                   <div className="flex items-center gap-3 mb-5 ml-8">
                     <Button
                       type="text"
                       danger
-                      onClick={() => setIsSetNewPassword(false)}
+                      onClick={() => {
+                        setIsSetNewPassword(false);
+
+                      }}
                     >
                       Cancel
                     </Button>
@@ -402,9 +539,9 @@ const UserForm = () => {
                   </div>
                 </div>
               )}
-              <Form.Item name="reset_pass" label="Password Reset">
+              {/* <Form.Item name="reset_pass" label="Password Reset"> */}
                 <Button>Send Reset Link</Button>
-              </Form.Item>
+              {/* </Form.Item> */}
             </>
           )}
 

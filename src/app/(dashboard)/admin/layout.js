@@ -1,6 +1,7 @@
 "use client";
 import {
   AppstoreOutlined,
+  FileImageOutlined,
   GlobalOutlined,
   LogoutOutlined,
   MailOutlined,
@@ -91,6 +92,11 @@ const DashboardLayout = ({ children }) => {
       "/admin/languages",
       <Link href="/admin/languages">Languages</Link>,
       <GlobalOutlined />
+    ),
+    getItem(
+      "/admin/images",
+      <Link href="/admin/images">Images</Link>,
+      <FileImageOutlined />
     ),
   ];
 

@@ -1,14 +1,16 @@
 "use client";
-import { SwapLeftOutlined } from "@ant-design/icons";
+import { SwapLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import {
   Button,
   Form,
+  Image,
   Input,
   Select,
   Switch,
   Tabs,
   Tooltip,
   TreeSelect,
+  Upload,
 } from "antd";
 import Link from "next/link";
 import {
@@ -30,13 +32,13 @@ export function NewsForm(props) {
   const pathName = usePathname();
   const searchParams = useSearchParams();
   const [form] = Form.useForm();
-
-  // const [cate, setCate] = useState([]);
   const [tags, setTags] = useState([]);
   const [langTable, setLangTable] = useState([]);
   const [postStatus, setPostStatus] = useState("");
   const [data, setData] = useState([]);
   const [catTree, setCatTree] = useState([]);
+  const [picURL, setPicURL] = useState(null);
+  const [previewPic, setPreviewPic] = useState(null);
   const Editor = dynamic(() => import("@/components/Editor"), { ssr: false });
   const authors = [
     {
@@ -65,14 +67,8 @@ export function NewsForm(props) {
   }
 
   useEffect(() => {
-    //const cate = (props.cate);
-    //setCate( props.cate );
-    //const  catTree  = buildCategoryTree( cate );
     setCatTree(JSON.parse(props.cate));
-    //const tags = (props.tags);
     setTags(JSON.parse(props.tags));
-    //get languages Table
-    //const langTable = (props.langTable);
     setLangTable(JSON.parse(props.langTable)); //set languageTable for news
     if (params?.id) {
       //get the news, newsdata is an array it's each row is a language's news
@@ -109,6 +105,7 @@ export function NewsForm(props) {
       };
       form.setFieldsValue(data1); //the data for the all the fields of form is done formating
       setData(data1); //set state for news
+      setPicURL(data1.image ?? "");
       setPostStatus(data1.post_status);
       notifyAddNewsSuccess();
 
@@ -117,9 +114,14 @@ export function NewsForm(props) {
       );
       setCatArr(resultItem);
       form.setFieldValue("mainCategory", data1.categories[0]);
+      //set value for caption and alt of main image
+      const mainImage = JSON.parse(props.mainImage);
+      console.log(
+        "🚀 ~ file: NewsForm.js:354 ~ useEffect ~ mainImage:",
+        mainImage
+      );
+      form.setFieldsValue({ caption: mainImage?.caption, alt: mainImage?.alt });
     }
-
-    console.log("effect");
   }, [props]);
 
   //Generate newsCode for the post. It pick the Title of the default language
@@ -135,13 +137,72 @@ export function NewsForm(props) {
     form.setFieldValue("news_code", newsCode);
   }
 
+  //add sizes and loading='lazy' to content
+  const filterContentEditor = (a) => {
+    console.log(a);
+    const result = a?.replace(/<img([^>]*)>/g, (match, group) => {
+      group = group.replace(/\s*sizes="[^"]*"/, ""); // Remove sizes default attribute
+      return `<img${group} sizes="(min-width: 450px) 100vw, 25vw" loading="lazy"/>`;
+    });
+    return result;
+  };
+
+  const uploadPicToServer = async (event) => {
+    const body = new FormData();
+    body.append("file", previewPic);
+    let imageURL;
+    //call api to move image to folder upload
+    const response = await fetch("/api/news/image", {
+      method: "POST",
+      body,
+    }).then(async (rs) => {
+      const image = await rs.json();
+      console.log(
+        "🚀 ~ file: NewsForm.js:181 ~ uploadPicToServer ~ image:",
+        image
+      );
+      imageURL = image.url;
+
+      //add image to table image
+      const imageRs = await props.addImage({
+        url: image.url,
+        alt: form.getFieldValue("alt") ?? "",
+        caption: form.getFieldValue("caption") ?? "",
+        srcset: "",
+      });
+      console.log(
+        "🚀 ~ file: NewsForm.js:189 ~ uploadPicToServer ~ imageRs:",
+        imageRs
+      );
+    });
+    return imageURL;
+  };
+
+  //func to update alt and caption image
+  const updateInfoImage = async () => {
+    const rs = await props.updateImage(
+      {
+        alt: form.getFieldValue("alt") ?? "",
+        caption: form.getFieldValue("caption") ?? "",
+      },
+      JSON.parse(props.mainImage).url
+    );
+    console.log("🚀 ~ file: NewsForm.js:209 ~ updateInfoImage ~ rs:", rs);
+  };
+
   //Handle submit form data to server
   async function handleSubmit(value) {
-    console.log("value submit:", value);
+    // when user upload new foto
+    const imageURL = previewPic ? await uploadPicToServer() : picURL;
+    //when there is already has foto and user don't uplaod new foto, just edit alt or caption
+    picURL && !previewPic && updateInfoImage();
+    console.log(
+      "🚀 ~ file: NewsForm.js:200 ~ handleSubmit ~ imageURL:",
+      imageURL
+    );
     //Reformat value data make it be suitable
     value.categories = value.categories.toString();
     value.tags = value.tags?.toString() ?? "";
-    //value.news_position = newsPosition ? 1 : 0;
     console.log("news_position 2: ", form.getFieldValue("news_position"));
     value.news_position = form.getFieldValue("news_position") ?? false;
     value.news_position = value.news_position ? 1 : 0;
@@ -154,10 +215,12 @@ export function NewsForm(props) {
       delete value[`title_${lang.code}`]; //delete unsused properties
       delete value[`excerpt_${lang.code}`];
       delete value[`content_${lang.code}`];
+
       return {
         title: form.getFieldValue(`title_${lang.code}`) ?? "",
         excerpt: form.getFieldValue(`excerpt_${lang.code}`) ?? "",
-        content: form.getFieldValue(`content_${lang.code}`) ?? "",
+        content:
+          filterContentEditor(form.getFieldValue(`content_${lang.code}`)) ?? "",
         languageCode: lang.code,
         newsId: params?.id,
       };
@@ -172,49 +235,58 @@ export function NewsForm(props) {
       const result = arrStringCat.join(",");
       value = { ...value, categories: result };
     }
-    // try {
-    //editing news
-    // if (params?.id) {
-    //   if (value.post_status == process.env.NEXT_PUBLIC_PS_TRASH)
-    //     //await delNews(value, newsLangs, params.id);
-    //     await props.dell(value, newsLangs, params.id);
-    //   else {
-    //     await props.editNews(value, newsLangs, params.id).then((message) => {
-    //       if (message.message == 1) {
-    //         //signal of success edit on server
-    //         setPostStatus(form.getFieldValue("post_status")); //set postStatus state to rerender action buttons
-    //         let messageNotify =
-    //           form.getFieldValue("post_status") ==
-    //           process.env.NEXT_PUBLIC_PS_DRAFT
-    //             ? "Save Draft Success"
-    //             : "Save Publish Success";
-    //         toast.success(messageNotify, {
-    //           position: "top-center",
-    //         });
-    //       } else {
-    //         //signal of faillure on server
-    //         let messageNotify =
-    //           "Cannot update news, please try again or inform admin";
-    //         toast.success(messageNotify, {
-    //           position: "top-center",
-    //         });
-    //       }
-    //     });
-    //   }
-    // }
-    // //adding news
-    // else {
-    //   await props.addNews(value, newsLangs).then((message) => {
-    //     console.log("message from server:", message);
-    //     if (message && message != 1) {
-    //       let messageNotify =
-    //         "Cannot update news, please try again or inform admin" + message;
-    //       toast.success(messageNotify, {
-    //         position: "top-center",
-    //       });
-    //     }
-    //   });
-    // }
+
+    value.image = imageURL; //set image property
+    console.log("value submit:", value);
+    const { alt, caption, ...newValue } = value; //remove alt and caption out of value variable to newValue
+    console.log(
+      "🚀 ~ file: NewsForm.js:180 ~ handleSubmit ~ newValue:",
+      newValue
+    );
+    console.log(newsLangs);
+
+    // editing news
+    if (params?.id) {
+      if (value.post_status == process.env.NEXT_PUBLIC_PS_TRASH)
+        //await delNews(value, newsLangs, params.id);
+        await props.dell(newValue, newsLangs, params.id);
+      else {
+        await props.editNews(newValue, newsLangs, params.id).then((message) => {
+          if (message.message == 1) {
+            //signal of success edit on server
+            setPostStatus(form.getFieldValue("post_status")); //set postStatus state to rerender action buttons
+            let messageNotify =
+              form.getFieldValue("post_status") ==
+              process.env.NEXT_PUBLIC_PS_DRAFT
+                ? "Save Draft Success"
+                : "Save Publish Success";
+            toast.success(messageNotify, {
+              position: "top-center",
+            });
+          } else {
+            //signal of faillure on server
+            let messageNotify =
+              "Cannot update news, please try again or inform admin";
+            toast.success(messageNotify, {
+              position: "top-center",
+            });
+          }
+        });
+      }
+    }
+    //adding news
+    else {
+      await props.addNews(newValue, newsLangs).then((message) => {
+        console.log("message from server:", message);
+        if (message && message != 1) {
+          let messageNotify =
+            "Cannot update news, please try again or inform admin" + message;
+          toast.success(messageNotify, {
+            position: "top-center",
+          });
+        }
+      });
+    }
   }
 
   const handleSubmitFailed = (errorInfo) => {
@@ -223,6 +295,15 @@ export function NewsForm(props) {
   //i dont see this function is useful, we can delete it
   const handleChangeTab = (key) => {
     console.log(">>> key tab ", key);
+  };
+  const getFile = (e) => {
+    console.log("Upload event:", e);
+
+    if (Array.isArray(e)) {
+      return e;
+    }
+
+    return e && e.fileList;
   };
 
   //Notify success adding new from /admin/add
@@ -255,8 +336,8 @@ export function NewsForm(props) {
     form.setFieldValue("post_status", value);
     form.setFieldValue("publish", publish);
   };
-  //Build category tree from category table
 
+  //Build category tree from category table
   function buildCategoryTree(categories, parent = null) {
     const categoryTree = [];
 
@@ -301,11 +382,7 @@ export function NewsForm(props) {
       }));
   }
   const treeData = catTree && buildTreeData(catTree, null);
-  console.log("catTree :", catTree);
 
-  const onChange1 = (newValue) => {
-    setValue(newValue);
-  };
   const [mainCat, setMainCat] = useState();
   const [catSelect, setCatSelect] = useState(false);
   const [catArr, setCatArr] = useState([]);
@@ -329,8 +406,8 @@ export function NewsForm(props) {
       setMainCat("");
     }
   };
-  // tab handle
 
+  // tab handle
   const TabComponent = ({ lang }) => {
     return (
       <>
@@ -357,24 +434,24 @@ export function NewsForm(props) {
         <Form.Item
           label="Excerpt"
           name={`excerpt_${lang}`}
-          rules={[
-            {
-              required: true,
-              message: "Please input your excerpt!",
-            },
-          ]}
+          // rules={[
+          //   {
+          //     required: true,
+          //     message: "Please input your excerpt!",
+          //   },
+          // ]}
         >
           <TextArea rows={4} />
         </Form.Item>
         <Form.Item
           label="Content"
           name={`content_${lang}`}
-          rules={[
-            {
-              required: true,
-              message: "Please input your content!",
-            },
-          ]}
+          // rules={[
+          //   {
+          //     required: true,
+          //     message: "Please input your content!",
+          //   },
+          // ]}
         >
           {/* <Input /> */}
           <Editor />
@@ -534,11 +611,9 @@ export function NewsForm(props) {
           ]}
         >
           <Select
-            //value={}
             style={{
               width: 120,
             }}
-            //onChange={handleChangeLanguage}
             options={authors}
           />
         </Form.Item>
@@ -601,6 +676,86 @@ export function NewsForm(props) {
           </Select>
         </Form.Item>
 
+        <Form.Item name="image" label="Image" getValueFromEvent={getFile}>
+          <Upload
+            name="file"
+            maxCount={1}
+            customRequest={(info) => {
+              console.log(info);
+              setPreviewPic(info.file);
+            }}
+            showUploadList={false}
+            beforeUpload={(file) => {
+              console.log(
+                "🚀 ~ file: NewsForm.js:498 ~ NewsForm ~ file:",
+                file
+              );
+              return new Promise((resolve, reject) => {
+                // check the file type
+                const isImg =
+                  file.type === "image/jpeg" ||
+                  file.type === "image/jpg" ||
+                  file.type === "image/png" ||
+                  file.type === "image/gif";
+                if (!isImg) {
+                  message.error("You can only upload images");
+                  reject(false);
+                }
+
+                const isLt5M =
+                  file.size / 1024 / 1024 <=
+                  process.env.NEXT_PUBLIC_FILE_LIMITED_SIZE;
+                // check the file size
+                if (!isLt5M) {
+                  message.error(
+                    `Image must smaller than ${process.env.NEXT_PUBLIC_FILE_LIMITED_SIZE}MB!`
+                  );
+                  reject(false);
+                } else {
+                  resolve(true);
+                }
+              });
+            }}
+            headers={{ authorization: "authorization-text" }}
+          >
+            <Button icon={<UploadOutlined />} className="mb-1">
+              {!picURL ? "Upload" : "Change Picture"}
+            </Button>
+          </Upload>
+        </Form.Item>
+
+        <div className="ml-32 mb-5">
+          {previewPic && (
+            <Image
+              src={`${URL.createObjectURL(previewPic)}`}
+              width={160}
+              className="rounded-lg shadow"
+              alt={`${picURL}`}
+            />
+          )}
+          {picURL && !previewPic && (
+            <Image
+              src={`${picURL}`}
+              width={160}
+              className="rounded-lg shadow"
+              alt={`${picURL}`}
+            />
+          )}
+        </div>
+
+        {picURL || previewPic ? (
+          <>
+            <Form.Item name="caption" label="Caption">
+              <Input />
+            </Form.Item>
+            <Form.Item name="alt" label="Alt">
+              <Input />
+            </Form.Item>
+          </>
+        ) : (
+          <></>
+        )}
+
         {/* Manage multilanguages here */}
 
         <Tabs defaultActiveKey="1" items={itemTab} onChange={handleChangeTab} />
@@ -617,7 +772,6 @@ export function NewsForm(props) {
           name="publish"
           style={{ display: "none" }} // Hide the field using CSS
           valuePropName="checked"
-          // or className="hidden-field" // Apply a CSS class to hide the field
         >
           <Switch />
         </Form.Item>

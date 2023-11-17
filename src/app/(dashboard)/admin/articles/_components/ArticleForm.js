@@ -3,6 +3,7 @@ import { SwapLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import {
   Button,
   Form,
+  Image,
   Input,
   InputNumber,
   Select,
@@ -27,9 +28,7 @@ export function ArticleForm(props) {
   const [postStatus, setPostStatus] = useState("");
   const [data, setData] = useState(null);
   console.log("🚀 ~ file: ArticleForm.js:25 ~ ArticleForm ~ data:", data);
-  const [lang, setLang] = useState("vi");
-  const [picName, setPicName] = useState("");
-  console.log("🚀 ~ file: ArticleForm.js:32 ~ ArticleForm ~ picName:", picName);
+  const [picURL, setPicURL] = useState(null);
   const [previewPic, setPreviewPic] = useState(null);
   const [langTable, setLangTable] = useState([]);
 
@@ -49,7 +48,6 @@ export function ArticleForm(props) {
   //lang: language of the content
   // article: an array of article_lang
   function getArticleValue(property, article, lang) {
-    // console.log('vao day');
     let rs;
     article.forEach((element) => {
       if (element.languageCode == lang) {
@@ -79,18 +77,17 @@ export function ArticleForm(props) {
 
   //Notify success adding new from /admin/add
   function notifyAddArticleSuccess() {
-    //get message redirected from add news route
     if (searchParams.get("message")) {
       const message = searchParams.get("message") ?? "";
       if (message == 1) {
         //signal of success edit on server
-        let messageNotify = "Add news successfully";
+        let messageNotify = "Add article successfully";
         toast.success(messageNotify, {
           position: "top-center",
         });
       } else {
         //signal of faillure on server
-        let messageNotify = `Cannot add new news, please try again or inform admin: ${message}`;
+        let messageNotify = `Cannot add new article, please try again or inform admin: ${message}`;
         toast.success(messageNotify, {
           position: "top-center",
         });
@@ -158,7 +155,7 @@ export function ArticleForm(props) {
       </>
     );
   };
-  const itemsTab = props.langTable?.map((item) => ({
+  const itemsTab = JSON.parse(props.langTable)?.map((item) => ({
     key: item.code,
     label: item.name,
     children: (
@@ -173,19 +170,59 @@ export function ArticleForm(props) {
 
   const uploadPicToServer = async (event) => {
     const body = new FormData();
-    // console.log("file", image)
     body.append("file", previewPic);
+    let imageURL;
+    //call api to move image to folder upload
     const response = await fetch("/api/articles/image", {
       method: "POST",
       body,
+    }).then(async (rs) => {
+      const image = await rs.json();
+      console.log(
+        "🚀 ~ file: ArticleForm.js:181 ~ uploadPicToServer ~ image:",
+        image
+      );
+      imageURL = image.url;
+
+      //add image to table image
+      const imageRs = await props.addImage({
+        url: image.url,
+        alt: form.getFieldValue("alt") ?? "",
+        caption: form.getFieldValue("caption") ?? "",
+        srcset: "",
+      });
+      console.log(
+        "🚀 ~ file: ArticleForm.js:189 ~ uploadPicToServer ~ imageRs:",
+        imageRs
+      );
     });
+    return imageURL;
+  };
+
+  //func to update alt and caption image
+  const updateInfoImage = async () => {
+    const rs = await props.updateImage(
+      {
+        alt: form.getFieldValue("alt") ?? "",
+        caption: form.getFieldValue("caption") ?? "",
+      },
+      JSON.parse(props.mainImage).url
+    );
+    console.log("🚀 ~ file: ArticleForm.js:209 ~ updateInfoImage ~ rs:", rs);
   };
 
   // Handle SUBMIT FORM
   async function handleSubmit(value) {
+    // when user upload new foto
+    const imageURL = previewPic ? await uploadPicToServer() : picURL;
+    //when there is already has foto and user don't uplaod new foto, just edit alt or caption
+    picURL && !previewPic && updateInfoImage();
+    console.log(
+      "🚀 ~ file: ArticleForm.js:200 ~ handleSubmit ~ imageURL:",
+      imageURL
+    );
     value.categories = value.categories.toString();
-    //value.news_position = newsPosition ? 1 : 0;
-    console.log("news_position 2: ", form.getFieldValue("article_position"));
+    console.log("article_position : ", form.getFieldValue("article_position"));
     if (form.getFieldValue("publish")) {
       value = { ...value, post_date: "1" }; //add property post_date into the value object
     }
@@ -204,20 +241,25 @@ export function ArticleForm(props) {
       };
     });
 
-    value.image = picName.replaceAll(" ", "_");
+    value.image = imageURL;
 
     console.log("value submit:", value);
     console.log("articleLangs: ", articleLangs);
 
+    const { alt, caption, ...newValue } = value;
+    console.log(
+      "🚀 ~ file: ArticleForm.js:224 ~ handleSubmit ~ newValue:",
+      newValue
+    );
+
     //editing article
     if (params?.id) {
       if (value.post_status == process.env.NEXT_PUBLIC_PS_TRASH)
-        await props.dellArticle(value, articleLangs, params.id);
+        await props.dellArticle(newValue, articleLangs, params.id);
       else {
         await props
-          .editArticle(value, articleLangs, params.id)
+          .editArticle(newValue, articleLangs, params.id)
           .then((message) => {
-            uploadPicToServer();
             if (message.message == 1) {
               //signal of success edit on server
               setPostStatus(form.getFieldValue("post_status")); //set postStatus state to rerender action buttons
@@ -242,14 +284,14 @@ export function ArticleForm(props) {
     }
     //adding article
     else {
-      await props.addArticle(value, articleLangs).then((message) => {
-        uploadPicToServer();
+      await props.addArticle(newValue, articleLangs).then((message) => {
         console.log("message from server:", message);
         if (message && message != 1) {
           let messageNotify =
             "Cannot update article, please try again or inform admin" + message;
-          toast.success(messageNotify, {
+          toast.error(messageNotify, {
             position: "top-center",
+            duration: 4000,
           });
         }
       });
@@ -262,12 +304,12 @@ export function ArticleForm(props) {
 
   //USE EFFECT
   useEffect(() => {
-    setCate(props.cate);
-    setLangTable(props.langTable); //set languageTable for article
+    setCate(JSON.parse(props.cate));
+    setLangTable(JSON.parse(props.langTable)); //set languageTable for article
     if (params?.id) {
       //get the article, articledata is an array it's each row is a language's article
 
-      let articleData = props.data;
+      let articleData = JSON.parse(props.data);
       console.log(
         "🚀 ~ file: ArticleForm.js:273 ~ useEffect ~ articleData:",
         articleData
@@ -275,7 +317,7 @@ export function ArticleForm(props) {
       //Build the data for title, excerpt, content
       let mainArticleContent = {};
 
-      props.langTable?.forEach((lang) => {
+      JSON.parse(props.langTable)?.forEach((lang) => {
         mainArticleContent[`title_${lang.code}`] = getArticleValue(
           "title",
           articleData,
@@ -301,9 +343,17 @@ export function ArticleForm(props) {
       };
       form.setFieldsValue(data1); //the data for the all the fields of form is done formating
       setData(data1); //set state for article
-      setPicName(data1.image);
+      setPicURL(data1.image ?? "");
       setPostStatus(data1.post_status);
       notifyAddArticleSuccess();
+
+      //set value for caption and alt of main image
+      const mainImage = JSON.parse(props.mainImage);
+      console.log(
+        "🚀 ~ file: ArticleForm.js:354 ~ useEffect ~ mainImage:",
+        mainImage
+      );
+      form.setFieldsValue({ caption: mainImage?.caption, alt: mainImage?.alt });
     }
   }, [props]);
 
@@ -467,7 +517,12 @@ export function ArticleForm(props) {
           ></Select>
         </Form.Item>
 
-        <Form.Item name="image" label="Image" getValueFromEvent={getFile}>
+        <Form.Item
+          name="image"
+          label="Image"
+          // valuePropName="fileList"
+          getValueFromEvent={getFile}
+        >
           <Upload
             name="file"
             maxCount={1}
@@ -475,45 +530,84 @@ export function ArticleForm(props) {
             customRequest={(info) => {
               console.log(info);
               setPreviewPic(info.file);
-              setPicName(info.file.name);
             }}
             showUploadList={false}
             beforeUpload={(file) => {
+              console.log(
+                "🚀 ~ file: ArticleForm.js:498 ~ ArticleForm ~ file:",
+                file
+              );
               return new Promise((resolve, reject) => {
-                if (file.size > 9000000) {
-                  reject("file size exceed");
-                  message.error("File size exceed");
+                // check the file type
+                const isImg =
+                  file.type === "image/jpeg" ||
+                  file.type === "image/jpg" ||
+                  file.type === "image/png" ||
+                  file.type === "image/gif";
+                if (!isImg) {
+                  message.error("You can only upload images");
+                  reject(false);
+                }
+
+                const isLt5M =
+                  file.size / 1024 / 1024 <=
+                  process.env.NEXT_PUBLIC_FILE_LIMITED_SIZE;
+                // check the file size
+                if (!isLt5M) {
+                  message.error(
+                    `Image must smaller than ${process.env.NEXT_PUBLIC_FILE_LIMITED_SIZE}MB!`
+                  );
+                  reject(false);
                 } else {
-                  resolve("success");
-                  message.success("Upload successfully");
+                  console.log("vao day");
+                  resolve(true);
                 }
               });
             }}
             headers={{ authorization: "authorization-text" }}
           >
-            <Button icon={<UploadOutlined />}>Upload</Button>
+            <Button icon={<UploadOutlined />} className="mb-1">
+              {!picURL ? "Upload" : "Change Picture"}
+            </Button>
           </Upload>
-          {previewPic && (
-            <img
-              src={`${URL.createObjectURL(previewPic)}`}
-              className="w-32 h-32 rounded-sm shadow"
-              alt={`${picName}`}
-            />
-          )}
-          {picName && !previewPic && (
-            <img
-              src={`/uploads/${picName}`}
-              className="w-32 h-32 rounded-sm shadow"
-              alt={`${picName}`}
-            />
-          )}
         </Form.Item>
+
+        <div className="ml-32 mb-5">
+          {previewPic && (
+            <Image
+              src={`${URL.createObjectURL(previewPic)}`}
+              width={160}
+              className="rounded-lg shadow"
+              alt={`${picURL}`}
+            />
+          )}
+          {picURL && !previewPic && (
+            <Image
+              src={`${picURL}`}
+              width={160}
+              className="rounded-lg shadow"
+              alt={`${picURL}`}
+            />
+          )}
+        </div>
+
+        {picURL || previewPic ? (
+          <>
+            <Form.Item name="caption" label="Caption">
+              <Input />
+            </Form.Item>
+            <Form.Item name="alt" label="Alt">
+              <Input />
+            </Form.Item>
+          </>
+        ) : (
+          <></>
+        )}
 
         <Form.Item label="position" name="article_position">
           <InputNumber
             min={1}
             max={10}
-            defaultValue={1}
             onChange={(e) => form.setFieldValue({ article_position: e.value })}
           />
         </Form.Item>

@@ -1,4 +1,4 @@
-import { db } from "@/config/db";
+import { funcLogin } from "@/library/funcLogin";
 import { Button } from "antd";
 import { funcLogin } from "@/library/funcLogin";
 import { cookies } from "next/headers";

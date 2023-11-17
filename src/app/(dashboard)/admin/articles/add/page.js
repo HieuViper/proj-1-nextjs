@@ -1,35 +1,49 @@
-import { addAarticle, funcArticle } from "@/library/funcArticles";
+import { funcArticle } from "@/library/funcArticles";
+import { funcImage } from "@/library/funcImages";
 import { redirect } from "next/navigation";
 import { ArticleForm } from "../_components/ArticleForm";
 
 const AddArticlePage = async () => {
-  // if (!db.initialized) {
-  //   await db.initialize();
-  // }
   async function addArticle(data, articleLangs) {
     "use server";
     let message = "";
     let id;
     try {
-      id = await addAarticle(data, articleLangs);
+      id = await funcArticle.addAarticle(data, articleLangs);
       console.log("🚀 ~ file: page.js:14 ~ addArticle ~ id:", id);
       message = 1;
     } catch (error) {
       message = `Fail to add a Article, try again or inform your admin: ${error.message}`;
     }
-    console.log("id:", id);
     if (id) {
       redirect(`/admin/articles/edit/${id}?message=${message}`);
     }
 
     return message;
   }
+  async function addImage(data) {
+    "use server";
+    let result;
+    try {
+      rs = await funcImage.addImage(data);
+      console.log("🚀 ~ file: page.js:14 ~ addArticle ~ rs:", rs);
+      result = rs;
+    } catch (error) {
+      console.log(error.message);
+    }
+
+    return result;
+  }
   const cate = await funcArticle.getCategories(process.env.DEFAULT_LANGUAGE);
   const langTable = await funcArticle.getLanguages();
   return (
     <div className="">
       Add new article
-      <ArticleForm cate={cate} langTable={langTable} {...{ addArticle }} />
+      <ArticleForm
+        cate={JSON.stringify(cate)}
+        langTable={JSON.stringify(langTable)}
+        {...{ addArticle, addImage }}
+      />
     </div>
   );
 };

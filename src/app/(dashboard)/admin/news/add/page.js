@@ -1,18 +1,14 @@
-import { NewsForm } from '../_components/NewsForm';
-import { funcNews } from '@/library/funcNews';
-import { db } from '@/config/db';
-import { redirect } from 'next/navigation';
-import { message } from 'antd';
+import { funcImage } from "@/library/funcImages";
+import { funcNews } from "@/library/funcNews";
+import { redirect } from "next/navigation";
+import { NewsForm } from "../_components/NewsForm";
 
 export const dynamic = "force-dynamic";
 
 async function AddNews() {
-  if (!db.initialized) {
-    await db.initialize();
-  }
   async function addNews(data, newsLangs) {
-    'use server';
-    let message = '';
+    "use server";
+    let message = "";
     let id;
     try {
       id = await funcNews.addANews(data, newsLangs);
@@ -20,23 +16,36 @@ async function AddNews() {
     } catch (error) {
       message = `Fail to add a news, try again or inform your admin: ${error.message}`;
     }
-    console.log('id:', id);
     if (id) {
       redirect(`/admin/news/edit/${id}?message=${message}`);
     }
 
     return message;
   }
+  async function addImage(data) {
+    "use server";
+    let result;
+    try {
+      rs = await funcImage.addImage(data);
+      console.log("🚀 ~ file: page.js:14 ~ addArticle ~ rs:", rs);
+      result = rs;
+    } catch (error) {
+      console.log(error.message);
+    }
+
+    return result;
+  }
   const cate = await funcNews.getCategories(process.env.DEFAULT_LANGUAGE);
   const tags = await funcNews.getTags(process.env.DEFAULT_LANGUAGE);
   const langTable = await funcNews.getLanguages();
   return (
     <div className="">
-      <h1>Add new News</h1>
-      <NewsForm cate={JSON.stringify(cate)}
+      <h1 className="text-2xl">Add new News</h1>
+      <NewsForm
+        cate={JSON.stringify(cate)}
         tags={JSON.stringify(tags)}
         langTable={JSON.stringify(langTable)}
-        {...{ addNews }}
+        {...{ addNews, addImage }}
       />
     </div>
   );

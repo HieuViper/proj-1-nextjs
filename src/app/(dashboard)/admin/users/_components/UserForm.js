@@ -8,17 +8,15 @@ import {
   UploadOutlined,
   WarningTwoTone,
 } from "@ant-design/icons";
-import { AutoComplete, Button, Form, Input, Select, Upload } from "antd";
+import { Button, Form, Input, Select, Upload } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 
-
-import PasswordStrengthBar from "react-password-strength-bar";
 import { useRouter } from "next/navigation";
+import PasswordStrengthBar from "react-password-strength-bar";
 
 const UserForm = (props) => {
   const router = useRouter();
@@ -33,55 +31,55 @@ const UserForm = (props) => {
   const [displayName, setDisplayName] = useState([]);
   const [roles, setRoles] = useState([]);
 
-  useEffect(()=>{
+  useEffect(() => {
     //set role options for the field role
     const rolesData = props.roles;
-    setRoles( Object.keys( rolesData ).map((role) => ({
-      value: role,
-      key: role,
-      label: role,
-    })) );
+    setRoles(
+      Object.keys(rolesData).map((role) => ({
+        value: role,
+        key: role,
+        label: role,
+      }))
+    );
     //set user data for the form
-    if( props.data ){
-     // console.log('user: ', JSON.parse(props.data));
+    if (props.data) {
+      // console.log('user: ', JSON.parse(props.data));
       let formdata = JSON.parse(props.data);
-      formdata.old_email = formdata.email;    //add new value for new field old_email. We keep this value to make sure user has change their email
+      formdata.old_email = formdata.email; //add new value for new field old_email. We keep this value to make sure user has change their email
       form.setFieldsValue(formdata);
     }
-  }, [props])
+  }, [props]);
 
   //submit value
   const onFinish = async (values) => {
-
-
-    if(params.id){
+    if (params.id) {
       //update current user
-      let {new_password, ...user} = values;
-      if( isSetNewPassword )
-        user.password = new_password;
-      await props.updateUser( user ).then(( message ) => {
+      let { new_password, ...user } = values;
+      if (isSetNewPassword) user.password = new_password;
+      await props.updateUser(user).then((message) => {
         //success update user
-        if( message == 1 ) {
-          let messageNotify =
-            "Update user successfully - ";
+        if (message == 1) {
+          let messageNotify = "Update user successfully - ";
           toast.success(messageNotify, {
             position: "top-center",
-            duration: 5000
+            duration: 5000,
           });
-        } else {  //fail to update user
+        } else {
+          //fail to update user
           let messageNotify =
-          "Fail to update user. Try again or inform system's admin - " + message;
-        toast.error(messageNotify, {
-          position: "top-center",
-          duration: 5000,
-        });
+            "Fail to update user. Try again or inform system's admin - " +
+            message;
+          toast.error(messageNotify, {
+            position: "top-center",
+            duration: 5000,
+          });
         }
-      }) ;
+      });
     } else {
       //add new user
       let { confirmPassword, ...user } = values;
       console.log("Received values of form: ", user);
-      await props.addUser( user ).then(( message ) => {
+      await props.addUser(user).then((message) => {
         //console.log("message from server:", message);
         if (message && message != 1) {
           let messageNotify =
@@ -114,42 +112,54 @@ const UserForm = (props) => {
   };
 
   //generate display options for the field display_name
-  function generateDisplay( ) {
+  function generateDisplay() {
     setDisplayName([
       {
-        value: form.getFieldValue('nick_name'),
-        key:  'nickName',
-        label: form.getFieldValue('nick_name'),
+        value: form.getFieldValue("nick_name"),
+        key: "nickName",
+        label: form.getFieldValue("nick_name"),
       },
       {
-        value: form.getFieldValue('first_name'),
-        key: 'firstName',
-        label: form.getFieldValue('first_name'),
+        value: form.getFieldValue("first_name"),
+        key: "firstName",
+        label: form.getFieldValue("first_name"),
       },
       {
-        value: form.getFieldValue('last_name'),
-        key: 'lastName',
-        label: form.getFieldValue('last_name'),
+        value: form.getFieldValue("last_name"),
+        key: "lastName",
+        label: form.getFieldValue("last_name"),
       },
       {
-        value: form.getFieldValue('last_name') + " " + form.getFieldValue('first_name'),
+        value:
+          form.getFieldValue("last_name") +
+          " " +
+          form.getFieldValue("first_name"),
         key: "LastFirstName",
-        label: form.getFieldValue('last_name') + " " + form.getFieldValue('first_name'),
+        label:
+          form.getFieldValue("last_name") +
+          " " +
+          form.getFieldValue("first_name"),
       },
       {
-        value: form.getFieldValue('first_name') + " " + form.getFieldValue('last_name'),
+        value:
+          form.getFieldValue("first_name") +
+          " " +
+          form.getFieldValue("last_name"),
         key: "firstLastName",
-        label: form.getFieldValue('first_name') + " " + form.getFieldValue('last_name'),
+        label:
+          form.getFieldValue("first_name") +
+          " " +
+          form.getFieldValue("last_name"),
       },
     ]);
   }
 
   function goBackUserList(event) {
-    console.log('comer here link');
+    console.log("comer here link");
     event.preventDefault();
     router.refresh();
     // const decoratePath = new URL('http://localhost:3000/admin');
-    router.push('/admin/users');
+    router.push("/admin/users");
   }
 
   //Handle upload picture
@@ -174,7 +184,6 @@ const UserForm = (props) => {
 
       <div className="mx-auto">
         <Form
-          //className="w-full"
           style={
             {
               // maxWidth: 600,
@@ -182,20 +191,10 @@ const UserForm = (props) => {
             }
           }
           labelCol={{
-            xs: {
-              span: 12,
-            },
-            sm: {
-              span: 3,
-            },
+            span: 4,
           }}
           wrapperCol={{
-            xs: {
-              span: 12,
-            },
-            sm: {
-              span: 8,
-            },
+            span: 8,
           }}
           form={form}
           name="user-form"
@@ -227,7 +226,9 @@ const UserForm = (props) => {
               },
             ]}
           >
-            <Input key="firstName" placeholder="Văn Anh"
+            <Input
+              key="firstName"
+              placeholder="Văn Anh"
               onChange={(e) => generateDisplay()}
             />
           </Form.Item>
@@ -242,9 +243,11 @@ const UserForm = (props) => {
               },
             ]}
           >
-            <Input key="lastName" placeholder="Nguyễn"
-             onChange={(e) => generateDisplay()}
-             />
+            <Input
+              key="lastName"
+              placeholder="Nguyễn"
+              onChange={(e) => generateDisplay()}
+            />
           </Form.Item>
 
           <Form.Item
@@ -257,8 +260,11 @@ const UserForm = (props) => {
               },
             ]}
           >
-            <Input key="nickName" placeholder="Nguyễn"
-             onChange={(e) => generateDisplay()} />
+            <Input
+              key="nickName"
+              placeholder="Nguyễn"
+              onChange={(e) => generateDisplay()}
+            />
           </Form.Item>
 
           <Form.Item
@@ -277,9 +283,12 @@ const UserForm = (props) => {
               }}
               //options={displayName}
             >
-              {displayName && displayName.map((item) => (
-                <Select.Option key={ item.key } value={ item.value }>{ item.label }</Select.Option>
-              ))}
+              {displayName &&
+                displayName.map((item) => (
+                  <Select.Option key={item.key} value={item.value}>
+                    {item.label}
+                  </Select.Option>
+                ))}
             </Select>
           </Form.Item>
 
@@ -297,11 +306,14 @@ const UserForm = (props) => {
               style={{
                 width: 200,
               }}
-             // options={roles}
+              // options={roles}
             >
-              { roles && roles.map((item) => (
-                <Select.Option key={ item.key } value={ item.value }>{ item.label }</Select.Option>
-              )) }
+              {roles &&
+                roles.map((item) => (
+                  <Select.Option key={item.key} value={item.value}>
+                    {item.label}
+                  </Select.Option>
+                ))}
             </Select>
           </Form.Item>
 
@@ -322,11 +334,12 @@ const UserForm = (props) => {
             <Input key="emailIn" placeholder="example@gmail.com" />
           </Form.Item>
 
-          <Form.Item name="old_email" style={{ display: "none" }} >
+          <Form.Item name="old_email" style={{ display: "none" }}>
             <Input key="oldEmail" />
           </Form.Item>
 
           <Form.Item label="Website" name="website">
+            <Input key="websiteIn" placeholder="https://my-website.com" />
             <Input key="websiteIn" placeholder="https://my-website.com" />
           </Form.Item>
 
@@ -353,15 +366,15 @@ const UserForm = (props) => {
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
-                     // form.setFieldsValue({ password: e.target.value }); //may be no need
-
+                      // form.setFieldsValue({ password: e.target.value }); //may be no need
                     }}
                     autoComplete="false"
                   />
-
                 </>
               </Form.Item>
-              <PasswordStrengthBar
+              <Form.Item>
+                <div className="ml-40 w-80">
+                  <PasswordStrengthBar
                     password={password}
                     scoreWords={[
                       "Very Weak",
@@ -374,10 +387,12 @@ const UserForm = (props) => {
                   />
                   <Button
                     onClick={() => generatePassword()}
-                    icon={<SyncOutlined  />}
+                    icon={<SyncOutlined />}
                   >
                     Generate Password
                   </Button>
+                </div>
+              </Form.Item>
 
               <Form.Item
                 name="confirmPassword"
@@ -403,7 +418,7 @@ const UserForm = (props) => {
                   }),
                 ]}
               >
-                <Input.Password key="confirmPass" autoComplete="false"/>
+                <Input.Password key="confirmPass" autoComplete="false" />
               </Form.Item>
             </>
           ) : (
@@ -437,58 +452,58 @@ const UserForm = (props) => {
                 label="Profile Picture"
                 getValueFromEvent={getFile}
               >
-
-                <Input key="img" style={{ display: "none" }} />
+                {/* <Input key="img" style={{ display: "none" }} /> */}
+                <>
+                  <Upload
+                    name="file"
+                    maxCount={1}
+                    // action="/api/articles/image"
+                    customRequest={(info) => {
+                      console.log(info);
+                      setPreviewPic(info.file);
+                      setPicName(info.file.name);
+                    }}
+                    showUploadList={false}
+                    beforeUpload={(file) => {
+                      return new Promise((resolve, reject) => {
+                        if (file.size > 9000000) {
+                          reject("file size exceed");
+                          message.error("File size exceed");
+                        } else {
+                          resolve("success");
+                          message.success("Upload successfully");
+                        }
+                      });
+                    }}
+                    headers={{ authorization: "authorization-text" }}
+                  >
+                    <Button icon={<UploadOutlined />}>Upload</Button>
+                  </Upload>
+                  {previewPic && (
+                    <img
+                      src={`${URL.createObjectURL(previewPic)}`}
+                      className="w-32 h-32 rounded-sm shadow"
+                      alt={`${picName}`}
+                    />
+                  )}
+                  {picName && !previewPic && (
+                    <img
+                      src={`/uploads/${picName}`}
+                      className="w-32 h-32 rounded-sm shadow"
+                      alt={`${picName}`}
+                    />
+                  )}
+                </>
               </Form.Item>
-
-              <Upload
-                  name="file"
-                  maxCount={1}
-                  // action="/api/articles/image"
-                  customRequest={(info) => {
-                    console.log(info);
-                    setPreviewPic(info.file);
-                    setPicName(info.file.name);
-                  }}
-                  showUploadList={false}
-                  beforeUpload={(file) => {
-                    return new Promise((resolve, reject) => {
-                      if (file.size > 9000000) {
-                        reject("file size exceed");
-                        message.error("File size exceed");
-                      } else {
-                        resolve("success");
-                        message.success("Upload successfully");
-                      }
-                    });
-                  }}
-                  headers={{ authorization: "authorization-text" }}
-                >
-                  <Button icon={<UploadOutlined />}>Upload</Button>
-                </Upload>
-                {previewPic && (
-                  <img
-                    src={`${URL.createObjectURL(previewPic)}`}
-                    className="w-32 h-32 rounded-sm shadow"
-                    alt={`${picName}`}
-                  />
-                )}
-                {picName && !previewPic && (
-                  <img
-                    src={`/uploads/${picName}`}
-                    className="w-32 h-32 rounded-sm shadow"
-                    alt={`${picName}`}
-                  />
-                )}
 
               <p className="text-xl font-semibold my-3">Account Management</p>
               {/* <Form.Item name="new_pass" label="Password Reset"> */}
-                <Button
-                  onClick={() => setIsSetNewPassword(true)}
-                  icon={<WarningTwoTone twoToneColor="#ffcc00 " />}
-                >
-                  Set New Password
-                </Button>
+              <Button
+                onClick={() => setIsSetNewPassword(true)}
+                icon={<WarningTwoTone twoToneColor="#ffcc00 " />}
+              >
+                Set New Password
+              </Button>
               {/* </Form.Item> */}
 
               {isSetNewPassword && (
@@ -522,33 +537,31 @@ const UserForm = (props) => {
                       onChange={(e) => setPassword(e.target.value)}
                       autoComplete="false"
                     />
-
                   </Form.Item>
                   <PasswordStrengthBar
-                      password={password}
-                      scoreWords={[
-                        "Very Weak",
-                        "Weak",
-                        "Medium",
-                        "Strong",
-                        "Very Strong",
-                      ]}
-                      shortScoreWord="Too short"
-                    />
+                    password={password}
+                    scoreWords={[
+                      "Very Weak",
+                      "Weak",
+                      "Medium",
+                      "Strong",
+                      "Very Strong",
+                    ]}
+                    shortScoreWord="Too short"
+                  />
                   <div className="flex items-center gap-3 mb-5 ml-8">
                     <Button
                       type="text"
                       danger
                       onClick={() => {
                         setIsSetNewPassword(false);
-
                       }}
                     >
                       Cancel
                     </Button>
                     <Button
                       onClick={() => generatePassword()}
-                      icon={<SyncOutlined  />}
+                      icon={<SyncOutlined />}
                     >
                       Generate Password
                     </Button>
@@ -556,7 +569,7 @@ const UserForm = (props) => {
                 </div>
               )}
               {/* <Form.Item name="reset_pass" label="Password Reset"> */}
-                <Button>Send Reset Link</Button>
+              <Button>Send Reset Link</Button>
               {/* </Form.Item> */}
             </>
           )}

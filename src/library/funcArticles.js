@@ -60,7 +60,6 @@ export async function getAllArticle(
     let sqlquery = `SELECT * FROM articles_all WHERE (${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}) ${orderQuery} LIMIT ${fromarticle}, ${size}`;
 
     const results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
-    console.log("result:", results);
     return results;
   } catch (error) {
     throw new Error("Fail to get articles from database" + error.message);
@@ -284,10 +283,6 @@ export async function addAarticle(data, articleLangs) {
     console.log("data :", data);
 
     const article = await db.Articles.create(data, { transaction: t });
-    console.log(
-      "🚀 ~ file: getArticles.js:287 ~ addAarticle ~ article:",
-      article
-    );
 
     //add articleId property to the articleLangs
     for (const element of articleLangs) {

@@ -4,24 +4,24 @@ import { articleCateLanguageModel } from "./models/article_cate_langs";
 import { articleCategoriesModel } from "./models/article_categories";
 import { articleLanguageModel } from "./models/article_languages";
 import { articleModel } from "./models/articles";
+import { iconsModel } from "./models/icons";
+import { imgsModel } from "./models/imgs";
 import { languagesModel } from "./models/languages";
+import { manufacturerLanguagesModel } from "./models/manufacturer_languages";
+import { manufacturersModel } from "./models/manufacturers";
 import { newsModel } from "./models/news";
 import { newsCateLanguageModel } from "./models/news_cate_langs";
 import { newsCategoriesModel } from "./models/news_categories";
 import { newsLanguageModel } from "./models/news_languages";
-import { tagLangsModel } from "./models/tag_langs";
-import { tagsModel } from "./models/tags";
-import { iconsModel } from "./models/icons";
-import { manufacturersModel } from "./models/manufacturers";
-import { manufacturerLanguagesModel } from "./models/manufacturer_languages";
-import { productsModel } from "./models/products";
-import { productsLanguagesModel } from "./models/products_languages";
-import { productCategoriesModel } from "./models/product_categories";
 import { productCateLanguageModel } from "./models/product_cate_langs";
+import { productCategoriesModel } from "./models/product_categories";
 import { productGuaranteeModel } from "./models/product_guarantee";
 import { productTransportModel } from "./models/product_transport";
+import { productsModel } from "./models/products";
+import { productsLanguagesModel } from "./models/products_languages";
+import { tagLangsModel } from "./models/tag_langs";
+import { tagsModel } from "./models/tags";
 import { usersModel } from "./models/users";
-import { imgsModel } from "./models/imgs";
 
 const sequelize = new Sequelize(
   process.env.DB_DBNAME,
@@ -44,28 +44,28 @@ export const db = {
   initialized: false,
   initialize,
   seq: sequelize,
-  News: newsModel( sequelize ),
-  News_languages: newsLanguageModel( sequelize ),
-  Languages: languagesModel( sequelize ),
-  Articles: articleModel( sequelize ),
-  Article_languages: articleLanguageModel( sequelize ),
-  Article_categories: articleCategoriesModel( sequelize ),
-  Article_cate_langs: articleCateLanguageModel( sequelize ),
-  News_categories: newsCategoriesModel( sequelize ),
-  News_cate_langs: newsCateLanguageModel( sequelize ),
-  Tags: tagsModel( sequelize ),
-  Tag_langs: tagLangsModel( sequelize ),
-  Icons: iconsModel( sequelize ),
-  Manufacturers: manufacturersModel( sequelize ),
-  Manufacturer_languages: manufacturerLanguagesModel( sequelize ),
-  Products: productsModel( sequelize ),
-  Products_languages: productsLanguagesModel( sequelize ),
-  Product_transport: productTransportModel( sequelize ),
-  Product_guarantee: productGuaranteeModel( sequelize ),
-  Product_categories: productCategoriesModel( sequelize ),
-  Product_cate_langs: productCateLanguageModel( sequelize ),
-  Users: usersModel( sequelize ),
-  Imgs: imgsModel( sequelize ),
+  News: newsModel(sequelize),
+  News_languages: newsLanguageModel(sequelize),
+  Languages: languagesModel(sequelize),
+  Articles: articleModel(sequelize),
+  Article_languages: articleLanguageModel(sequelize),
+  Article_categories: articleCategoriesModel(sequelize),
+  Article_cate_langs: articleCateLanguageModel(sequelize),
+  News_categories: newsCategoriesModel(sequelize),
+  News_cate_langs: newsCateLanguageModel(sequelize),
+  Tags: tagsModel(sequelize),
+  Tag_langs: tagLangsModel(sequelize),
+  Icons: iconsModel(sequelize),
+  Manufacturers: manufacturersModel(sequelize),
+  Manufacturer_languages: manufacturerLanguagesModel(sequelize),
+  Products: productsModel(sequelize),
+  Products_languages: productsLanguagesModel(sequelize),
+  Product_transport: productTransportModel(sequelize),
+  Product_guarantee: productGuaranteeModel(sequelize),
+  Product_categories: productCategoriesModel(sequelize),
+  Product_cate_langs: productCateLanguageModel(sequelize),
+  Users: usersModel(sequelize),
+  Imgs: imgsModel(sequelize),
 };
 
 // initialize db and models, called on first api request from /helpers/api/api-handler.js
@@ -105,24 +105,32 @@ async function initialize() {
   db.Tags.belongsToMany(db.Languages, { through: db.Tag_langs });
   db.Languages.belongsToMany(db.Tags, { through: db.Tag_langs });
 
-  db.Manufacturers.belongsToMany( db.Languages, { through: db.Manufacturer_languages } );
-  db.Languages.belongsToMany( db.Manufacturers, { through: db.Manufacturer_languages } );
+  db.Manufacturers.belongsToMany(db.Languages, {
+    through: db.Manufacturer_languages,
+  });
+  db.Languages.belongsToMany(db.Manufacturers, {
+    through: db.Manufacturer_languages,
+  });
 
-  db.Products.belongsToMany( db.Languages, { through: db.Products_languages } );
-  db.Languages.belongsToMany( db.Products, { through: db.Products_languages } );
+  db.Products.belongsToMany(db.Languages, { through: db.Products_languages });
+  db.Languages.belongsToMany(db.Products, { through: db.Products_languages });
 
-  db.Product_categories.belongsToMany( db.Languages, { through: db.Product_cate_langs } );
-  db.Languages.belongsToMany( db.Product_categories, { through: db.Product_cate_langs } );
+  db.Product_categories.belongsToMany(db.Languages, {
+    through: db.Product_cate_langs,
+  });
+  db.Languages.belongsToMany(db.Product_categories, {
+    through: db.Product_cate_langs,
+  });
 
-  db.Languages.hasMany( db.Product_transport );
-  db.Product_transport.belongsTo( db.Languages );
+  db.Languages.hasMany(db.Product_transport);
+  db.Product_transport.belongsTo(db.Languages);
 
-  db.Languages.hasMany( db.Product_guarantee );
-  db.Product_guarantee.belongsTo ( db.Languages );
+  db.Languages.hasMany(db.Product_guarantee);
+  db.Product_guarantee.belongsTo(db.Languages);
 
   //relation ship one-to-many with products
-  db.Manufacturers.hasMany( db.Products );
-  db.Products.belongsTo( db.Manufacturers );
+  db.Manufacturers.hasMany(db.Products);
+  db.Products.belongsTo(db.Manufacturers);
 
   //relation ship one-to-many with images table
   // db.Imgs.hasMany( db.Users, { foreignKey: 'image' } );
@@ -135,7 +143,7 @@ async function initialize() {
   // db.Articles.belongsTo( db.Imgs, { foreignKey: 'image' } );
 
   // sync all models with database
-   await sequelize.sync({ force: true });
+  await sequelize.sync({ alter: true });
 
   db.initialized = true;
   console.log("Initializing database is done");

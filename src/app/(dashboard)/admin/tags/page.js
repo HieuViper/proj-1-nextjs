@@ -1,10 +1,8 @@
+import { funcLanguage } from "@/library/funcLanguages";
 import { funcTags } from "@/library/funcTags";
 import TagList from "./_components/TagList";
 
 async function TagsPage({ searchParams }) {
-  if (!db.initialized) {
-    await db.initialize();
-  }
   const page = searchParams?.page ?? 1;
   const size = searchParams?.size ?? process.env.PAGE_SIZE;
   const search = searchParams?.search ?? "";
@@ -69,7 +67,7 @@ async function TagsPage({ searchParams }) {
   if (bulkdel != "") {
     await delBulkTag(bulkdel);
   }
-  const langTable = await getLanguages();
+  const langTable = await funcLanguage.getLanguages();
   const allTags = await getAllTag(page, size, search, lang);
   const pagination = {
     pageSize: parseInt(size),

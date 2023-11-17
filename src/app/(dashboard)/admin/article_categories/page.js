@@ -1,10 +1,11 @@
 import { funcArticleCategories } from "@/library/funcArticleCategories";
+import { funcLanguage } from "@/library/funcLanguages";
 import ArticleList from "./_components/ArticleCatList";
 
 async function ArticlePage() {
-  if (!db.initialized) {
-    await db.initialize();
-  }
+  // if (!db.initialized) {
+  //   await db.initialize();
+  // }
 
   async function getAllArticle(lang) {
     "use server";
@@ -58,7 +59,7 @@ async function ArticlePage() {
   const allArticleCat = await funcArticleCategories.getAllArticleCat(
     process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE
   );
-  const langTable = await getLanguages();
+  const langTable = await funcLanguage.getLanguages();
 
   return (
     <>

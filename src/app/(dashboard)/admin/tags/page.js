@@ -1,4 +1,4 @@
-import { funcLanguage } from "@/library/funcLanguages";
+import { callNon } from "@/library/api";
 import { funcTags } from "@/library/funcTags";
 import TagList from "./_components/TagList";
 
@@ -12,9 +12,11 @@ async function TagsPage({ searchParams }) {
 
   async function getAllTag(page, size, search, lang) {
     "use server";
-    const tagData = await funcTags.getAllTags(page, size, search, lang);
-    const total = await funcTags.getTotalTags(search, lang);
-    return { tagData, total };
+    const rs = await callNon(
+      `/api/tags?page=${page}&size=${size}&search=${search}&lang=${lang}`,
+      "GET"
+    );
+    return { tagData: rs.data, total: rs.total };
   }
   async function getTag(id) {
     "use server";
@@ -23,23 +25,35 @@ async function TagsPage({ searchParams }) {
   }
   async function addTag(data, tagLangs, lang) {
     "use server";
-    let message = "";
-    let id;
     try {
-      await funcTags.addTags(data, tagLangs);
-      const rs = await funcTags.getAllTags(page, size, search, lang);
+      // await funcTags.addTags(data, tagLangs);
+      await callNon("/api/tags", "POST", {
+        data: data,
+        tagLangs: tagLangs,
+      });
+      const rs = await callNon(
+        `/api/tags?page=${page}&size=${size}&search=${search}&lang=${lang}`,
+        "GET"
+      );
       return { message: 1, tagList: rs };
     } catch (error) {
       message = `Fail to add a tags, try again or inform your admin: ${error.message}`;
     }
-    return message;
   }
 
   async function editTag(data, tagLangs, id, lang) {
     "use server";
     try {
-      await funcTags.updateTags(data, tagLangs, id);
-      const rs = await funcTags.getAllTags(page, size, search, lang);
+      await callNon(`/api/tags/${id}`, "PUT", {
+        data: data,
+        tagLangs: tagLangs,
+      });
+      const rs = await callNon(
+        `/api/tags?page=${page}&size=${size}&search=${search}&lang=${lang}`,
+        "GET"
+      );
+      // await funcTags.updateTags(data, tagLangs, id);
+      // const rs = await funcTags.getAllTags(page, size, search, lang);
       return { message: 1, tagList: rs };
     } catch (error) {
       return {
@@ -49,16 +63,25 @@ async function TagsPage({ searchParams }) {
   }
   async function delTag(id) {
     "use server";
-    await funcTags.deleteTags(id);
+    try {
+      const rs = await callNon(`/api/tags/${id}`, "DELETE");
+      return { message: 1, result: rs.data };
+    } catch (error) {
+      throw new Error(
+        `Fail to update Languages, try again or inform your admin: ${error.message}`
+      );
+    }
   }
   async function delBulkTag(arrId) {
     "use server";
-    await funcTags.deleteBulkTags(arrId);
-  }
-  async function searchTag(search, lang) {
-    "use server";
-    const tag = await funcTags.getSearchQuery(search, lang);
-    return tag;
+    try {
+      const rs = await callNon(`/api/tags`, "DELETE", { arrDell: arrId });
+      return { message: 1, result: rs.data };
+    } catch (error) {
+      throw new Error(
+        `Fail to update Languages, try again or inform your admin: ${error.message}`
+      );
+    }
   }
 
   if (del != "") {
@@ -67,7 +90,7 @@ async function TagsPage({ searchParams }) {
   if (bulkdel != "") {
     await delBulkTag(bulkdel);
   }
-  const langTable = await funcLanguage.getLanguages();
+  const langTable = await callNon("/api/languages", "GET");
   const allTags = await getAllTag(page, size, search, lang);
   const pagination = {
     pageSize: parseInt(size),
@@ -78,7 +101,7 @@ async function TagsPage({ searchParams }) {
     <>
       <TagList
         dataTable={JSON.stringify(allTags.tagData)}
-        langTable={JSON.stringify(langTable)}
+        langTable={JSON.stringify(langTable.data)}
         pagination={pagination}
         {...{
           getAllTag,
@@ -87,7 +110,6 @@ async function TagsPage({ searchParams }) {
           editTag,
           delTag,
           delBulkTag,
-          searchTag,
         }}
       />
     </>

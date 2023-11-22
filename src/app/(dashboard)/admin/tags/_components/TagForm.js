@@ -39,7 +39,7 @@ export function TagForm(props) {
     try {
       if (id) {
         await editTag(value, tagLangs, id, lang).then((res) => {
-          setTags(res.tagList);
+          setTags(res.tagList.data);
           handleModal();
           toast.success("Update Tag success ");
           setLoading(false);
@@ -60,7 +60,7 @@ export function TagForm(props) {
 
         console.log("value :", value);
         await addTag(value, tagLangs, lang).then((res) => {
-          setTags(res.tagList);
+          setTags(res.tagList.data);
           toast.success("Create Tag success");
           setLoading(false);
           form.resetFields();

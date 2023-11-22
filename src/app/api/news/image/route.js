@@ -52,10 +52,10 @@ export async function POST(req, res) {
       // check folder exist
       await doesFolderExist(`public/uploads/${nameFolderInCustom}`).then(
         async (exists) => {
-          if (exists) {
+          if (exists) {   //no need
             console.log("Folder exists!");
             const temp = filename.split(".");
-            filename = temp[0] + "-" + Date.now().toString() + "." + temp[1];
+            filename = temp[0] + "-" + Date.now().toString() + "." + temp[1]; //no need, it is duplicate the below step at row 73
           } else {
             console.log("Folder does not exist.");
             await fsPromises.mkdir(`public/uploads/${nameFolderInCustom}`);

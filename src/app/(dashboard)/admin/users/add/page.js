@@ -1,13 +1,16 @@
 import UserForm from "../_components/UserForm";
-import { userRoles } from "@/library/userRoles";
+import getConfig from "next/config";
 import { funcUsers } from "@/library/funcUsers";
 import { redirect } from "next/navigation";
 import { headers, cookies } from "next/headers";
-import { log } from "console";
+import { funcLogin } from "@/library/funcLogin";
 
 export const dynamic = "force-dynamic";
 
-const AddUserPage = () => {
+const AddUserPage = async () => {
+  const loginInfo = funcLogin.checkAuthentication();
+  const isAuthorize = await funcLogin.checkAuthorize( loginInfo.user, 'users','add' );
+
   async function addUser(user){
     'use server'
     let message = '';
@@ -25,12 +28,6 @@ const AddUserPage = () => {
 
     return message;
   }
-  const headerInst = headers();
-  headerInst.forEach( (value, key) => {
-    console.log('key:', key, ' --- value: ', value);
-  });
-  console.log('cookie from header', headerInst.getSetCookie());
-  console.log('cookies: ', cookies().getAll());
 
 
   return (
@@ -41,7 +38,11 @@ const AddUserPage = () => {
           Create a brand new user and add them to this site.
         </span>
       </div>
-      <UserForm roles={userRoles} {...{ addUser }} />
+      <UserForm roles={ getConfig().serverRuntimeConfig.userRoles }
+                user={ loginInfo.user }
+                isAuthorize={ isAuthorize }
+                {...{ addUser }}
+                />
     </>
   );
 };

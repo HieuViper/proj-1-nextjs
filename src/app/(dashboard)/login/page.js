@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 // import { now } from "sequelize/types/utils";
 
 const LoginPage = () => {
+
   //Handle login's process
   async function login( username, password ) {
     'use server'
@@ -17,6 +18,7 @@ const LoginPage = () => {
         name: 'Authorization',
         value: token,
         httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
         path: '/',
         sameSite: 'lax',  //Strict
         maxAge: process.env.LOGIN_TIME,
@@ -31,16 +33,8 @@ const LoginPage = () => {
     return message;
   }
 
-  let token = cookies().get('Authorization');
-  //console.log('token from cookie:', token);
-  let loginInfo;
-  if ( token ) {
-    loginInfo = funcLogin.isLogin ( token.value );
-    console.log('loginInfo:', loginInfo);
-    if ( loginInfo.isLogin ) {
-      redirect(`/admin`);
-    }
-}
+
+  funcLogin.checkAuthenticationForLoginPage();
 
   return (
     <div className="bg-[url('/background.jpg')] bg-no-repeat bg-center bg-cover min-h-screen flex justify-center items-center">

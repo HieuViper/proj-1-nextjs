@@ -6,16 +6,15 @@ import {
   QuestionCircleOutlined,
   UserAddOutlined,
 } from "@ant-design/icons";
-import { Button, Radio, Select, Space, Table, Tag } from "antd";
-import { Popconfirm } from "antd/es/popconfirm";
 import Search from "antd/es/input/Search";
+import { Button, Radio, Select, Space, Table, Tag, Popconfirm, Modal } from "antd";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import http, { request } from 'http';
-import Head from "next/head";
-import { Header } from "antd/es/layout/layout";
+import LoginSmallForm from "@/components/LoginSmallForm";
+
+
 //import { setCookie  } from 'js-cookie';
 
 const UserList = ( props ) => {
@@ -45,8 +44,14 @@ const UserList = ( props ) => {
   const [search, setSearch] = useState("");
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [roles, setRoles] = useState({});   //contain all the role and the number of records for each role { Aministrator: 20, Editor: 100 }
+  const [loginForm, setLoginForm] = useState( false );
+  const [errorMessage, setErrorMessage] = useState('');   //display the serious error
 
   useEffect(() => {
+    //redirect to login page if user is not authorized
+    if( props.isAuthorize == false ) {
+      handleNotAuthorized();
+    }
     setUsers( JSON.parse( props.dataTable ) );
     setPaginationServer( props.pagination );
     setTotals( props.totals );
@@ -106,8 +111,9 @@ const UserList = ( props ) => {
     router.push(`${pathName}${query}`);
   };
 
-  const onSearchChange = (e) => {
+  const onSearchChange = async (e) => {
     setSearch(e.target.value);
+
   };
   const handleSearch = async (value) => {
     //set state sorter to init state, that means sort follow the date column
@@ -164,6 +170,37 @@ const UserList = ( props ) => {
   };
 
 
+
+  //redirect user to login page if user doenst have valid authorization
+  async function handleNotAuthorized() {
+    setErrorMessage('You dont have valid authorization. You will be logout of the system in 5 seconds.');
+    const res = await fetch('/api/login?option=delAuth', {
+      method: 'GET',
+    });
+    setTimeout(async () => {
+      router.push('/login');
+    }, 5000);
+
+  }
+
+  //used for call API at client component
+  function callAPI ( funcAPI ) {
+    const res = funcAPI();
+    if( res.status == 401 ) {
+      setLoginForm( true );
+    }
+    if( res.status == 405 ) {
+      handleNotAuthorized();
+    }
+  }
+
+  //Function for testing, it is called when pressing the button call API
+  async function testCalling() {
+    callAPI( async () =>  await fetch('/api/login', {
+      method: 'PUT',
+      cache: 'no-store'
+    })  )
+  }
   // var options = {
   //   port: 3000,
   //   host: 'localhost',
@@ -239,7 +276,7 @@ const UserList = ( props ) => {
                   </span>
                 </Link>{" "}
                 |
-                {/* <Popconfirm
+                 <Popconfirm
                   title="Delete the task"
                   icon={
                     <QuestionCircleOutlined
@@ -249,18 +286,18 @@ const UserList = ( props ) => {
                     />
                   }
                   description="Are you sure to delete this user?"
-                  onConfirm={() => {}}
+                  onConfirm={() => {
+                    router.push(`/admin/users?del=${record.username}&page=${paginationServer.current}&size=${paginationServer.pageSize}&role=${role}&search=${search}${orderParaDefault}`)
+                  }}
                   onCancel={(e) => console.log(e)}
                   okText="Yes"
                   cancelText="Cancel"
-                > */}
-                 <Link href={`/admin/users?del=${record.username}&page=${paginationServer.current}&size=${paginationServer.pageSize}&role=${role}&search=${search}${orderParaDefault}`}>
+                >
                   <span className="btn-delete cursor-pointer">
                     <DeleteOutlined className="pr-1" />
                     Delete
                   </span>
-                </Link>
-                {/* </Popconfirm> */}
+                </Popconfirm>
                 |{" "}
                 <Link href={`/vi/users/preview/${record.username}`}>
                   <span className="btn-preview">
@@ -321,7 +358,11 @@ const UserList = ( props ) => {
 
   return (
     <>
+      <div class="text-red-500 font-bold">
+          { errorMessage }
+      </div>
       <div className="flex justify-between mb-4 gap-x-4">
+
         <div className="flex gap-x-5">
           <p className="font-semibold text-2xl pr-4">Users</p>
           { props.roles[ props.user.role ]?.users?.add  === true && (
@@ -417,6 +458,17 @@ const UserList = ( props ) => {
           x: 1300,
         }}
       />
+      <Button onClick={ testCalling } >
+        click call API
+      </Button>
+      <Modal
+        title="Login"
+        open={ loginForm }
+        onCancel={ () => { router.push('/login') } }
+        footer={[]}
+      >
+        <LoginSmallForm {...{ setLoginForm }} />
+      </Modal>
     </>
   );
 };

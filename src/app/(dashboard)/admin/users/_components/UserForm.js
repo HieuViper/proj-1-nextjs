@@ -30,8 +30,12 @@ const UserForm = (props) => {
   const [previewPic, setPreviewPic] = useState(null);
   const [displayName, setDisplayName] = useState([]);
   const [roles, setRoles] = useState([]);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
+    if( props.isAuthorize == false ) {
+      handleNotAuthorized();
+    }
     //set role options for the field role
     const rolesData = props.roles;
     setRoles(
@@ -50,6 +54,21 @@ const UserForm = (props) => {
     }
   }, [props]);
 
+  async function handleNotAuthorized() {
+    setErrorMessage('You dont have valid authorization. You will be logout of the system in 5 seconds.');
+    const res = await fetch('/api/login?option=delAuth', {
+      method: 'GET',
+    });
+    // console.log('response ok:', res.ok);
+    // console.log('response status:', res.status);
+    // console.log('response headers:', res.headers);
+    // console.log('response json:', await res.text());  //use for transfering text in body of response
+    // console.log('response.json:', await res.json()); // use for transfering object in body of response. The object has to be JSON
+    setTimeout(async () => {
+      router.push('/login');
+    }, 5000);
+
+  }
   //submit value
   const onFinish = async (values) => {
     if (params.id) {
@@ -174,6 +193,9 @@ const UserForm = (props) => {
   };
   return (
     <div>
+      <div class="text-red-500 font-bold">
+        { errorMessage }
+      </div>
       <div className="flex justify-start mb-4">
         <Link href={`/admin/users`} onClick={(e) => goBackUserList(e)}>
           <Button type="dashed" icon={<SwapLeftOutlined />}>
@@ -339,7 +361,6 @@ const UserForm = (props) => {
           </Form.Item>
 
           <Form.Item label="Website" name="website">
-            <Input key="websiteIn" placeholder="https://my-website.com" />
             <Input key="websiteIn" placeholder="https://my-website.com" />
           </Form.Item>
 

@@ -699,7 +699,7 @@ export function NewsForm(props) {
                   file.type === "image/gif";
                 if (!isImg) {
                   message.error("You can only upload images");
-                  reject(false);
+                  reject(false);  //put reason here
                 }
 
                 const isLt5M =
@@ -710,7 +710,7 @@ export function NewsForm(props) {
                   message.error(
                     `Image must smaller than ${process.env.NEXT_PUBLIC_FILE_LIMITED_SIZE}MB!`
                   );
-                  reject(false);
+                  reject(false);  //put some reason here
                 } else {
                   resolve(true);
                 }

@@ -6,25 +6,21 @@ import {
   QuestionCircleOutlined,
   UserAddOutlined,
 } from "@ant-design/icons";
-import { Button, Radio, Select, Space, Table, Tag } from "antd";
-import { Popconfirm } from "antd/es/popconfirm";
+import { Button, Popconfirm, Radio, Space, Table } from "antd";
 import Search from "antd/es/input/Search";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import http, { request } from 'http';
-import Head from "next/head";
-import { Header } from "antd/es/layout/layout";
 //import { setCookie  } from 'js-cookie';
 
-const UserList = ( props ) => {
+const UserList = (props) => {
   const router = useRouter();
   const pathName = usePathname();
   const searchParams = useSearchParams();
 
   let orderParaDefault = ""; //this orderPara is built from current role and sorted state
-  let orderParaInit = "";    // this orderPara is build from current role and initSort variable
+  let orderParaInit = ""; // this orderPara is build from current role and initSort variable
   const initSort = {
     order: null,
     columnKey: null,
@@ -35,7 +31,6 @@ const UserList = ( props ) => {
     current: 1,
   });
 
-
   const [totals, setTotals] = useState({});
   const [sortedInfo, setSortedInfo] = useState(initSort);
   const [users, setUsers] = useState();
@@ -44,32 +39,32 @@ const UserList = ( props ) => {
   const [role, setRole] = useState(searchParams.get("role") ?? "");
   const [search, setSearch] = useState("");
   const [loadingStatus, setLoadingStatus] = useState(false);
-  const [roles, setRoles] = useState({});   //contain all the role and the number of records for each role { Aministrator: 20, Editor: 100 }
+  const [roles, setRoles] = useState({}); //contain all the role and the number of records for each role { Aministrator: 20, Editor: 100 }
 
   useEffect(() => {
-    setUsers( JSON.parse( props.dataTable ) );
-    setPaginationServer( props.pagination );
-    setTotals( props.totals );
-    const { itemsOfTable, all, ...rolesData} = props.totals;
-    setRoles( rolesData );
-    setSelectedRowKeys( [] );
-    setLoadingStatus( false );
-    setLoading( false );
+    setUsers(JSON.parse(props.dataTable));
+    setPaginationServer(props.pagination);
+    setTotals(props.totals);
+    const { itemsOfTable, all, ...rolesData } = props.totals;
+    setRoles(rolesData);
+    setSelectedRowKeys([]);
+    setLoadingStatus(false);
+    setLoading(false);
     notifyAddUserSuccess();
-    console.log('user: ', props.user);
+    console.log("user: ", props.user);
   }, [props]);
 
   //Notify success adding new from /admin/add
   function notifyAddUserSuccess() {
     //get message redirected from add user route
-      const message = searchParams.get("message") ?? "";
-      if (message == 1) {
-        //signal of success edit on server
-        let messageNotify = "Add user successfully";
-        toast.success(messageNotify, {
-          position: "top-center",
-        });
-      }
+    const message = searchParams.get("message") ?? "";
+    if (message == 1) {
+      //signal of success edit on server
+      let messageNotify = "Add user successfully";
+      toast.success(messageNotify, {
+        position: "top-center",
+      });
+    }
   }
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -84,7 +79,7 @@ const UserList = ( props ) => {
 
   //Bulk delete
   const startDelete = () => {
-    setLoading( true );
+    setLoading(true);
     const current = new URLSearchParams(searchParams);
     const sorter = getOrderPara(sortedInfo, false);
     const keys = selectedRowKeys
@@ -120,7 +115,7 @@ const UserList = ( props ) => {
     setSortedInfo(initSort);
   };
 
-  const handleRole = async ( role ) => {
+  const handleRole = async (role) => {
     //set state sorter to init state
 
     const orderPara = orderParaInit;
@@ -163,7 +158,6 @@ const UserList = ( props ) => {
     );
   };
 
-
   // var options = {
   //   port: 3000,
   //   host: 'localhost',
@@ -172,12 +166,12 @@ const UserList = ( props ) => {
   // request.setHeader('Authorization', 'my Token');
   // console.log('Request:', request);
   // request.end();
-/*
+  /*
   const header1 = new Headers();
   header1.set('Authorization','huy token');
   console.log("header1:", header1.get('Authorization'));
   */
-/*
+  /*
   const postData = JSON.stringify({
     'msg': 'Hello World!',
   });
@@ -217,7 +211,6 @@ const UserList = ( props ) => {
   req.end()
 */
 
-
   //Table Columns
   const columns = [
     {
@@ -239,7 +232,7 @@ const UserList = ( props ) => {
                   </span>
                 </Link>{" "}
                 |
-                {/* <Popconfirm
+                <Popconfirm
                   title="Delete the task"
                   icon={
                     <QuestionCircleOutlined
@@ -253,14 +246,16 @@ const UserList = ( props ) => {
                   onCancel={(e) => console.log(e)}
                   okText="Yes"
                   cancelText="Cancel"
-                > */}
-                 <Link href={`/admin/users?del=${record.username}&page=${paginationServer.current}&size=${paginationServer.pageSize}&role=${role}&search=${search}${orderParaDefault}`}>
-                  <span className="btn-delete cursor-pointer">
-                    <DeleteOutlined className="pr-1" />
-                    Delete
-                  </span>
-                </Link>
-                {/* </Popconfirm> */}
+                >
+                  <Link
+                    href={`/admin/users?del=${record.username}&page=${paginationServer.current}&size=${paginationServer.pageSize}&role=${role}&search=${search}${orderParaDefault}`}
+                  >
+                    <span className="btn-delete cursor-pointer">
+                      <DeleteOutlined className="pr-1" />
+                      Delete
+                    </span>
+                  </Link>
+                </Popconfirm>
                 |{" "}
                 <Link href={`/vi/users/preview/${record.username}`}>
                   <span className="btn-preview">
@@ -317,22 +312,20 @@ const UserList = ( props ) => {
     },
   ];
 
-
-
   return (
     <>
       <div className="flex justify-between mb-4 gap-x-4">
         <div className="flex gap-x-5">
           <p className="font-semibold text-2xl pr-4">Users</p>
-          { props.roles[ props.user.role ]?.users?.add  === true && (
-          <Link href={`/admin/users/add`}>
-            <Button className="">
-              <div className="flex justify-center items-center gap-2">
-                Add User
-                <UserAddOutlined />
-              </div>
-            </Button>
-          </Link>
+          {props.roles[props.user.role]?.users?.add === true && (
+            <Link href={`/admin/users/add`}>
+              <Button className="">
+                <div className="flex justify-center items-center gap-2">
+                  Add User
+                  <UserAddOutlined />
+                </div>
+              </Button>
+            </Link>
           )}
         </div>
         <Search
@@ -348,10 +341,10 @@ const UserList = ( props ) => {
       </div>
 
       <div className="flex items-center gap-2 mb-3">
-      <Space>
+        <Space>
           <Radio.Group
             disabled={loadingStatus}
-            defaultValue={ searchParams.get("role") ?? "" }
+            defaultValue={searchParams.get("role") ?? ""}
             onChange={(e) => {
               handleRole(e.target.value);
               setLoadingStatus(true);
@@ -359,14 +352,14 @@ const UserList = ( props ) => {
             optionType="button"
             buttonStyle="solid"
           >
-            <Radio.Button value="" key="AllRoles">All ({totals.all})</Radio.Button>
-            {
-              Object.keys(roles).map((aRow) => (
-                <Radio.Button value={ aRow } key={ aRow }>
-                  { aRow }({ roles[aRow] })
-                </Radio.Button>
-              ))
-            }
+            <Radio.Button value="" key="AllRoles">
+              All ({totals.all})
+            </Radio.Button>
+            {Object.keys(roles).map((aRow) => (
+              <Radio.Button value={aRow} key={aRow}>
+                {aRow}({roles[aRow]})
+              </Radio.Button>
+            ))}
           </Radio.Group>
         </Space>
       </div>
@@ -387,17 +380,17 @@ const UserList = ( props ) => {
           okText="Yes"
           cancelText="Cancel"
         > */}
-          <Button
-            type="primary"
-            danger
-            onClick={startDelete}
-            disabled={!hasSelected}
-            loading={loading}
-          >
-            <div className="flex justify-center items-center gap-2">
-              Bulk Delete <DeleteOutlined />
-            </div>
-          </Button>
+        <Button
+          type="primary"
+          danger
+          onClick={startDelete}
+          disabled={!hasSelected}
+          loading={loading}
+        >
+          <div className="flex justify-center items-center gap-2">
+            Bulk Delete <DeleteOutlined />
+          </div>
+        </Button>
         {/* </Popconfirm> */}
 
         <span className="mx-2 italic">

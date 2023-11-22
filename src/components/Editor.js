@@ -49,7 +49,7 @@ const Editor = ({ value, onChange }) => {
                       }
                     );
                     formData.append("file", file1);
-                    await fetch("/api/image", {
+                    await fetch("/api/editor/image", {
                       method: "POST",
                       body: formData,
                     });

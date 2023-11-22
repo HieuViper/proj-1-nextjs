@@ -18,7 +18,6 @@ import toast from "react-hot-toast";
 import { TagForm } from "./TagForm";
 
 function TagList(props) {
-  console.log("props :", props);
   const { getAllTag, getTag, addTag, editTag, delTag, delBulkTag, searchTag } =
     props;
   const router = useRouter();

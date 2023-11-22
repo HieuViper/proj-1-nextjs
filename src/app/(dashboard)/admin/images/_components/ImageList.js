@@ -16,6 +16,7 @@ const { Dragger } = Upload;
 
 const ImageList = (props) => {
   const [imageList, setImageList] = useState([]);
+  console.log("🚀 ~ file: ImageList.js:19 ~ ImageList ~ imageList:", imageList);
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
   const [isModalAddOpen, setIsModalAddOpen] = useState(false);
   const [formAdd] = Form.useForm();
@@ -30,11 +31,10 @@ const ImageList = (props) => {
   const onFinishEdit = async (values) => {
     console.log("Success:", values);
 
-    const rs = await props.updateImage(values, values.url);
-    console.log("🚀 ~ file: ImageList.js:16 ~ onFinish ~ result:", rs);
+    const rs = await props.updateImage(values, values.id);
     if (rs) {
       message.success("Update Successfully");
-      setImageList(rs);
+      setImageList(rs.data);
     } else {
       message.error("Something went wrong");
     }
@@ -81,7 +81,7 @@ const ImageList = (props) => {
       const result = await uploadPicToServer();
       if (result) {
         message.success("Add Image Successfully");
-        setImageList(result);
+        setImageList(result.data);
       } else {
         message.error("Something went wrong");
       }
@@ -99,6 +99,7 @@ const ImageList = (props) => {
   // --------------
   // Modal Handler
   const showModalEdit = async (item) => {
+    console.log("🚀 ~ file: ImageList.js:103 ~ showModalEdit ~ item:", item);
     const rsMetadata = await props.getInfoImage(item.url);
     console.log(
       "🚀 ~ file: ImageList.js:30 ~ showModalEdit ~ rsMetadata:",
@@ -119,16 +120,13 @@ const ImageList = (props) => {
     setIsModalAddOpen(false);
   };
 
-  // --------------
-  // Image Handler
-  const handleDownloadImage = () => {};
-
   // Func to Delete Image
-  const handleDeleteImage = async (url) => {
-    const rs = await props.dellImage(url);
+  const handleDeleteImage = async (id) => {
+    const rs = await props.dellImage(id);
+    console.log("🚀 ~ file: ImageList.js:125 ~ handleDeleteImage ~ rs:", rs);
     if (rs) {
       message.success("Delete Successfully");
-      setImageList(rs);
+      setImageList(rs.data);
     } else {
       message.error("Something went wrong");
     }
@@ -185,7 +183,7 @@ const ImageList = (props) => {
             key="delete"
             title="Delete the Image Permanently"
             description="Are you sure to delete this image?"
-            onConfirm={() => handleDeleteImage(formEdit.getFieldValue("url"))}
+            onConfirm={() => handleDeleteImage(formEdit.getFieldValue("id"))}
             onCancel={() => {}}
             okText="Yes"
             cancelText="Cancel"
@@ -264,6 +262,7 @@ const ImageList = (props) => {
                 onFinishFailed={onFinishFailed}
                 autoComplete="off"
               >
+                <Form.Item name="id" className="hidden"></Form.Item>
                 <Form.Item label="URL" name="url">
                   <Input disabled={true} />
                 </Form.Item>

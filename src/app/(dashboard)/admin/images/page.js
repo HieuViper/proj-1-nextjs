@@ -1,4 +1,4 @@
-import { funcImage } from "@/library/funcImages";
+import { callNon } from "@/library/api";
 import axios from "axios";
 import { promises as fsPromises } from "fs";
 import sharp from "sharp";
@@ -8,46 +8,43 @@ import ImageList from "./_components/ImageList";
 export const dynamic = "force-dynamic";
 
 const ImagePage = async () => {
-  const imageData = await funcImage.getImages();
+  const imageData = await callNon("/api/images", "GET");
   async function addImage(data) {
     "use server";
-    let result;
     try {
-      await funcImage.addImage(data);
-      let newData = await funcImage.getImages();
-      result = newData;
+      try {
+        const rs = await callNon("/api/images", "POST", { data: data });
+        return { message: 1, data: rs.data };
+      } catch (error) {
+        throw new Error(
+          `Fail to add Languages, try again or inform your admin: ${error.message}`
+        );
+      }
     } catch (error) {
       console.log(error.message);
     }
-
-    return result;
   }
-  async function updateImage(data, url) {
+  async function updateImage(data, id) {
     "use server";
-    let result;
     try {
-      let rs = await funcImage.updateImage(data, url);
-      let newData = await funcImage.getImages();
-      console.log("🚀 ~ file: page.js:14 ~ updateImage ~ rs:", rs);
-      result = newData;
+      const rs = await callNon(`/api/images/${id}`, "PUT", { data: data });
+      return { message: 1, data: rs.data };
     } catch (error) {
-      console.log(error.message);
+      throw new Error(
+        `Fail to update Languages, try again or inform your admin: ${error.message}`
+      );
     }
-
-    return result;
   }
-  async function dellImage(url) {
+  async function dellImage(id) {
     "use server";
-    let result;
     try {
-      let rs = await funcImage.dellImage(url);
-      let newData = await funcImage.getImages();
-      result = newData;
+      const rs = await callNon(`/api/images/${id}`, "DELETE");
+      return { message: 1, data: rs.data };
     } catch (error) {
-      console.log(error.message);
+      throw new Error(
+        `Fail to update Languages, try again or inform your admin: ${error.message}`
+      );
     }
-
-    return result;
   }
 
   // Func to get Information of Image By URL provided
@@ -99,7 +96,7 @@ const ImagePage = async () => {
   return (
     <div>
       <ImageList
-        data={JSON.stringify(imageData)}
+        data={JSON.stringify(imageData.data)}
         {...{ updateImage, dellImage, addImage, getInfoImage }}
       />
     </div>

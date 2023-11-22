@@ -1,10 +1,9 @@
 /* eslint-disable @next/next/no-async-client-component */
 
+import { callNon } from "@/library/api";
 import {
   deleteArticle,
   deleteBulkArticle,
-  getAllArticle,
-  getTotalNumOfarticle,
   recoverArticle,
   trashArticle,
 } from "@/library/funcArticles";
@@ -51,35 +50,42 @@ async function ArticlePage({ searchParams }) {
     order = "desc";
   }
 
-  const articleData = await getAllArticle(
-    status,
-    page,
-    size,
-    search,
-    orderby,
-    order,
-    author,
-    category,
-    tag,
-    lang
+  const { data: articleData, totals } = await callNon(
+    `/api/articles?post_status=${status}&page=${page}&size=${size}&search=${search}&orderby=${orderby}&order=${order}&author=${author}&category=${category}&tag=${tag}&lang=${lang}`,
+    "GET"
   );
-  const totals = await getTotalNumOfarticle(
-    status,
-    search,
-    author,
-    category,
-    tag,
-    lang
-  );
+  // const articleData = await getAllArticle(
+  //   status,
+  //   page,
+  //   size,
+  //   search,
+  //   orderby,
+  //   order,
+  //   author,
+  //   category,
+  //   tag,
+  //   lang
+  // );
+  // const totals = await getTotalNumOfarticle(
+  //   status,
+  //   search,
+  //   author,
+  //   category,
+  //   tag,
+  //   lang
+  // );
   const pagination = {
     pageSize: parseInt(size),
     total: totals.itemsOfTable,
     current: parseInt(page),
   };
 
+  const langTable = await callNon("/api/languages", "GET");
+
   return (
     <>
       <ArticleList
+        langTable={JSON.stringify(langTable.data)}
         dataTable={JSON.stringify(articleData)}
         pagination={JSON.stringify(pagination)}
         totals={JSON.stringify(totals)}

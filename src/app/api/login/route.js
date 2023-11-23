@@ -29,19 +29,6 @@ export async function PUT( req ) {
   const { reqStatus } = await funcLogin.checkForProtectedApi('login');
   if ( reqStatus != 200 )
     return NextResponse.json({} , { status: reqStatus });
-  // //Check authentication before using API
-  // const loginInfo = funcLogin.checkAuthenticationForApi();
-  // console.log('isLogin?', loginInfo.isLogin);
-  // if( loginInfo.isLogin == false ) {
-  //   return NextResponse.json({} , { status: 401 });
-  // }
-
-  // //Check authorization before using API
-  // const isAuthorize = await funcLogin.checkAuthorize( loginInfo.user, 'login' );
-  // console.log('isAuthorized?', isAuthorize) ;
-  // if( isAuthorize == false ) {
-  //   return NextResponse.json({}, { status: 405 });
-  // }
 
 
   return NextResponse.json({ msg:'hello'}, { status: 200 } );

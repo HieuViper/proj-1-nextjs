@@ -16,6 +16,7 @@ const LanguageList = (props) => {
     searchLanguage,
   } = props;
   const [data, setData] = useState(null);
+  console.log("🚀 ~ file: LanguageList.js:20 ~ LanguageList ~ data:", data);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,7 +64,7 @@ const LanguageList = (props) => {
   const showModal = async (code) => {
     setIsModalOpen(true);
     getLanguage(code).then((res) => {
-      setDataOneLang(res);
+      setDataOneLang(res.data);
     });
   };
   const handleOk = () => {
@@ -75,7 +76,7 @@ const LanguageList = (props) => {
 
   //USE EFFECT
   useEffect(() => {
-    setData(JSON.parse(props.data));
+    setData(JSON.parse(props.langTable).data);
   }, []);
 
   // COLUMNS TABLE
@@ -199,6 +200,7 @@ const LanguageList = (props) => {
             </Popconfirm>
           </div>
           <Table
+            loading={data ? false : true}
             rowSelection={rowSelection}
             columns={columns}
             dataSource={data}

@@ -6,6 +6,7 @@ import {
   QuestionCircleOutlined,
   UserAddOutlined,
 } from "@ant-design/icons";
+import { Button, Popconfirm, Radio, Space, Table } from "antd";
 import Search from "antd/es/input/Search";
 import { Button, Radio, Select, Space, Table, Tag, Popconfirm, Modal } from "antd";
 import Link from "next/link";
@@ -17,13 +18,13 @@ import LoginSmallForm from "@/components/LoginSmallForm";
 
 //import { setCookie  } from 'js-cookie';
 
-const UserList = ( props ) => {
+const UserList = (props) => {
   const router = useRouter();
   const pathName = usePathname();
   const searchParams = useSearchParams();
 
   let orderParaDefault = ""; //this orderPara is built from current role and sorted state
-  let orderParaInit = "";    // this orderPara is build from current role and initSort variable
+  let orderParaInit = ""; // this orderPara is build from current role and initSort variable
   const initSort = {
     order: null,
     columnKey: null,
@@ -33,7 +34,6 @@ const UserList = ( props ) => {
     total: 0,
     current: 1,
   });
-
 
   const [totals, setTotals] = useState({});
   const [sortedInfo, setSortedInfo] = useState(initSort);
@@ -61,20 +61,20 @@ const UserList = ( props ) => {
     setLoadingStatus( false );
     setLoading( false );
     notifyAddUserSuccess();
-    console.log('user: ', props.user);
+    console.log("user: ", props.user);
   }, [props]);
 
   //Notify success adding new from /admin/add
   function notifyAddUserSuccess() {
     //get message redirected from add user route
-      const message = searchParams.get("message") ?? "";
-      if (message == 1) {
-        //signal of success edit on server
-        let messageNotify = "Add user successfully";
-        toast.success(messageNotify, {
-          position: "top-center",
-        });
-      }
+    const message = searchParams.get("message") ?? "";
+    if (message == 1) {
+      //signal of success edit on server
+      let messageNotify = "Add user successfully";
+      toast.success(messageNotify, {
+        position: "top-center",
+      });
+    }
   }
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -89,7 +89,7 @@ const UserList = ( props ) => {
 
   //Bulk delete
   const startDelete = () => {
-    setLoading( true );
+    setLoading(true);
     const current = new URLSearchParams(searchParams);
     const sorter = getOrderPara(sortedInfo, false);
     const keys = selectedRowKeys
@@ -126,7 +126,7 @@ const UserList = ( props ) => {
     setSortedInfo(initSort);
   };
 
-  const handleRole = async ( role ) => {
+  const handleRole = async (role) => {
     //set state sorter to init state
 
     const orderPara = orderParaInit;
@@ -189,7 +189,7 @@ const UserList = ( props ) => {
     if( res.status == 401 ) {
       setLoginForm( true );
     }
-    if( res.status == 405 ) {
+    if( res.status == 403 ) {
       handleNotAuthorized();
     }
   }
@@ -209,12 +209,12 @@ const UserList = ( props ) => {
   // request.setHeader('Authorization', 'my Token');
   // console.log('Request:', request);
   // request.end();
-/*
+  /*
   const header1 = new Headers();
   header1.set('Authorization','huy token');
   console.log("header1:", header1.get('Authorization'));
   */
-/*
+  /*
   const postData = JSON.stringify({
     'msg': 'Hello World!',
   });
@@ -254,7 +254,6 @@ const UserList = ( props ) => {
   req.end()
 */
 
-
   //Table Columns
   const columns = [
     {
@@ -276,7 +275,7 @@ const UserList = ( props ) => {
                   </span>
                 </Link>{" "}
                 |
-                 <Popconfirm
+                <Popconfirm
                   title="Delete the task"
                   icon={
                     <QuestionCircleOutlined
@@ -354,8 +353,6 @@ const UserList = ( props ) => {
     },
   ];
 
-
-
   return (
     <>
       <div class="text-red-500 font-bold">
@@ -365,15 +362,15 @@ const UserList = ( props ) => {
 
         <div className="flex gap-x-5">
           <p className="font-semibold text-2xl pr-4">Users</p>
-          { props.roles[ props.user.role ]?.users?.add  === true && (
-          <Link href={`/admin/users/add`}>
-            <Button className="">
-              <div className="flex justify-center items-center gap-2">
-                Add User
-                <UserAddOutlined />
-              </div>
-            </Button>
-          </Link>
+          {props.roles[props.user.role]?.users?.add === true && (
+            <Link href={`/admin/users/add`}>
+              <Button className="">
+                <div className="flex justify-center items-center gap-2">
+                  Add User
+                  <UserAddOutlined />
+                </div>
+              </Button>
+            </Link>
           )}
         </div>
         <Search
@@ -389,10 +386,10 @@ const UserList = ( props ) => {
       </div>
 
       <div className="flex items-center gap-2 mb-3">
-      <Space>
+        <Space>
           <Radio.Group
             disabled={loadingStatus}
-            defaultValue={ searchParams.get("role") ?? "" }
+            defaultValue={searchParams.get("role") ?? ""}
             onChange={(e) => {
               handleRole(e.target.value);
               setLoadingStatus(true);
@@ -400,14 +397,14 @@ const UserList = ( props ) => {
             optionType="button"
             buttonStyle="solid"
           >
-            <Radio.Button value="" key="AllRoles">All ({totals.all})</Radio.Button>
-            {
-              Object.keys(roles).map((aRow) => (
-                <Radio.Button value={ aRow } key={ aRow }>
-                  { aRow }({ roles[aRow] })
-                </Radio.Button>
-              ))
-            }
+            <Radio.Button value="" key="AllRoles">
+              All ({totals.all})
+            </Radio.Button>
+            {Object.keys(roles).map((aRow) => (
+              <Radio.Button value={aRow} key={aRow}>
+                {aRow}({roles[aRow]})
+              </Radio.Button>
+            ))}
           </Radio.Group>
         </Space>
       </div>
@@ -428,17 +425,17 @@ const UserList = ( props ) => {
           okText="Yes"
           cancelText="Cancel"
         > */}
-          <Button
-            type="primary"
-            danger
-            onClick={startDelete}
-            disabled={!hasSelected}
-            loading={loading}
-          >
-            <div className="flex justify-center items-center gap-2">
-              Bulk Delete <DeleteOutlined />
-            </div>
-          </Button>
+        <Button
+          type="primary"
+          danger
+          onClick={startDelete}
+          disabled={!hasSelected}
+          loading={loading}
+        >
+          <div className="flex justify-center items-center gap-2">
+            Bulk Delete <DeleteOutlined />
+          </div>
+        </Button>
         {/* </Popconfirm> */}
 
         <span className="mx-2 italic">

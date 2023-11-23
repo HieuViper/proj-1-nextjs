@@ -47,6 +47,11 @@ const ArticleList = (props) => {
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [lang, setLang] = useState("vi");
 
+  //set languages for the languages select box
+  let langOptions = JSON.parse(props.langTable).map((lang) => {
+    return { value: lang.code, label: lang.name };
+  });
+
   const onSearchChange = (e) => {
     setSearch(e.target.value);
   };
@@ -374,16 +379,17 @@ const ArticleList = (props) => {
               width: 120,
             }}
             onChange={handleChangeLanguage}
-            options={[
-              {
-                value: "vi",
-                label: "Tiếng Việt",
-              },
-              {
-                value: "en",
-                label: "English",
-              },
-            ]}
+            options={langOptions}
+            // options={[
+            //   {
+            //     value: "vi",
+            //     label: "Tiếng Việt",
+            //   },
+            //   {
+            //     value: "en",
+            //     label: "English",
+            //   },
+            // ]}
           />
         </div>
         <Search

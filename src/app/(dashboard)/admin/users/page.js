@@ -9,15 +9,9 @@ export const dynamic = "force-dynamic";
 
 const UserPage = async ({ searchParams }) => {
 
-  // let token = cookies().get('Authorization');
-  // console.log('token from cookie:', token);
-  // if ( !token )
-  //   redirect(`/admin/login`);
-  // const loginInfo = funcLogin.isLogin ( token.value );
-  // if ( !loginInfo.isLogin ) {
-  //   redirect(`/admin/login?message=${loginInfo.message}`);
-  // }
   const loginInfo = funcLogin.checkAuthentication();
+  console.log('is it comback here?');
+  const isAuthorize = await funcLogin.checkAuthorize(loginInfo.user, 'users');
 
 
    const keys = searchParams?.keys ?? "";
@@ -35,10 +29,7 @@ const UserPage = async ({ searchParams }) => {
    if (del != '') {
       await funcUsers.deleteUser(del);
    }
-  //  if (Object.keys(searchParams).length == 0) {
-  //     orderby = "post_modified";
-  //     order = "desc";
-  //  }
+
   console.log('Users list page');
   const usersData = await funcUsers.getUsers(
     role,
@@ -56,10 +47,10 @@ const UserPage = async ({ searchParams }) => {
     // disabled: true
   };
 
-  console.log('cookies: ', cookies().getAll());
   return (
     <>
       <UserList dataTable={JSON.stringify(usersData)} user={loginInfo.user} roles={userRoles}
+        isAuthorize={ isAuthorize }
         pagination={pagination}
         totals={totals} />
     </>

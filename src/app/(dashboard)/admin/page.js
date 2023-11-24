@@ -2,11 +2,8 @@ import { funcLogin } from "@/library/funcLogin";
 import { Button } from "antd";
 
 const DashboardPage = async () => {
-  // createSampleData();
-  // if (!db.initialized) {
-  //   await db.initialize();
-  // }
 
+  console.log('at Admin Page');
   const loginInfo = funcLogin.checkAuthentication();
 
   return (

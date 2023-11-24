@@ -2,16 +2,33 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input } from "antd";
 import { useState } from "react";
+import { Axios } from "axios";
 
-const LoginForm = (props) => {
+
+
+const LoginSmallForm = (props) => {
+  const { setLoginForm } = props;
   const [err, setErr] = useState('');
 
+
   const onFinish = async (values) => {
-    console.log("Received values of form: ", values);
+
     //proccess login
-    await props.login( values.username, values.password ).then( ( message ) => {
-      setErr(message);
-    } );
+    // await props.login( values.username, values.password ).then( ( message ) => {
+    //   if ( message ) setErr(message);
+    // } );
+    const res = await fetch('/api/login', {
+        method: 'POST',
+        body: JSON.stringify({ username: values.username, password: values.password }),
+    });
+    if( res.status == 401 ) {
+      let msg2 = await res.json();
+      console.log('Login message:', msg2);
+      setErr( msg2.msg );
+    }
+    if( res.status == 200 ) {
+      setLoginForm( false );
+    }
   };
 
   return (
@@ -24,12 +41,12 @@ const LoginForm = (props) => {
       }}
       onFinish={onFinish}
     >
-      <div>{err}</div>
+      <div class="text-red-500 font-bold">{err}</div>
       <Form.Item
         name="username"
         rules={[
           {
-            required: true,
+            required: "true",
             message: "Please input your Username!",
           },
         ]}
@@ -43,7 +60,7 @@ const LoginForm = (props) => {
         name="password"
         rules={[
           {
-            required: true,
+            required: "true",
             message: "Please input your Password!",
           },
         ]}
@@ -71,8 +88,9 @@ const LoginForm = (props) => {
           Login
         </Button>
       </Form.Item>
+
     </Form>
   );
 };
 
-export default LoginForm;
+export default LoginSmallForm;

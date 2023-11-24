@@ -12,15 +12,19 @@ import {
   UserOutlined,
   UsergroupAddOutlined,
 } from "@ant-design/icons";
-import { Avatar, Button, Layout, Menu, theme } from "antd";
+import { Avatar, Button, Layout, Menu, theme, Modal } from "antd";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { useLogin } from "@/store/login";
+import LoginSmallForm from "./LoginSmallForm";
 
 const { Header, Sider, Content } = Layout;
 
 const DashboardLayout = ( props ) => {
   const [collapsed, setCollapsed] = useState(false);
+  const { loginForm, setLoginForm } = useLogin();
+
   const router = useRouter();
   const {
     token: { colorBgContainer },
@@ -196,7 +200,18 @@ const DashboardLayout = ( props ) => {
           { props.children }
         </Content>
       </Layout>
+
+      <Modal
+        title="Login"
+        open={ loginForm }
+        onCancel={ () => { router.push('/login') } }
+        footer={[]}
+        >
+        <LoginSmallForm {...{ setLoginForm }} />
+      </Modal>
     </Layout>
+
+
   );
 };
 

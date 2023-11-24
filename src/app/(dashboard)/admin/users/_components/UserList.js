@@ -6,7 +6,6 @@ import {
   QuestionCircleOutlined,
   UserAddOutlined,
 } from "@ant-design/icons";
-import { Button, Popconfirm, Radio, Space, Table } from "antd";
 import Search from "antd/es/input/Search";
 import { Button, Radio, Select, Space, Table, Tag, Popconfirm, Modal } from "antd";
 import Link from "next/link";
@@ -14,7 +13,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import LoginSmallForm from "@/components/LoginSmallForm";
-
+import { callAPI, handleNotAuthorized } from "@/library/client/callAPI";
+import { useLogin } from "@/store/login";
 
 //import { setCookie  } from 'js-cookie';
 
@@ -44,22 +44,27 @@ const UserList = (props) => {
   const [search, setSearch] = useState("");
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [roles, setRoles] = useState({});   //contain all the role and the number of records for each role { Aministrator: 20, Editor: 100 }
-  const [loginForm, setLoginForm] = useState( false );
+  // const [loginForm, setLoginForm] = useState( false );
   const [errorMessage, setErrorMessage] = useState('');   //display the serious error
+  const { setLoginForm } = useLogin();
 
   useEffect(() => {
     //redirect to login page if user is not authorized
     if( props.isAuthorize == false ) {
-      handleNotAuthorized();
+      handleNotAuthorized(
+        () => { router.push('/login') },
+        ( msg ) => { setErrorMessage( msg ) }
+      );
     }
+
     setUsers( JSON.parse( props.dataTable ) );
     setPaginationServer( props.pagination );
     setTotals( props.totals );
     const { itemsOfTable, all, ...rolesData} = props.totals;
     setRoles( rolesData );
     setSelectedRowKeys( [] );
-    setLoadingStatus( false );
-    setLoading( false );
+    setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
+    setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
     notifyAddUserSuccess();
     console.log("user: ", props.user);
   }, [props]);
@@ -171,35 +176,42 @@ const UserList = (props) => {
 
 
 
-  //redirect user to login page if user doenst have valid authorization
-  async function handleNotAuthorized() {
-    setErrorMessage('You dont have valid authorization. You will be logout of the system in 5 seconds.');
-    const res = await fetch('/api/login?option=delAuth', {
-      method: 'GET',
-    });
-    setTimeout(async () => {
-      router.push('/login');
-    }, 5000);
 
-  }
-
-  //used for call API at client component
-  function callAPI ( funcAPI ) {
-    const res = funcAPI();
-    if( res.status == 401 ) {
-      setLoginForm( true );
-    }
-    if( res.status == 403 ) {
-      handleNotAuthorized();
-    }
-  }
 
   //Function for testing, it is called when pressing the button call API
   async function testCalling() {
-    callAPI( async () =>  await fetch('/api/login', {
+    const res = await callAPI( await fetch('/api/login', {
       method: 'PUT',
       cache: 'no-store'
-    })  )
+    }),
+      () => { router.push('/login') },
+      () => { setLoginForm( true ) },
+      ( msg ) => { setErrorMessage( msg ) }
+    );
+  }
+
+  //send test mail to nguyenqghuy@gmail.com
+  async function sendMyMail() {
+    const res = await callAPI( await fetch('/api/email', {
+      method: 'POST',
+      cache: 'no-store',
+      body: JSON.stringify( { from: 'nagaoreishi@gmail.com',
+        to: 'nguyenqghuy@gmail.com',
+        subject: `mail test at ${new Date()}`,
+        text: 'hello Huy, sending mail succesfully'
+      } ),
+    }),
+      () => { router.push('/login') },
+      () => { setLoginForm( true ) },
+      ( msg ) => { setErrorMessage( msg ) }
+    );
+    if( res.ok  == true )
+      setErrorMessage('Sending mail successfully');
+    // else {
+    //   let err = await res.json();
+    //   console.log('error from calling mail:', err.msg);
+    //   setErrorMessage(err.msg);
+    // }
   }
   // var options = {
   //   port: 3000,
@@ -355,7 +367,7 @@ const UserList = (props) => {
 
   return (
     <>
-      <div class="text-red-500 font-bold">
+      <div className="text-red-500 font-bold">
           { errorMessage }
       </div>
       <div className="flex justify-between mb-4 gap-x-4">
@@ -458,14 +470,18 @@ const UserList = (props) => {
       <Button onClick={ testCalling } >
         click call API
       </Button>
-      <Modal
+      <Button onClick={ sendMyMail } >
+        click send mail to nguyenqghuy@gmail.com
+      </Button>
+
+      {/* <Modal
         title="Login"
         open={ loginForm }
         onCancel={ () => { router.push('/login') } }
         footer={[]}
       >
         <LoginSmallForm {...{ setLoginForm }} />
-      </Modal>
+      </Modal> */}
     </>
   );
 };

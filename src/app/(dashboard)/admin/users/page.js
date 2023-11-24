@@ -47,7 +47,6 @@ const UserPage = async ({ searchParams }) => {
     // disabled: true
   };
 
-  console.log('cookies: ', cookies().getAll());
   return (
     <>
       <UserList dataTable={JSON.stringify(usersData)} user={loginInfo.user} roles={userRoles}

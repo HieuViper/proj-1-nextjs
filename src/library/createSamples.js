@@ -21,11 +21,12 @@ const createLanguage = async () => {
 export const createUsers = async () => {
   console.log("Start creating samples for Users table");
 
-  await db.Languages.bulkCreate([
+  await db.Users.bulkCreate([
     {
       username: "admin",
       password: "$2b$10$rPaOOP0Qz/5tEfm5BqFfwOzrDAVBfpjiB2radK82ybwnylPUqXKZa", //admin
       nick_name: "admin",
+      role: "Administrator",
       createdAt: db.seq.literal("now()"),
       updatedAt:db.seq.literal("now()"),
     },
@@ -188,17 +189,18 @@ const createTags = async () => {
 
 export const createSampleData = async () => {
   console.log("start creating bulk data");
-  createLanguage();
-  createUsers();
-  createNewsCate();
-  createArticleCategories();
-  createTags
+  await createLanguage();
+  await createUsers();
+  await createNewsCate();
+  await createArticleCategories();
+  await createTags();
 
   for (let i = 1; i <= 100; i++) {
     //create sample for news, news_languages
+    let news;
     try {
       if( (i % 5) == 0 ) {
-        let news = await db.News.create({
+        news = await db.News.create({
           categories: "bat_dong_san",
           tags: "tag1, tag2",
           post_author: "admin",
@@ -208,8 +210,8 @@ export const createSampleData = async () => {
           post_modified: db.seq.literal("now()"),
         });
       }
-      if( (i % 5) == 1 ) {
-        let news = await db.News.create({
+      else if( (i % 5) == 1 ) {
+        news = await db.News.create({
           categories: "chung_khoan",
           tags: "tag1, tag2",
           post_author: "admin",
@@ -219,7 +221,7 @@ export const createSampleData = async () => {
           post_modified: db.seq.literal("now()"),
         });
       } else {
-        let news = await db.News.create({
+        news = await db.News.create({
           categories: "xa_hoi",
           tags: "tag1, tag2",
           post_author: "admin",

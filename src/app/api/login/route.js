@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { funcLogin } from "@/library/funcLogin";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { log } from "util";
 
 export const dynamic = 'force-dynamic' // defaults to force-static
 
-export async function GET(req, { params }) {
 
+//Delete authentication of a user if he violate the authorization
+export async function GET(req, { params }) {
     // const { searchParams } = new URL(req.url)
     const searchParams = req.nextUrl.searchParams;
     //Delete the Authentication
@@ -19,11 +19,11 @@ export async function GET(req, { params }) {
     }
     return new NextResponse('hello', {
       status: 200,
-      //headers: { 'Set-Cookie': cookies().toString() },
     });
 
 }
 
+//this API is writen for testing
 export async function PUT( req ) {
 
   const { reqStatus } = await funcLogin.checkForProtectedApi('login');
@@ -34,6 +34,10 @@ export async function PUT( req ) {
   return NextResponse.json({ msg:'hello'}, { status: 200 } );
 }
 
+// Login API. It is used for logging into the system
+//parameter: { username: something
+//             password: somepass
+//            }
 export async function POST(req) {
     const credential = await req.json();
     let message;

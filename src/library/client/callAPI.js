@@ -20,24 +20,25 @@ export async function handleNotAuthorized( funcForward, fSetErr ) {
   export async function callAPI ( res, funcForward, fEnLoginForm, fSetErr ) {
 
     let err = await res.json();
-    switch ( res.status ) {
-      case 401:
-        fEnLoginForm();
-        break;
-      case 403:
-        handleNotAuthorized( funcForward, fSetErr );
-        break;
-      case 400:
-        fSetErr( `API's inputs are invalid` );
-        break;
-      case 405:
-        fSetErr( 'Method is not allowed' );
-        break;
-      case 500:
-        fSetErr( 'Internal Server Error' + err.msg );
-        break;
-    }
+    if ( res.ok )
+        switch ( res.status ) {
+            case 401:
+                fEnLoginForm();
+                break;
+            case 403:
+                handleNotAuthorized( funcForward, fSetErr );
+                break;
+            case 400:
+                fSetErr( `API's inputs are invalid` );
+                break;
+            case 405:
+                fSetErr( 'Method is not allowed' );
+                break;
+            case 500:
+                fSetErr( 'Internal Server Error' + err?.msg );
+                break;
+            default:
+                fSetErr( 'Error:' + err?.msg );
+        }
     return res;
   }
-
-//   export default useStore;

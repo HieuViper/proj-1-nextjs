@@ -198,5 +198,5 @@ async function checkAuthorize( user,  module, feature = null) {
     if( isAuthorize == false ) {
       return { reqStatus: 403 };
     }
-    return { reqStatus: 200 }
+    return { reqStatus: 200, loginInfo };
   }

@@ -1,9 +1,11 @@
 import { db } from "@/config/db";
+import { createSampleData } from "@/library/createSamples";
 
 const StartPage = async () => {
-  //createSampleData();
+
   if (!db.initialized) {
     await db.initialize();
+    await createSampleData();
   }
 
   return (

@@ -5,38 +5,23 @@ import UserForm from "../../_components/UserForm";
 import { funcUsers } from "@/library/funcUsers";
 import { userRoles } from "@/library/userRoles";
 import { headers, cookies } from "next/headers";
+import { funcLogin } from "@/library/funcLogin";
+import { funcImage } from "@/library/funcImages";
 
 const EditUserPage = async ({ params }) => {
-  console.log('params: ', params.id);
+  const loginInfo = funcLogin.checkAuthentication();
+  const isAuthorize = await funcLogin.checkAuthorize( loginInfo.user, 'users','edit' );
+
+  let mainImage;
   const user = await funcUsers.getUser(params.id);
+  if ( user.image )
+    mainImage = await funcImage.getImage(user.image);
 
-  //update user information
-  async function updateUser(userPara) {
-    'use server';
-    //test cookie
-    // cookies().set({
-    //   name: 'Authorization',
-    //   value: 'Huy Token',
-    //   httpOnly: true,
-    //   path: '/',
-    //   sameSite: 'lax',  //Strict
-    //   maxAge: 300,
-    // })
-
-    let message;
-    try {
-      await funcUsers.updateAUser(userPara);
-      message = 1 ;
-    } catch (error) {
-      message = ` ${error.message}`;
-    }
-    return message
-  }
-
-  const headerInst = headers();
-  headerInst.forEach( (value, key) => {
-    console.log('key:', key, ' --- value: ', value);
-  });
+//just for testing headers
+  // const headerInst = headers();
+  // headerInst.forEach( (value, key) => {
+  //   console.log('key:', key, ' --- value: ', value);
+  // });
 
   return (
     <>
@@ -52,8 +37,9 @@ const EditUserPage = async ({ params }) => {
         </Link>
       </div>
       <UserForm data={JSON.stringify(user)}
+                mainImage={JSON.stringify(mainImage)}
                 roles={userRoles}
-                {...{updateUser}}
+               // {...{updateUser}}
       />
     </>
   );

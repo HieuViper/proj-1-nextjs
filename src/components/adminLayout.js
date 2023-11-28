@@ -14,6 +14,7 @@ import {
 } from "@ant-design/icons";
 import { Avatar, Button, Layout, Menu, theme, Modal } from "antd";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useLogin } from "@/store/login";
@@ -176,7 +177,7 @@ const DashboardLayout = ( props ) => {
           >
             {
                 props.user?.image ?
-                            <Image src={user.image} width={30} height={30} />
+                            <Image src={props.user.image} width={30} height={30} style={{ width: '30px', height: '30px' }} className="mr-2" alt={props.user.display} />
                             :
                             <Avatar icon={<UserOutlined />} />
             }

@@ -3,6 +3,7 @@ import { request } from "http";
 import { Op, QueryTypes } from "sequelize";
 import { userRoles } from "./userRoles";
 import bcrypt from 'bcrypt';
+import { funcLogin } from "./funcLogin";
 
 export const funcUsers = {
   getUsers,
@@ -13,6 +14,7 @@ export const funcUsers = {
   updateAUser,
   addAUser,
   getUserByEmail,
+  userList,
 };
 
 
@@ -40,7 +42,7 @@ export async function getUsers(
     const whereQuery = ( roleQuery == "" && searchQuery == "" ) ? ""
                         : `WHERE (${roleQuery} ${searchQuery})`;
 
-    let sqlquery = `SELECT * FROM users ${whereQuery} ${orderQuery} LIMIT ${fromNews}, ${size}`;
+    let sqlquery = `SELECT username, image, display_name, role, num_posts, email  FROM users ${whereQuery} ${orderQuery} LIMIT ${fromNews}, ${size}`;
 
     const results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
 
@@ -217,17 +219,70 @@ export async function addAUser(data) {
     const hash = await bcrypt.hash(data.password, salt);
 
     data.password = hash;
-    console.log('Salt:', salt);
-    console.log('Hashed Password:', hash);
-
-
     const user = await db.Users.create(data);
-
-
     return user.username;
   } catch (error) {
     throw new Error("Cannot create user: " + error.message);
   }
 }
 
+//handle proccesses of user list route
+//parameter: loginInfo: contain logging information of user, include the role to check authorization
+//           searchParams: contain the query from URL of the request
+async function userList( loginInfo, searchParams ) {
+
+  const keys = searchParams?.get('keys') ?? "";
+  const del = searchParams?.get('del') ?? "";
+  const role = searchParams?.get('role') ?? "";
+  const search = searchParams?.get('search') ?? "";
+  const page = searchParams?.get('page') ?? 1;
+  const size = searchParams?.get('size') ?? process.env.PAGE_SIZE;
+  let orderby = searchParams?.get('orderby') ?? "";
+  let order = searchParams?.get('order') ?? "";
+
+  let result = {
+    error: null,
+    msg: null,
+    users: null,
+    pagination: null,
+    totals: null,
+  }
+
+  try {
+      if( keys != '' || del != '' ) {
+        let isAuthorize = await funcLogin.checkAuthorize( loginInfo.user, 'users', 'delete');
+        if ( isAuthorize == false ) {
+            result.error = 403;
+            return result;
+        }
+        console.log('is Authorize for deleting:', isAuthorize);
+        if ( keys != '' )
+            await funcUsers.deleteBulkUsers(keys);
+        if ( del != '' )
+            await funcUsers.deleteUser(del);
+      }
+      result.users = await funcUsers.getUsers(
+          role,
+          page,
+          size,
+          search,
+          orderby,
+          order,
+      );
+
+      result.totals = await funcUsers.getTotalNumOfUsers( role, search );
+      result.pagination = {
+          pageSize: parseInt(size),
+          total: result.totals.itemsOfTable,
+          current: parseInt(page),
+          // disabled: true
+      };
+      return result;
+  }
+  catch( error ) {
+    result.error = 500;
+    result.msg = error.message;
+    return result;
+  }
+}
 

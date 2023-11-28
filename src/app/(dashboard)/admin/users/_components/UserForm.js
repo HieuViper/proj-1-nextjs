@@ -8,15 +8,16 @@ import {
   UploadOutlined,
   WarningTwoTone,
 } from "@ant-design/icons";
-import { Button, Form, Input, Select, Upload } from "antd";
+import { Button, Form, Input, Select, Upload, Image } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-
 import { useRouter } from "next/navigation";
 import PasswordStrengthBar from "react-password-strength-bar";
+import { callAPI, handleNotAuthorized } from "@/library/client/callAPI";
+import { useLogin } from "@/store/login";
 
 const UserForm = (props) => {
   const router = useRouter();
@@ -26,11 +27,14 @@ const UserForm = (props) => {
 
   const [isSetNewPassword, setIsSetNewPassword] = useState(false);
   const [password, setPassword] = useState("");
-  const [picName, setPicName] = useState("");
-  const [previewPic, setPreviewPic] = useState(null);
+  // const [picName, setPicName] = useState("");
+  // const [previewPic, setPreviewPic] = useState(null);
   const [displayName, setDisplayName] = useState([]);
   const [roles, setRoles] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
+  const [uploadPic, setUploadPic] = useState(null);
+  const [picURL, setPicURL] = useState(null);
+  const { setLoginForm } = useLogin();    //use to set global state allowing enable the login form.
 
   useEffect(() => {
     if( props.isAuthorize == false ) {
@@ -49,66 +53,83 @@ const UserForm = (props) => {
     if (props.data) {
       // console.log('user: ', JSON.parse(props.data));
       let formdata = JSON.parse(props.data);
+      setPicURL( formdata.image );
       formdata.old_email = formdata.email; //add new value for new field old_email. We keep this value to make sure user has change their email
       form.setFieldsValue(formdata);
     }
+    if ( props.mainImage ) {
+      let mainImage = JSON.parse( props.mainImage )
+      form.setFieldsValue( mainImage );
+    }
   }, [props]);
 
-  async function handleNotAuthorized() {
-    setErrorMessage('You dont have valid authorization. You will be logout of the system in 5 seconds.');
-    const res = await fetch('/api/login?option=delAuth', {
-      method: 'GET',
-    });
-    // console.log('response ok:', res.ok);
-    // console.log('response status:', res.status);
-    // console.log('response headers:', res.headers);
-    // console.log('response json:', await res.text());  //use for transfering text in body of response
-    // console.log('response.json:', await res.json()); // use for transfering object in body of response. The object has to be JSON
-    setTimeout(async () => {
-      router.push('/login');
-    }, 5000);
 
-  }
   //submit value
   const onFinish = async (values) => {
+    let imageInfo = null;
+    console.log("values:", values);
+    const body = new FormData();
+    body.append('imageFile', uploadPic);    //attach uploaded image
+    if( picURL || uploadPic ) {
+      imageInfo = {
+        alt: values.alt ?? "",
+        caption: values.caption ?? "",
+      }
+      // let { alt, caption, ...values2 } = values;
+      delete values.alt;
+      delete values.caption;
+    }
+    body.append('imageInfo', JSON.stringify(imageInfo));  //attach image information
     if (params.id) {
       //update current user
       let { new_password, ...user } = values;
       if (isSetNewPassword) user.password = new_password;
-      await props.updateUser(user).then((message) => {
-        //success update user
-        if (message == 1) {
-          let messageNotify = "Update user successfully - ";
-          toast.success(messageNotify, {
-            position: "top-center",
-            duration: 5000,
-          });
-        } else {
-          //fail to update user
-          let messageNotify =
-            "Fail to update user. Try again or inform system's admin - " +
-            message;
-          toast.error(messageNotify, {
-            position: "top-center",
-            duration: 5000,
-          });
-        }
-      });
+      user.image = picURL;          //set the old image url back to user.image
+      body.append('user', JSON.stringify(user));          //attach user information
+
+      let { result, res } = await callAPI( await fetch(`/api/users/update`, {
+          method: 'POST',
+          cache: 'no-store',
+          body
+        }),
+        ( msg ) => { setErrorMessage( msg ) },
+        () => { router.push('/login') },
+        () => { setLoginForm( true ) },
+      );
+
+      //success update user
+      if ( res.ok == true ) {
+        let messageNotify = "Update user successfully - ";
+        toast.success(messageNotify, {
+          position: "top-center",
+          duration: 5000,
+        });
+      }
     } else {
       //add new user
       let { confirmPassword, ...user } = values;
       console.log("Received values of form: ", user);
-      await props.addUser(user).then((message) => {
-        //console.log("message from server:", message);
-        if (message && message != 1) {
-          let messageNotify =
-            "Cannot add user, please try again or inform admin - " + message;
-          toast.error(messageNotify, {
+      body.append('user', JSON.stringify(user));          //attach user information
+      //await props.addUser(user).then((message) => {
+      let { result, res } = await callAPI( await fetch(`/api/users/add`, {
+          method: 'POST',
+          cache: 'no-store',
+          body
+        }),
+        ( msg ) => { setErrorMessage( msg ) },
+        () => { router.push('/login') },
+        () => { setLoginForm( true ) },
+      );
+
+        if( res.ok == true ) {
+          let messageNotify = "Add user successfully - ";
+          toast.success(messageNotify, {
             position: "top-center",
             duration: 5000,
           });
+          router.push('/admin/users');
         }
-      });
+      //});
     }
   };
 
@@ -193,7 +214,7 @@ const UserForm = (props) => {
   };
   return (
     <div>
-      <div class="text-red-500 font-bold">
+      <div className="text-red-500 font-bold">
         { errorMessage }
       </div>
       <div className="flex justify-start mb-4">
@@ -339,6 +360,87 @@ const UserForm = (props) => {
             </Select>
           </Form.Item>
 
+
+        <Form.Item name="image" label="Image" getValueFromEvent={getFile}>
+          {/* <Input style={{ display: "none" }} /> */}
+          <Upload
+            name="file"
+            maxCount={1}
+            customRequest={(info) => {
+              console.log(info);
+              setUploadPic(info.file);
+            }}
+            showUploadList={false}
+            fileList={[]}
+            beforeUpload={(file) => {
+              console.log(
+                "🚀 ~ file: NewsForm.js:498 ~ NewsForm ~ file:",
+                file
+              );
+              return new Promise((resolve, reject) => {
+                // check the file type
+                const isImg =
+                  file.type === "image/jpeg" ||
+                  file.type === "image/jpg" ||
+                  file.type === "image/png" ||
+                  file.type === "image/gif";
+                if (!isImg) {
+                  message.error("You can only upload images");
+                  reject(false);  //put reason here
+                }
+
+                const isLt5M =
+                  file.size / 1024 / 1024 <=
+                  process.env.NEXT_PUBLIC_FILE_LIMITED_SIZE;
+                // check the file size
+                if (!isLt5M) {
+                  message.error(
+                    `Image must smaller than ${process.env.NEXT_PUBLIC_FILE_LIMITED_SIZE}MB!`
+                  );
+                  reject(false);  //put some reason here
+                } else {
+                  resolve(true);
+                }
+              });
+            }}
+            headers={{ authorization: "authorization-text" }}
+          >
+            <Button icon={<UploadOutlined />} className="mb-1">
+              {!picURL ? "Upload" : "Change Picture"}
+            </Button>
+          </Upload>
+        </Form.Item>
+
+
+        <div className="ml-32 mb-5">
+          {uploadPic && (
+            <Image
+              src={`${URL.createObjectURL(uploadPic)}`}
+              width={160}
+              className="rounded-lg shadow"
+
+            />
+          )}
+          {picURL && !uploadPic && (
+            <Image
+              src={`${picURL}`}
+              width={160}
+              className="rounded-lg shadow"
+            />
+          )}
+        </div>
+
+        {(picURL || uploadPic) && (
+          <>
+            <Form.Item name="caption" label="Caption">
+              <Input />
+            </Form.Item>
+            <Form.Item name="alt" label="Alt">
+              <Input />
+            </Form.Item>
+          </>
+        )}
+
           <Form.Item
             name="email"
             label="E-mail"
@@ -467,13 +569,13 @@ const UserForm = (props) => {
                   className="placeholder:text-xs"
                 />
               </Form.Item>
-
+{/*
               <Form.Item
                 name="image"
                 label="Profile Picture"
                 getValueFromEvent={getFile}
               >
-                {/* <Input key="img" style={{ display: "none" }} /> */}
+
                 <>
                   <Upload
                     name="file"
@@ -515,7 +617,7 @@ const UserForm = (props) => {
                     />
                   )}
                 </>
-              </Form.Item>
+              </Form.Item> */}
 
               <p className="text-xl font-semibold my-3">Account Management</p>
               {/* <Form.Item name="new_pass" label="Password Reset"> */}
@@ -599,6 +701,7 @@ const UserForm = (props) => {
           <div className="w-full flex justify-start items-center mt-6">
             <Button type="primary" htmlType="submit">
               {params?.id ? "Update User" : "Add New User"}
+
             </Button>
           </div>
         </Form>

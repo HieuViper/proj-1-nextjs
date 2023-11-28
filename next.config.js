@@ -10,7 +10,7 @@ const nextConfig = {
     userRoles: {
       Administrator: {
         users: {
-          add: false,
+          add: true,
           edit: true,
           delete: true,
         },

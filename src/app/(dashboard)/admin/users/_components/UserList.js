@@ -5,18 +5,19 @@ import {
   EyeOutlined,
   QuestionCircleOutlined,
   UserAddOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import Search from "antd/es/input/Search";
-import { Button, Radio, Select, Space, Table, Tag, Popconfirm, Modal } from "antd";
+import { Avatar, Button, Radio, Select, Space, Table, Tag, Popconfirm} from "antd";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import LoginSmallForm from "@/components/LoginSmallForm";
 import { callAPI, handleNotAuthorized } from "@/library/client/callAPI";
 import { useLogin } from "@/store/login";
 
-//import { setCookie  } from 'js-cookie';
+
 
 const UserList = (props) => {
   const router = useRouter();
@@ -40,13 +41,14 @@ const UserList = (props) => {
   const [users, setUsers] = useState();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState(searchParams.get("role") ?? "");
+  const [role, setRole] = useState(searchParams.get("role") ?? ""); // the role of the current fileter
   const [search, setSearch] = useState("");
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [roles, setRoles] = useState({});   //contain all the role and the number of records for each role { Aministrator: 20, Editor: 100 }
   // const [loginForm, setLoginForm] = useState( false );
   const [errorMessage, setErrorMessage] = useState('');   //display the serious error
-  const { setLoginForm } = useLogin();
+  const { setLoginForm } = useLogin();    //use to set global state allowing enable the login form.
+
 
   useEffect(() => {
     //redirect to login page if user is not authorized
@@ -56,18 +58,25 @@ const UserList = (props) => {
         ( msg ) => { setErrorMessage( msg ) }
       );
     }
+    notifyAddUserSuccess();
+    setResetStates( props );
 
-    setUsers( JSON.parse( props.dataTable ) );
-    setPaginationServer( props.pagination );
-    setTotals( props.totals );
-    const { itemsOfTable, all, ...rolesData} = props.totals;
-    setRoles( rolesData );
+  }, [props]);
+
+  //Set and reset States after receving data from server component or APIs
+  function setResetStates( result ) {
+    setUsers( JSON.parse( result.dataTable ) );
+    setPaginationServer( result.pagination );
+    // console.log('pagination:', result.pagination);
+    // console.log('user:', result.dataTable);
+    setTotals( result.totals );
+    const { itemsOfTable, all, ...rolesData} = result.totals;
+    setRoles( rolesData );      //rolesData has the format { Administrator: 2, Editor: 4 }
+    //Reset the states
     setSelectedRowKeys( [] );
     setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
     setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
-    notifyAddUserSuccess();
-    console.log("user: ", props.user);
-  }, [props]);
+  }
 
   //Notify success adding new from /admin/add
   function notifyAddUserSuccess() {
@@ -93,7 +102,7 @@ const UserList = (props) => {
   const hasSelected = selectedRowKeys.length > 0;
 
   //Bulk delete
-  const startDelete = () => {
+  const startDelete = async () => {
     setLoading(true);
     const current = new URLSearchParams(searchParams);
     const sorter = getOrderPara(sortedInfo, false);
@@ -113,7 +122,18 @@ const UserList = (props) => {
 
     const searchPara = current.toString();
     const query = searchPara ? `?${searchPara}` : "";
-    router.push(`${pathName}${query}`);
+    //router.push(`${pathName}${query}`);
+    let { result, res } = await callAPI( await fetch(`/api/users${query}`, {
+        method: 'GET',
+        cache: 'no-store'
+      }),
+      ( msg ) => { setErrorMessage( msg ) },
+      () => { router.push('/login') },
+      () => { setLoginForm( true ) },
+    );
+    if ( res.status == 200 ) {
+      setResetStates( result );
+    }
   };
 
   const onSearchChange = async (e) => {
@@ -124,9 +144,20 @@ const UserList = (props) => {
     //set state sorter to init state, that means sort follow the date column
     setSearch(value);
     const orderPara = orderParaInit;
-    router.push(
-      `${pathName}?role=${role}&size=${paginationServer.pageSize}&search=${value}${orderPara}`
+    // router.push(`${pathName}?role=${role}&size=${paginationServer.pageSize}&search=${value}${orderPara}`);
+    let query = `?role=${role}&size=${paginationServer.pageSize}&search=${value}${orderPara}`;
+    let { result, res } = await callAPI( await fetch(`/api/users${query}`, {
+        method: 'GET',
+        cache: 'no-store'
+      }),
+      ( msg ) => { setErrorMessage( msg ) },
+      () => { router.push('/login') },
+      () => { setLoginForm( true ) },
     );
+    if ( res.status == 200 ) {
+      setResetStates( result );
+    }
+
     //reset the state of filter, we just dont reset filter of status and language.
     setSortedInfo(initSort);
   };
@@ -135,10 +166,22 @@ const UserList = (props) => {
     //set state sorter to init state
 
     const orderPara = orderParaInit;
-    router.refresh();
-    router.push(
-      `${pathName}?role=${role}&size=${paginationServer.pageSize}${orderPara}`
+    //router.refresh();
+    // router.push(`${pathName}?role=${role}&size=${paginationServer.pageSize}${orderPara}`);
+    let query = `?role=${role}&size=${paginationServer.pageSize}${orderPara}`;
+    let { result, res } = await callAPI( await fetch(`/api/users${query}`, {
+        method: 'GET',
+        cache: 'no-store'
+      }),
+      ( msg ) => { setErrorMessage( msg ) },
+      () => { router.push('/login') },
+      () => { setLoginForm( true ) },
     );
+    if ( res.status == 200 ) {
+      // result = await res.json();
+      setResetStates( result );
+    }
+
     //Reset all below states
     setSortedInfo(initSort);
     setRole(role);
@@ -165,34 +208,41 @@ const UserList = (props) => {
   orderParaInit = getOrderPara(initSort, true);
   //set languages for the languages select box
 
-  const handleChange = (pagination, filters, sorter) => {
+  const handleChange = async (pagination, filters, sorter) => {
     setLoadingStatus(true);
     setSortedInfo(sorter);
     const orderPara = getOrderPara(sorter, true);
-    router.push(
-      `${pathName}?page=${pagination.current}&size=${pagination.pageSize}&role=${role}&search=${search}${orderPara}`
+    // router.push(`${pathName}?page=${pagination.current}&size=${pagination.pageSize}&role=${role}&search=${search}${orderPara}`);
+    let query = `?page=${pagination.current}&size=${pagination.pageSize}&role=${role}&search=${search}${orderPara}`;
+    let { result, res } = await callAPI( await fetch(`/api/users${query}`, {
+        method: 'GET',
+        cache: 'no-store'
+      }),
+      ( msg ) => { setErrorMessage( msg ) },
+      () => { router.push('/login') },
+      () => { setLoginForm( true ) },
     );
+    if ( res.status == 200 ) {
+      setResetStates( result );
+    }
   };
-
-
-
 
 
   //Function for testing, it is called when pressing the button call API
   async function testCalling() {
-    const res = await callAPI( await fetch('/api/login', {
+    const { result, res } = await callAPI( await fetch('/api/login', {
       method: 'PUT',
       cache: 'no-store'
     }),
+      ( msg ) => { setErrorMessage( msg ) },
       () => { router.push('/login') },
       () => { setLoginForm( true ) },
-      ( msg ) => { setErrorMessage( msg ) }
     );
   }
 
   //send test mail to nguyenqghuy@gmail.com
   async function sendMyMail() {
-    const res = await callAPI( await fetch('/api/email', {
+    const { result, res } = await callAPI( await fetch('/api/email', {
       method: 'POST',
       cache: 'no-store',
       body: JSON.stringify( { from: 'nagaoreishi@gmail.com',
@@ -201,17 +251,10 @@ const UserList = (props) => {
         text: 'hello Huy, sending mail succesfully'
       } ),
     }),
-      () => { router.push('/login') },
-      () => { setLoginForm( true ) },
       ( msg ) => { setErrorMessage( msg ) }
     );
     if( res.ok  == true )
       setErrorMessage('Sending mail successfully');
-    // else {
-    //   let err = await res.json();
-    //   console.log('error from calling mail:', err.msg);
-    //   setErrorMessage(err.msg);
-    // }
   }
   // var options = {
   //   port: 3000,
@@ -277,39 +320,63 @@ const UserList = (props) => {
       render: (_, record) => {
         return (
           <>
-            <div className="text-base font-medium pb-2">{record.username}</div>
+            <div className="flex items-center text-base font-medium pb-2">
+              { record.image && <Image src={record.image} width={20} height={20} style={{ width: '20px', height: '20px' }} className="mr-2" alt={record.username} /> }
+              {record.username}
+            </div>
             <div className="flex gap-2">
               <>
-                <Link href={`/admin/users/edit/${record.username}`}>
-                  <span className="btn-edit">
-                    <EditOutlined className="pr-1" />
-                    Edit
-                  </span>
-                </Link>{" "}
-                |
-                <Popconfirm
-                  title="Delete the task"
-                  icon={
-                    <QuestionCircleOutlined
-                      style={{
-                        color: "red",
+                { props.roles[props.user.role]?.users?.edit === true && (
+                  <>
+                    <Link href={`/admin/users/edit/${record.username}`}>
+                      <span className="btn-edit">
+                        <EditOutlined className="pr-1" />
+                        Edit
+                      </span>
+                    </Link>
+                    |{' '}
+                  </>
+                )}
+                { props.roles[props.user.role]?.users?.delete === true && (
+                  <>
+                    <Popconfirm
+                      title="Delete the task"
+                      icon={
+                        <QuestionCircleOutlined
+                          style={{
+                            color: "red",
+                          }}
+                        />
+                      }
+                      description="Are you sure to delete this user?"
+                      onConfirm={ async () => {
+                        // router.push(`/admin/users?del=${record.username}&page=${paginationServer.current}&size=${paginationServer.pageSize}&role=${role}&search=${search}${orderParaDefault}`)
+                        let query = `?del=${record.username}&page=${paginationServer.current}&size=${paginationServer.pageSize}&role=${role}&search=${search}${orderParaDefault}`;
+                        let { result, res } = await callAPI( await fetch(`/api/users${query}`, {
+                            method: 'GET',
+                            cache: 'no-store'
+                          }),
+                          ( msg ) => { setErrorMessage( msg ) },
+                          () => { router.push('/login') },
+                          () => { setLoginForm( true ) },
+                        );
+                        if ( res.status == 200 ) {
+                          setResetStates( result );
+                        }
                       }}
-                    />
-                  }
-                  description="Are you sure to delete this user?"
-                  onConfirm={() => {
-                    router.push(`/admin/users?del=${record.username}&page=${paginationServer.current}&size=${paginationServer.pageSize}&role=${role}&search=${search}${orderParaDefault}`)
-                  }}
-                  onCancel={(e) => console.log(e)}
-                  okText="Yes"
-                  cancelText="Cancel"
-                >
-                  <span className="btn-delete cursor-pointer">
-                    <DeleteOutlined className="pr-1" />
-                    Delete
-                  </span>
-                </Popconfirm>
-                |{" "}
+                      onCancel={(e) => console.log(e)}
+                      okText="Yes"
+                      cancelText="Cancel"
+                    >
+                      <span className="btn-delete cursor-pointer">
+                        <DeleteOutlined className="pr-1" />
+                        Delete
+                      </span>
+                    </Popconfirm>
+                    |{" "}
+                  </>
+                )}
+
                 <Link href={`/vi/users/preview/${record.username}`}>
                   <span className="btn-preview">
                     <EyeOutlined className="pr-1" />
@@ -422,7 +489,7 @@ const UserList = (props) => {
       </div>
 
       <div className="mb-3">
-        {/* <Popconfirm
+       <Popconfirm
           title="Delete users"
           description={`Are you sure to delete ${selectedRowKeys.length} items?`}
           icon={
@@ -436,11 +503,12 @@ const UserList = (props) => {
           onCancel={() => {}}
           okText="Yes"
           cancelText="Cancel"
-        > */}
+          disabled={!hasSelected}
+        >
         <Button
           type="primary"
           danger
-          onClick={startDelete}
+          //onClick={startDelete}
           disabled={!hasSelected}
           loading={loading}
         >
@@ -448,7 +516,7 @@ const UserList = (props) => {
             Bulk Delete <DeleteOutlined />
           </div>
         </Button>
-        {/* </Popconfirm> */}
+       </Popconfirm>
 
         <span className="mx-2 italic">
           {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
@@ -473,15 +541,6 @@ const UserList = (props) => {
       <Button onClick={ sendMyMail } >
         click send mail to nguyenqghuy@gmail.com
       </Button>
-
-      {/* <Modal
-        title="Login"
-        open={ loginForm }
-        onCancel={ () => { router.push('/login') } }
-        footer={[]}
-      >
-        <LoginSmallForm {...{ setLoginForm }} />
-      </Modal> */}
     </>
   );
 };

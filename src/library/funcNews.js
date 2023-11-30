@@ -1,6 +1,8 @@
 //'use server';
 import { db } from "@/config/db";
 import { Op, QueryTypes } from "sequelize";
+import { funcLogin } from "./funcLogin";
+import { log } from "console";
 
 //get Status query from parameter post_status
 function getStatusQuery(post_status) {
@@ -34,6 +36,7 @@ export const funcNews = {
   getLanguages,
   updateANews,
   addANews,
+  newsList,
 };
 //GetNews for tab "All,published, trash"
 export async function getAllNews(
@@ -344,5 +347,107 @@ export async function addANews(data, newsLangs) {
     await t.rollback();
     console.log(error);
     throw new Error("Cannot create news:" + error.message);
+  }
+}
+
+
+
+//handle proccesses of news list route
+//parameter: loginInfo: contain logging information of user, include the role to check authorization
+//           searchParams: contain the query from URL of the request
+async function newsList( loginInfo, searchParams ) {
+
+  const trash = searchParams?.get('trash') ?? "";
+  const keys = searchParams?.get('keys') ?? "";
+  const recover = searchParams?.get('recover') ?? "";
+  const del = searchParams?.get('del') ?? "";
+  const status = searchParams?.get('status') ?? "";
+  const search = searchParams?.get('search') ?? "";
+  const page = searchParams?.get('page') ?? 1;
+  const size = searchParams?.get('size') ?? process.env.PAGE_SIZE;
+  let orderby = searchParams?.get('orderby') ?? "";
+  let order = searchParams?.get('order') ?? "";
+  const author = searchParams?.get('author') ?? "";
+  const category = searchParams?.get('category') ?? "";
+  const tag = searchParams?.get('tag') ?? "";
+  const lang = searchParams?.get('lang') ?? process.env.DEFAULT_LANGUAGE;
+
+  let result = {
+    error: null,
+    msg: null,
+    news: null,
+    languages: null,
+    pagination: null,
+    totals: null,
+  }
+
+  try {
+      //Check for deleting
+      if( keys != '' || del != '' ) {
+        let isAuthorize = await funcLogin.checkAuthorize( loginInfo.user, 'news', 'delete');
+        if ( isAuthorize == false ) {
+            result.error = 403;
+            return result;
+        }
+        if ( keys != '' )
+            await funcNews.deleteBulkNews(keys);
+        if ( del != '' )
+            await funcNews.deleteNews(del);
+      }
+      //Check for moving to trash
+      if( trash != '' ) {
+        let isAuthorize = await funcLogin.checkAuthorize( loginInfo.user, 'news', 'moveTrash');
+        if ( isAuthorize == false ) {
+            result.error = 403;
+            return result;
+        }
+        await funcNews.trashNews(trash);
+      }
+      //Check for recovering
+      if( recover != '' ) {
+        let isAuthorize = await funcLogin.checkAuthorize( loginInfo.user, 'news', 'recover');
+        if ( isAuthorize == false ) {
+            result.error = 403;
+            return result;
+        }
+        await funcNews.recoverNews(recover);
+      }
+      //if no search params. Set default order for searching
+      if ( !searchParams || searchParams?.keys().length == 0) {
+        orderby = "post_modified";
+        order = "desc";
+      }
+      result.news = await funcNews.getAllNews(
+        status,
+        page,
+        size,
+        search,
+        orderby,
+        order,
+        author,
+        category,
+        tag,
+        lang
+      );
+      result.totals = await funcNews.getTotalNumOfNews(
+        status,
+        search,
+        author,
+        category,
+        tag,
+        lang
+      );
+      result.pagination = {
+        pageSize: parseInt(size),
+        total: result.totals.itemsOfTable,
+        current: parseInt(page),
+      };
+      result.languages = await funcNews.getLanguages();
+      return result;
+  }
+  catch( error ) {
+    result.error = 500;
+    result.msg = error.message;
+    return result;
   }
 }

@@ -15,12 +15,9 @@ export async function GET(req, { params }) {
     const searchParams = req.nextUrl.searchParams;
     try{
         result = await funcUsers.userList( loginInfo, searchParams );
-        if ( result.error ){
-            if (result.error == 403)
-                return NextResponse.json( {}, { status: 403 } );
-            if ( result.error == 500 )
-                return NextResponse.json( { msg: result.msg }, { status: 500 } );
-        }
+        if ( result.error )
+          return NextResponse.json( { msg: result.msg }, { status: result.error } );
+
         return NextResponse.json( { dataTable: JSON.stringify(result.users),
                                     //user: loginInfo.user,
                                     //roles: getConfig().serverRuntimeConfig.userRoles,
@@ -31,6 +28,4 @@ export async function GET(req, { params }) {
     catch ( error ) {
         return NextResponse.json( { msg: error.message }, { status: 500 } );
     }
-
-
 }

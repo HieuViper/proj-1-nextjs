@@ -33,8 +33,8 @@ function createToken( user ) {
   let token=null;
   let current = new Date();
   const payload = {
-    jti: user.username,
-    iss: user.display_name,
+    username: user.username,
+    display: user.display_name,
     // issuedAt: new Date(),
     // expire: new Date( currentTime.getTime() + process.env.LOGIN_TIME * 1000 ),
     nbefore: currentTime,
@@ -99,16 +99,15 @@ function isLogin( token ) {
     if ( !token )
       throw new Error('Token is empty');
     userToken = jwt.verify ( token, getConfig().serverRuntimeConfig.secret);
-    console.log('verified token :', userToken);
+    //console.log('verified token :', userToken);
 
     if ( userToken.nbefore && userToken.nbefore > currentTime ) {
       message = 'Token is used so soon';
       throw new Error ( message );
     }
-    const { jti, issuedAt, expire, nbefore, iat, exp, ...user} = userToken;
+    const { nbefore, iat, exp, ...user} = userToken;
     return { isLogin: true, user: user };
   } catch (error) {
-    console.log('error from isLogin:', error.message);
     return { isLogin: false, message: error.message, user: null };
   }
 }
@@ -116,7 +115,7 @@ function isLogin( token ) {
 //check authentication for user, if user is not yet logined or token is invalid, we redirect to login page
 function checkAuthentication() {
   let token = cookies().get('Authorization');
-  console.log('token from cookie Componenent:', token);
+  console.log('token from cookie Component:', token);
   if ( !token ){
     redirect(`/login`);
   }
@@ -146,7 +145,7 @@ function checkAuthenticationForLoginPage() {
 function checkAuthenticationForLayout() {
   let token = cookies().get('Authorization');
   console.log('token from cookie at layout:', token);
-  const loginInfo = token ? funcLogin.isLogin ( token.value ) : null;  //check the validity of token
+  const loginInfo = funcLogin.isLogin ( token?.value );  //check the validity of token
   return loginInfo;
 }
 
@@ -160,34 +159,39 @@ function checkAuthenticationForApi() {
   let loginInfo;
   let token = cookies().get('Authorization');
   console.log('token from cookie at API:', token);
-  if ( !token ){
-    loginInfo = { isLogin: false, message: 'Token is empty', user: null };
-    return loginInfo;
-  }
-  loginInfo = funcLogin.isLogin ( token.value );  //check the validation of token
+  // if ( !token ){
+  //   loginInfo = { isLogin: false, message: 'Token is empty', user: null };
+  //   return loginInfo;
+  // }
+  loginInfo = funcLogin.isLogin ( token?.value );  //check the validation of token
   return loginInfo;
 }
 
 //check the authorization of user for a module , and a feature
-async function checkAuthorize( user,  module, feature = null) {
+async function checkAuthorize( user,  module = null, feature = null) {
   const roles = getConfig().serverRuntimeConfig.userRoles;
   let isAuthorize = false;
-  if ( !feature ){
+  if( feature ) {
+    isAuthorize = roles[user.role][module][feature];
+    console.log('authorize with feature:', isAuthorize);
+  }
+  else if ( module ) {
     isAuthorize = roles[user.role][module] ? true : false
     console.log('authorize without feature:', isAuthorize);
   }
-  else
-  {
-    isAuthorize = roles[user.role][module][feature];
+  else {
+    isAuthorize = roles[user.role] ? true : false
+    console.log('basic authorization:', isAuthorize);
   }
   return isAuthorize;
-  }
+}
 
   //Check for protected API before allowing using the API
   async function checkForProtectedApi(module, feature = null) {
     //Check authentication before using API
     const loginInfo = checkAuthenticationForApi();
     console.log('isLogin?', loginInfo.isLogin);
+    console.log('loginInfo in checkforprotectedAPI:', loginInfo);
     if( loginInfo.isLogin == false ) {
       return  { reqStatus: 401 };
     }
@@ -198,5 +202,5 @@ async function checkAuthorize( user,  module, feature = null) {
     if( isAuthorize == false ) {
       return { reqStatus: 403 };
     }
-    return { reqStatus: 200 }
+    return { reqStatus: 200, loginInfo };
   }

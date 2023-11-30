@@ -17,27 +17,28 @@ export async function handleNotAuthorized( funcForward, fSetErr ) {
   //funcForward: the function is called to redirect when request have invalid authorization
   //fEnLoginForm:  the function enable login form when request is unauthenticated
   //fSetErr: the function is used to set Error message
-  export async function callAPI ( res, funcForward, fEnLoginForm, fSetErr ) {
+  export async function callAPI ( res, fSetErr, funcForward, fEnLoginForm ) {
 
-    let err = await res.json();
-    switch ( res.status ) {
-      case 401:
-        fEnLoginForm();
-        break;
-      case 403:
-        handleNotAuthorized( funcForward, fSetErr );
-        break;
-      case 400:
-        fSetErr( `API's inputs are invalid` );
-        break;
-      case 405:
-        fSetErr( 'Method is not allowed' );
-        break;
-      case 500:
-        fSetErr( 'Internal Server Error' + err.msg );
-        break;
-    }
-    return res;
+    let result = await res.json();
+    if ( res.ok == false )
+        switch ( res.status ) {
+            case 401:
+                fEnLoginForm();
+                break;
+            case 403:
+                handleNotAuthorized( funcForward, fSetErr );
+                break;
+            case 400:
+                fSetErr( `API's inputs are invalid: ` + result?.msg );
+                break;
+            case 405:
+                fSetErr( 'Method is not allowed' );
+                break;
+            case 500:
+                fSetErr( 'Internal Server Error: ' + result?.msg );
+                break;
+            default:
+                fSetErr( 'Error:' + result?.msg );
+        }
+    return { result, res };
   }
-
-//   export default useStore;

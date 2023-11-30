@@ -14,6 +14,7 @@ import {
   UsergroupAddOutlined,
 } from "@ant-design/icons";
 import { Avatar, Button, Layout, Menu, Modal, theme } from "antd";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -198,7 +199,14 @@ const DashboardLayout = (props) => {
             }}
           >
             {props.user?.image ? (
-              <Image src={user.image} width={30} height={30} />
+              <Image
+                src={props.user.image}
+                width={30}
+                height={30}
+                style={{ width: "30px", height: "30px" }}
+                className="mr-2"
+                alt={props.user.display}
+              />
             ) : (
               <Avatar icon={<UserOutlined />} />
             )}

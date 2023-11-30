@@ -11,25 +11,6 @@ const AddUserPage = async () => {
   const loginInfo = funcLogin.checkAuthentication();
   const isAuthorize = await funcLogin.checkAuthorize( loginInfo.user, 'users','add' );
 
-  async function addUser(user){
-    'use server'
-    let message = '';
-    let username;
-    try {
-      username = await funcUsers.addAUser( user );
-      message = 1;
-    } catch (error) {
-      message = `Fail to add a user, try again or inform your admin: ${error.message}`;
-    }
-    console.log('username:', username);
-    if (username) {
-      redirect(`/admin/users?message=${message}`);
-    }
-
-    return message;
-  }
-
-
   return (
     <>
       <div className="mb-3">
@@ -41,7 +22,7 @@ const AddUserPage = async () => {
       <UserForm roles={ getConfig().serverRuntimeConfig.userRoles }
                 user={ loginInfo.user }
                 isAuthorize={ isAuthorize }
-                {...{ addUser }}
+                //{...{ addUser }}
                 />
     </>
   );

@@ -5,7 +5,7 @@ import { funcImage } from "@/library/funcImages";
 
 export const dynamic = 'force-dynamic' // defaults to force-static
 
-export async function POST(req, { params }) {
+export async function POST(req) {
     //Check for security
     const { reqStatus, loginInfo } = await funcLogin.checkForProtectedApi('users', 'add');
     if ( reqStatus != 200 )
@@ -23,8 +23,6 @@ export async function POST(req, { params }) {
     } catch ( error ) {
         return NextResponse.json( { msg: error.message }, { status: 400 });
     }
-    console.log('users:', user);
-    console.log('imageInfo:', imageInfo);
     try {
         let imageUrl = null;
         //save image File
@@ -41,7 +39,7 @@ export async function POST(req, { params }) {
             user.image = null;      //set image null when user didn't send image
         }
 
-        const username = await funcUsers.addAUser(user);
+        await funcUsers.addAUser(user);
         return NextResponse.json( {}, { status: 200 });
     } catch ( error ) {
         return NextResponse.json( { msg: error.message }, { status: 500 });

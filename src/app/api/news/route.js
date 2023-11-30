@@ -1,29 +1,32 @@
 import { NextResponse } from "next/server";
+import { funcLogin } from "@/library/funcLogin";
+import { funcNews } from "@/library/funcNews";
 
-export async function GET(req, res) {
-<<<<<<< HEAD
-    return NextResponse.json({message: 'helo'})
+export const dynamic = 'force-dynamic' // defaults to force-static
+
+export async function GET(req, { params }) {
+
+    const { reqStatus, loginInfo } = await funcLogin.checkForProtectedApi('news');
+    if ( reqStatus != 200 )
+        return NextResponse.json({} , { status: reqStatus });
+
+    let result;
+    // const { searchParams } = new URL(req.url)
+    const searchParams = req.nextUrl.searchParams;
+
+    try{
+        result = await funcNews.newsList( loginInfo, searchParams );
+        if ( result.error )
+          return NextResponse.json( { msg: result.msg }, { status: result.error } );
+
+        //return the result to client
+        return NextResponse.json( { dataTable: JSON.stringify(result.news),
+                                    pagination: result.pagination,
+                                    totals: result.totals,
+                                    langTable: JSON.stringify(result.languages)
+        } );
+    }
+    catch ( error ) {
+        return NextResponse.json( { msg: error.message }, { status: 500 } );
+    }
 }
-
-// export async function POST(req, res) {
-//     console.log('at POST API:', req.body.newsid);
-
-//     return NextResponse.json({message: req})
-// }
-
-export async function POST(req, res) {
-    const newsid = await req.json();
-    console.log('newsid:', newsid);
-    return NextResponse.json ({ message: newsid });
-    // Then save email to your database, etc...
-  }
-=======
-  return NextResponse.json({ message: "hello" });
-}
-export async function POST(req, res) {
-  console.log("vao ");
-  const body = await req.json();
-  console.log("body", body);
-  return NextResponse.json({ prompt: 12 });
-}
->>>>>>> 5f8aaaba24bf4af60dab634e2a18c6ffeea98f8d

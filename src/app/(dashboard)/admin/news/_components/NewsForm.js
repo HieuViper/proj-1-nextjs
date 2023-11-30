@@ -416,7 +416,7 @@ export function NewsForm(props) {
           name={`title_${lang}`}
           rules={[
             {
-              required: true,
+              required: "true",
               message: "Please input your title!",
             },
           ]}
@@ -680,6 +680,7 @@ export function NewsForm(props) {
           <Upload
             name="file"
             maxCount={1}
+            fileList={[]}
             customRequest={(info) => {
               console.log(info);
               setPreviewPic(info.file);

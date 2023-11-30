@@ -40,5 +40,7 @@ export async function handleNotAuthorized( funcForward, fSetErr ) {
             default:
                 fSetErr( 'Error:' + result?.msg );
         }
+    else
+        fSetErr("");
     return { result, res };
   }

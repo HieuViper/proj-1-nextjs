@@ -58,8 +58,10 @@ const UserList = (props) => {
         ( msg ) => { setErrorMessage( msg ) }
       );
     }
-    notifyAddUserSuccess();
+
     setResetStates( props );
+    setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
+    setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
 
   }, [props]);
 
@@ -74,22 +76,9 @@ const UserList = (props) => {
     setRoles( rolesData );      //rolesData has the format { Administrator: 2, Editor: 4 }
     //Reset the states
     setSelectedRowKeys( [] );
-    setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
-    setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
   }
 
-  //Notify success adding new from /admin/add
-  function notifyAddUserSuccess() {
-    //get message redirected from add user route
-    const message = searchParams.get("message") ?? "";
-    if (message == 1) {
-      //signal of success edit on server
-      let messageNotify = "Add user successfully";
-      toast.success(messageNotify, {
-        position: "top-center",
-      });
-    }
-  }
+
 
   const onSelectChange = (newSelectedRowKeys) => {
     // console.log("selectedRowKeys changed: ", newSelectedRowKeys);
@@ -104,6 +93,7 @@ const UserList = (props) => {
   //Bulk delete
   const startDelete = async () => {
     setLoading(true);
+    setLoadingStatus(true);
     const current = new URLSearchParams(searchParams);
     const sorter = getOrderPara(sortedInfo, false);
     const keys = selectedRowKeys
@@ -134,6 +124,9 @@ const UserList = (props) => {
     if ( res.status == 200 ) {
       setResetStates( result );
     }
+    setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
+    setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
+
   };
 
   const onSearchChange = async (e) => {
@@ -143,6 +136,7 @@ const UserList = (props) => {
   const handleSearch = async (value) => {
     //set state sorter to init state, that means sort follow the date column
     setSearch(value);
+    setLoadingStatus(true);
     const orderPara = orderParaInit;
     // router.push(`${pathName}?role=${role}&size=${paginationServer.pageSize}&search=${value}${orderPara}`);
     let query = `?role=${role}&size=${paginationServer.pageSize}&search=${value}${orderPara}`;
@@ -157,6 +151,8 @@ const UserList = (props) => {
     if ( res.status == 200 ) {
       setResetStates( result );
     }
+    setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
+    setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
 
     //reset the state of filter, we just dont reset filter of status and language.
     setSortedInfo(initSort);
@@ -164,7 +160,7 @@ const UserList = (props) => {
 
   const handleRole = async (role) => {
     //set state sorter to init state
-
+    setLoadingStatus(true);
     const orderPara = orderParaInit;
     //router.refresh();
     // router.push(`${pathName}?role=${role}&size=${paginationServer.pageSize}${orderPara}`);
@@ -181,6 +177,8 @@ const UserList = (props) => {
       // result = await res.json();
       setResetStates( result );
     }
+    setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
+    setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
 
     //Reset all below states
     setSortedInfo(initSort);
@@ -225,6 +223,9 @@ const UserList = (props) => {
     if ( res.status == 200 ) {
       setResetStates( result );
     }
+    setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
+    setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
+
   };
 
 
@@ -328,12 +329,15 @@ const UserList = (props) => {
               <>
                 { props.roles[props.user.role]?.users?.edit === true && (
                   <>
-                    <Link href={`/admin/users/edit/${record.username}`}>
+                    <a href="#" className={loadingStatus == true ? 'disabled-link' : undefined } onClick={ () => {
+                      setLoadingStatus(true);
+                      router.push(`/admin/users/edit/${record.username}`);
+                    }} >
                       <span className="btn-edit">
                         <EditOutlined className="pr-1" />
                         Edit
                       </span>
-                    </Link>
+                    </a>
                     |{' '}
                   </>
                 )}
@@ -363,6 +367,9 @@ const UserList = (props) => {
                         if ( res.status == 200 ) {
                           setResetStates( result );
                         }
+                        setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
+                        setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
+
                       }}
                       onCancel={(e) => console.log(e)}
                       okText="Yes"
@@ -376,13 +383,15 @@ const UserList = (props) => {
                     |{" "}
                   </>
                 )}
-
-                <Link href={`/vi/users/preview/${record.username}`}>
-                  <span className="btn-preview">
-                    <EyeOutlined className="pr-1" />
-                    Preview
-                  </span>
-                </Link>
+                  <a href="#"  className={loadingStatus == true ? 'disabled-link' : undefined } onClick={ () => {
+                      setLoadingStatus(true);
+                      router.push(`/vi/users/preview/${record.username}`);
+                    }} >
+                    <span className="btn-preview">
+                      <EyeOutlined className="pr-1" />
+                      Preview
+                    </span>
+                  </a>
               </>
             </div>
           </>
@@ -455,6 +464,7 @@ const UserList = (props) => {
         <Search
           placeholder="input search text"
           value={search}
+          disabled={loadingStatus}
           onChange={(e) => onSearchChange(e)}
           onSearch={(e) => handleSearch(e)}
           enterButton
@@ -541,6 +551,7 @@ const UserList = (props) => {
       <Button onClick={ sendMyMail } >
         click send mail to nguyenqghuy@gmail.com
       </Button>
+
     </>
   );
 };

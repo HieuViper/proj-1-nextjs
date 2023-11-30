@@ -21,20 +21,20 @@ const createLanguage = async () => {
 export const createUsers = async () => {
   console.log("Start creating samples for Users table");
 
-  await db.Languages.bulkCreate([
+  await db.Users.bulkCreate([
     {
       username: "admin",
       password: "$2b$10$rPaOOP0Qz/5tEfm5BqFfwOzrDAVBfpjiB2radK82ybwnylPUqXKZa", //admin
       nick_name: "admin",
       createdAt: db.seq.literal("now()"),
-      updatedAt:db.seq.literal("now()"),
+      updatedAt: db.seq.literal("now()"),
     },
   ]);
-}
+};
 
 //create news category
 const createNewsCate = async () => {
-  try{
+  try {
     //first record of news category
     let newsCate0 = await db.News_categories.create({
       category_code: `kinh_te`,
@@ -117,48 +117,43 @@ const createNewsCate = async () => {
         languageCode: "en",
       },
     ]);
-
-  } catch( error ) {
-    console.log('cannot create category for news');
+  } catch (error) {
+    console.log("cannot create category for news");
   }
-  console.log('Creating news Category is done');
+  console.log("Creating news Category is done");
 };
-
 
 //Create article category
 const createArticleCategories = async () => {
+  for (let i = 1; i <= 5; i++) {
+    try {
+      let articleCate = await db.Article_categories.create({
+        category_code: `cate-${i}`,
+      });
 
-    for (let i = 1; i <= 5; i++) {
-      try {
-        let articleCate = await db.Article_categories.create({
-          category_code: `cate-${i}`,
-        });
-
-        await db.Article_cate_langs.bulkCreate([
-          {
-            articleCategoryId: articleCate.id,
-            name: "Tên cate " + articleCate.id,
-            description: "mô tả của cate " + articleCate.id,
-            languageCode: "vi",
-          },
-          {
-            articleCategoryId: articleCate.id,
-            name: "Name cate " + articleCate.id,
-            description: "description about cate " + articleCate.id,
-            languageCode: "en",
-          },
-        ]);
-      } catch (error) {
-        console.error("Error creating article category data:", error.message);
-      }
+      await db.Article_cate_langs.bulkCreate([
+        {
+          articleCategoryId: articleCate.id,
+          name: "Tên cate " + articleCate.id,
+          description: "mô tả của cate " + articleCate.id,
+          languageCode: "vi",
+        },
+        {
+          articleCategoryId: articleCate.id,
+          name: "Name cate " + articleCate.id,
+          description: "description about cate " + articleCate.id,
+          languageCode: "en",
+        },
+      ]);
+    } catch (error) {
+      console.error("Error creating article category data:", error.message);
     }
-    console.log('Creating article category is done');
-}
-
+  }
+  console.log("Creating article category is done");
+};
 
 //Create tags
 const createTags = async () => {
-
   for (let i = 1; i <= 5; i++) {
     try {
       let tag = await db.Tags.create({
@@ -183,8 +178,8 @@ const createTags = async () => {
       console.error("Error creating tag data:", error.message);
     }
   }
-  console.log('Creating tags is done');
-}
+  console.log("Creating tags is done");
+};
 
 export const createSampleData = async () => {
   console.log("start creating bulk data");
@@ -192,12 +187,12 @@ export const createSampleData = async () => {
   createUsers();
   createNewsCate();
   createArticleCategories();
-  createTags
+  createTags();
 
   for (let i = 1; i <= 100; i++) {
     //create sample for news, news_languages
     try {
-      if( (i % 5) == 0 ) {
+      if (i % 5 == 0) {
         let news = await db.News.create({
           categories: "bat_dong_san",
           tags: "tag1, tag2",
@@ -208,7 +203,7 @@ export const createSampleData = async () => {
           post_modified: db.seq.literal("now()"),
         });
       }
-      if( (i % 5) == 1 ) {
+      if (i % 5 == 1) {
         let news = await db.News.create({
           categories: "chung_khoan",
           tags: "tag1, tag2",
@@ -229,7 +224,6 @@ export const createSampleData = async () => {
           post_modified: db.seq.literal("now()"),
         });
       }
-
 
       await db.News_languages.bulkCreate([
         {
@@ -278,5 +272,4 @@ export const createSampleData = async () => {
     }
   }
   console.log("creating bulk data for news and article is done");
-
 };

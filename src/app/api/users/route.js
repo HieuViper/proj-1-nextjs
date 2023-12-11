@@ -3,6 +3,7 @@ import { funcLogin } from "@/library/funcLogin";
 import { funcUsers } from "@/library/funcUsers";
 
 export const dynamic = 'force-dynamic' // defaults to force-static
+// export const fetchCache = 'force-no-store'
 
 export async function GET(req, { params }) {
 

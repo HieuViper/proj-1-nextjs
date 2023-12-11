@@ -1,12 +1,13 @@
 import { callNon } from "@/library/api";
 import { funcTags } from "@/library/funcTags";
 import TagList from "./_components/TagList";
+import { myConstant } from "@/store/constant";
 
 async function TagsPage({ searchParams }) {
   const page = searchParams?.page ?? 1;
-  const size = searchParams?.size ?? process.env.PAGE_SIZE;
+  const size = searchParams?.size ?? myConstant.post.PAGE_SIZE;
   const search = searchParams?.search ?? "";
-  const lang = searchParams?.lang ?? process.env.DEFAULT_LANGUAGE;
+  const lang = searchParams?.lang ?? myConstant.DEFAULT_LANGUAGE;
   const del = searchParams?.del ?? "";
   const bulkdel = searchParams?.bulkdel ?? "";
 

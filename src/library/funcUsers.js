@@ -4,6 +4,8 @@ import { Op, QueryTypes } from "sequelize";
 import { userRoles } from "./userRoles";
 import bcrypt from 'bcrypt';
 import { funcLogin } from "./funcLogin";
+import getConfig from "next/config";
+import { myConstant } from "@/store/constant";
 
 export const funcUsers = {
   getUsers,
@@ -112,11 +114,11 @@ export async function getTotalNumOfUsers( role, search ) {
 
 
 //Delete bulk of news, articles based on newsid
-export async function deleteBulkUsers(keys) {
+export async function deleteBulkUsers(keys, loginInfo) {
   try {
     const keysArr = keys.split(",");
-    if ( keysArr.includes('admin') )
-      throw new Error('Cannot delete default user admin');
+    if ( keysArr.includes( loginInfo.user.username ) )
+      throw new Error('Cannot delete your owned account');
     await db.Users.destroy({
       where: {
         username: {
@@ -132,9 +134,9 @@ export async function deleteBulkUsers(keys) {
 
 
 //Delete forever a news
-export async function deleteUser(key) {
-  if( key == 'admin' )
-    throw new Error(' Cannot delete default user');
+export async function deleteUser(key, loginInfo) {
+  if( key == loginInfo.user.username )
+    throw new Error(' Cannot delete your owned account');
   try {
     await db.Users.destroy({
       where: {
@@ -188,7 +190,7 @@ export async function updateAUser(data) {
     }
     //hash password if user change password
     if( user.password ) {
-      const salt = await bcrypt.genSalt(parseInt(process.env.SALT_ROUND));
+      const salt = await bcrypt.genSalt(parseInt(getConfig().serverRuntimeConfig.SALT_ROUND));
       const hash = await bcrypt.hash(data.password, salt);
       user.password = hash;
     }
@@ -227,7 +229,7 @@ export async function addAUser(data) {
       throw new Error( "Email is already being used" );
 
     //hash password
-    const salt = await bcrypt.genSalt(parseInt(process.env.SALT_ROUND));
+    const salt = await bcrypt.genSalt(parseInt(getConfig().serverRuntimeConfig.SALT_ROUND));
     const hash = await bcrypt.hash(data.password, salt);
 
     data.password = hash;
@@ -248,7 +250,7 @@ async function userList( loginInfo, searchParams ) {
   const role = searchParams?.get('role') ?? "";
   const search = searchParams?.get('search') ?? "";
   const page = searchParams?.get('page') ?? 1;
-  const size = searchParams?.get('size') ?? process.env.PAGE_SIZE;
+  const size = searchParams?.get('size') ?? myConstant.post.PAGE_SIZE;
   let orderby = searchParams?.get('orderby') ?? "";
   let order = searchParams?.get('order') ?? "";
 
@@ -269,9 +271,9 @@ async function userList( loginInfo, searchParams ) {
         }
         console.log('is Authorize for deleting:', isAuthorize);
         if ( keys != '' )
-            await funcUsers.deleteBulkUsers(keys);
+            await funcUsers.deleteBulkUsers(keys, loginInfo);
         if ( del != '' )
-            await funcUsers.deleteUser(del);
+            await funcUsers.deleteUser(del, loginInfo);
       }
       result.users = await funcUsers.getUsers(
           role,

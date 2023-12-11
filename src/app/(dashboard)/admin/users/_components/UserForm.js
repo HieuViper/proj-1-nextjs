@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import PasswordStrengthBar from "react-password-strength-bar";
 import { callAPI, handleNotAuthorized } from "@/library/client/callAPI";
 import { useLogin } from "@/store/login";
+import { myConstant } from "@/store/constant";
 
 const UserForm = (props) => {
   const router = useRouter();
@@ -37,8 +38,11 @@ const UserForm = (props) => {
   const { setLoginForm } = useLogin();    //use to set global state allowing enable the login form.
 
   useEffect(() => {
+
     if( props.isAuthorize == false ) {
-      handleNotAuthorized();
+      handleNotAuthorized(
+        () => { router.push('/login') },
+        ( msg ) => { setErrorMessage( msg ) });
     }
     //set role options for the field role
     const rolesData = props.roles;
@@ -61,7 +65,7 @@ const UserForm = (props) => {
       let mainImage = JSON.parse( props.mainImage )
       form.setFieldsValue( mainImage );
     }
-  }, [props]);
+  }, [props, router, form]);
 
 
   //submit value
@@ -392,11 +396,11 @@ const UserForm = (props) => {
 
                 const isLt5M =
                   file.size / 1024 / 1024 <=
-                  process.env.NEXT_PUBLIC_FILE_LIMITED_SIZE;
+                  myConstant.image.FILE_LIMITED_SIZE;
                 // check the file size
                 if (!isLt5M) {
                   message.error(
-                    `Image must smaller than ${process.env.NEXT_PUBLIC_FILE_LIMITED_SIZE}MB!`
+                    `Image must smaller than ${myConstant.image.FILE_LIMITED_SIZE}MB!`
                   );
                   reject(false);  //put some reason here
                 } else {
@@ -419,7 +423,7 @@ const UserForm = (props) => {
               src={`${URL.createObjectURL(uploadPic)}`}
               width={160}
               className="rounded-lg shadow"
-
+              alt=""
             />
           )}
           {picURL && !uploadPic && (
@@ -427,6 +431,7 @@ const UserForm = (props) => {
               src={`${picURL}`}
               width={160}
               className="rounded-lg shadow"
+              alt=""
             />
           )}
         </div>

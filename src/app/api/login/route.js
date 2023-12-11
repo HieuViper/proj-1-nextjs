@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { funcLogin } from "@/library/funcLogin";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { myConstant } from "@/store/constant";
 
 export const dynamic = 'force-dynamic' // defaults to force-static
 
@@ -51,7 +52,7 @@ export async function POST(req) {
         secure: process.env.NODE_ENV === 'production',
         path: '/',
         sameSite: 'lax',  //Strict
-        maxAge: process.env.LOGIN_TIME,
+        maxAge: myConstant.LOGIN_TIME,
       });
       return NextResponse.json({}, { status: 200 })
     } catch (error) {

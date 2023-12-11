@@ -1,13 +1,14 @@
 //"use server";
 import { db } from "@/config/db";
+import { myConstant } from "@/store/constant";
 import { Op, QueryTypes } from "sequelize";
 
 //get Status query from parameter post_status
 function getStatusQuery(post_status) {
   switch (post_status) {
     case "":
-      return `post_status!='${process.env.POST_STATUS_TRASH}'`;
-    case process.env.POST_STATUS_PRIORITY:
+      return `post_status!='${myConstant.post.POST_STATUS_TRASH}'`;
+    case myConstant.post.POST_STATUS_PRIORITY:
       return `article_position=1`;
     default:
       return `post_status='${post_status}'`;
@@ -102,7 +103,7 @@ export async function getTotalNumOfarticle(
   }
   try {
     //get total number of articles in All Status
-    let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status!='${process.env.POST_STATUS_TRASH}'`;
+    let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status!='${myConstant.post.POST_STATUS_TRASH}'`;
     //let results = await pool.query(sqlquery);
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.all = results[0].total;
@@ -113,7 +114,7 @@ export async function getTotalNumOfarticle(
   }
   try {
     //get total number of articles in draft status
-    let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status='${process.env.POST_STATUS_DRAFT}'`;
+    let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status='${myConstant.post.POST_STATUS_DRAFT}'`;
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.draft = results[0].total;
   } catch (error) {
@@ -123,7 +124,7 @@ export async function getTotalNumOfarticle(
   }
   try {
     //get total number of articles in published status
-    let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status='${process.env.POST_STATUS_PUBLISH}'`;
+    let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status='${myConstant.post.POST_STATUS_PUBLISH}'`;
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.publish = results[0].total;
   } catch (error) {
@@ -133,7 +134,7 @@ export async function getTotalNumOfarticle(
   }
   try {
     //get total number of articles in trash status
-    let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status='${process.env.POST_STATUS_TRASH}'`;
+    let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status='${myConstant.post.POST_STATUS_TRASH}'`;
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.trash = results[0].total;
   } catch (error) {
@@ -159,7 +160,7 @@ export async function getTotalNumOfarticle(
 export async function trashArticle(key) {
   try {
     await db.Articles.update(
-      { post_status: process.env.POST_STATUS_TRASH },
+      { post_status: myConstant.post.POST_STATUS_TRASH },
       {
         where: {
           id: key,
@@ -175,9 +176,9 @@ export async function trashArticle(key) {
 export async function deleteBulkArticle(keys, status) {
   try {
     const keysArr = keys.split(",");
-    if (status != process.env.POST_STATUS_TRASH)
+    if (status != myConstant.post.POST_STATUS_TRASH)
       await db.Articles.update(
-        { post_status: process.env.POST_STATUS_TRASH },
+        { post_status: myConstant.post.POST_STATUS_TRASH },
         {
           where: {
             id: {
@@ -204,7 +205,7 @@ export async function deleteBulkArticle(keys, status) {
 export async function recoverArticle(key) {
   try {
     await db.Articles.update(
-      { post_status: process.env.POST_STATUS_DRAFT },
+      { post_status: myConstant.post.POST_STATUS_DRAFT },
       {
         where: {
           id: key,
@@ -263,7 +264,7 @@ export async function getLanguages() {
   //console.log('db in language:', db);
   try {
     const results = await db.Languages.findAll({
-      order: db.seq.literal(`code='${process.env.DEFAULT_LANGUAGE}' DESC`),
+      order: db.seq.literal(`code='${myConstant.DEFAULT_LANGUAGE}' DESC`),
     });
     return results;
   } catch (error) {

@@ -1,4 +1,5 @@
-import nodemailer from 'nodemailer'
+import nodemailer from 'nodemailer';
+import getConfig from 'next/config';
 
 export const funcEmail = {
     sendMail,
@@ -23,10 +24,10 @@ export const funcEmail = {
 export async function sendMail( options ) {
     const mailOptions = options;
     try{
-        const transporter = nodemailer.createTransport( { service: process.env.MAIL_SERVICE,
+        const transporter = nodemailer.createTransport( { service: getConfig().serverRuntimeConfig.MAIL_SERVICE,
                                                         auth: {
-                                                            user: process.env.MAIL_USER,
-                                                            pass: process.env.MAIL_PASS,  //jdlz yuhb rhtl tsr  //uill swsq lfyu lgfk
+                                                            user: getConfig().serverRuntimeConfig.MAIL_USER,
+                                                            pass: getConfig().serverRuntimeConfig.MAIL_PASS,  //jdlz yuhb rhtl tsr  //uill swsq lfyu lgfk
                                                         } });
         await transporter.sendMail( mailOptions );
     }

@@ -8,6 +8,7 @@ import {
   trashArticle,
 } from "@/library/funcArticles";
 import ArticleList from "./_components/ArticleList";
+import { myConstant } from "@/store/constant";
 
 // This part is important!
 export const dynamic = "force-dynamic";
@@ -23,13 +24,13 @@ async function ArticlePage({ searchParams }) {
   const status = searchParams?.status ?? "";
   const search = searchParams?.search ?? "";
   const page = searchParams?.page ?? 1;
-  const size = searchParams?.size ?? process.env.PAGE_SIZE;
+  const size = searchParams?.size ?? myConstant.post.PAGE_SIZE;
   let orderby = searchParams?.orderby ?? "";
   let order = searchParams?.order ?? "";
   const author = searchParams?.author ?? "";
   const category = searchParams?.category ?? "";
   const tag = searchParams?.tag ?? "";
-  const lang = searchParams?.lang ?? process.env.DEFAULT_LANGUAGE;
+  const lang = searchParams?.lang ?? myConstant.DEFAULT_LANGUAGE;
 
   console.log("searchparams: ", searchParams);
 

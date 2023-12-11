@@ -1,4 +1,5 @@
 import { db } from "@/config/db";
+import { myConstant } from "@/store/constant";
 
 const createLanguage = async () => {
   console.log("Start creating samples for languages table");
@@ -204,7 +205,7 @@ export const createSampleData = async () => {
           categories: "bat_dong_san",
           tags: "tag1, tag2",
           post_author: "admin",
-          post_status: process.env.POST_STATUS_DRAFT,
+          post_status: myConstant.post.POST_STATUS_DRAFT,
           news_code: `url_news_code${i}`,
           createdAt: db.seq.literal("now()"),
           post_modified: db.seq.literal("now()"),
@@ -215,7 +216,7 @@ export const createSampleData = async () => {
           categories: "chung_khoan",
           tags: "tag1, tag2",
           post_author: "admin",
-          post_status: process.env.POST_STATUS_DRAFT,
+          post_status: myConstant.post.POST_STATUS_DRAFT,
           news_code: `url_news_code${i}`,
           createdAt: db.seq.literal("now()"),
           post_modified: db.seq.literal("now()"),
@@ -225,7 +226,7 @@ export const createSampleData = async () => {
           categories: "xa_hoi",
           tags: "tag1, tag2",
           post_author: "admin",
-          post_status: process.env.POST_STATUS_DRAFT,
+          post_status: myConstant.post.POST_STATUS_DRAFT,
           news_code: `url_news_code${i}`,
           createdAt: db.seq.literal("now()"),
           post_modified: db.seq.literal("now()"),
@@ -255,7 +256,7 @@ export const createSampleData = async () => {
         categories: "cat-1, cat-2",
         tags: "tag1, tag2",
         post_author: "huy",
-        post_status: process.env.POST_STATUS_DRAFT,
+        post_status: myConstant.post.POST_STATUS_DRAFT,
         article_code: `Article_news_project${i}`,
       });
 

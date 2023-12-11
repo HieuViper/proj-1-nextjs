@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-async-client-component */
 "use client";
+import { myConstant } from "@/store/constant";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -154,7 +155,7 @@ const ArticleList = (props) => {
       let orderby;
       if (sorter.columnKey === "date")
         orderby =
-          status === process.env.NEXT_PUBLIC_PS_PUBLISH
+          status === myConstant.post.POST_STATUS_PUBLISH
             ? "post_date"
             : "post_modified";
       else orderby = sorter.columnKey;
@@ -213,7 +214,7 @@ const ArticleList = (props) => {
           <>
             <div className="text-base font-medium pb-2">{record.title}</div>
             <div className="flex gap-2">
-              {record.post_status !== process.env.NEXT_PUBLIC_PS_TRASH ? (
+              {record.post_status !== myConstant.post.POST_STATUS_TRASH ? (
                 <>
                   <Link href={`/admin/articles/edit/${record.id}`}>
                     <span className="btn-edit">
@@ -342,7 +343,7 @@ const ArticleList = (props) => {
       render: (_, record) => {
         return (
           <div>
-            {record.post_status == process.env.NEXT_PUBLIC_PS_PUBLISH ? (
+            {record.post_status == myConstant.post.POST_STATUS_PUBLISH ? (
               <>
                 Published
                 <br />
@@ -433,16 +434,16 @@ const ArticleList = (props) => {
             buttonStyle="solid"
           >
             <Radio.Button value="">All ({totals.all})</Radio.Button>
-            <Radio.Button value={process.env.NEXT_PUBLIC_PS_DRAFT}>
+            <Radio.Button value={myConstant.post.POST_STATUS_DRAFT}>
               Draft({totals.draft})
             </Radio.Button>
-            <Radio.Button value={process.env.NEXT_PUBLIC_PS_PUBLISH}>
+            <Radio.Button value={myConstant.post.POST_STATUS_PUBLISH}>
               Publish ({totals.publish})
             </Radio.Button>
-            <Radio.Button value={process.env.NEXT_PUBLIC_PS_PRIORITY}>
+            <Radio.Button value={myConstant.post.POST_STATUS_PRIORITY}>
               Priority ({totals.priority})
             </Radio.Button>
-            <Radio.Button value={process.env.NEXT_PUBLIC_PS_TRASH}>
+            <Radio.Button value={myConstant.post.POST_STATUS_TRASH}>
               Trash ({totals.trash})
             </Radio.Button>
           </Radio.Group>

@@ -7,6 +7,10 @@ const nextConfig = {
   reactStrictMode: false,
   serverRuntimeConfig: {
     secret: 'my-32-character-ultra-secure-and-ultra-long-secret',
+    SALT_ROUND: 10,
+    MAIL_USER: 'nagaoreishi@gmail.com',
+    MAIL_PASS: 'uillswsqlfyulgfk',
+    MAIL_SERVICE: 'gmail',
     userRoles: {
       Administrator: {
         users: {

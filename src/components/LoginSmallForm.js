@@ -41,7 +41,7 @@ const LoginSmallForm = (props) => {
       }}
       onFinish={onFinish}
     >
-      <div class="text-red-500 font-bold">{err}</div>
+      <div className="text-red-500 font-bold">{err}</div>
       <Form.Item
         name="username"
         rules={[

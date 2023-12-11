@@ -15,6 +15,7 @@ import {
 import { Avatar, Button, Layout, Menu, theme, Modal } from "antd";
 import Link from "next/link";
 import Image from "next/image";
+
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useLogin } from "@/store/login";
@@ -132,7 +133,7 @@ const DashboardLayout = ( props ) => {
             target="_blank"
             className="sidebar-logo p-4 flex justify-center items-center gap-2"
           >
-            <img src="https://ng.ant.design/assets/img/logo.svg" alt="logo" />
+            <Image src="https://ng.ant.design/assets/img/logo.svg" alt="logo" width={200} height={200} />
             {!collapsed && (
               <div className="font-semibold">ADMIN&nbsp;DASHBOARD</div>
             )}

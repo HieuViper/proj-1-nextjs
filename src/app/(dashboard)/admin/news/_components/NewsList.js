@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { callAPI, handleNotAuthorized } from "@/library/client/callAPI";
 import { useLogin } from "@/store/login";
 import { Span } from "next/dist/trace";
+import { myConstant } from "@/store/constant";
 
 export default function NewsList(props) {
   const router = useRouter();
@@ -53,7 +54,7 @@ export default function NewsList(props) {
   const [category, setCategory] = useState("");
   const [tag, setTag] = useState("");
   const [loadingStatus, setLoadingStatus] = useState(false);
-  const [lang, setLang] = useState(process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE);
+  const [lang, setLang] = useState(myConstant.DEFAULT_LANGUAGE);
   const [errorMessage, setErrorMessage] = useState('');   //display the serious error
   const { setLoginForm } = useLogin();    //use to set global state allowing enable the login form.
 
@@ -67,13 +68,13 @@ export default function NewsList(props) {
       );
     }
 
-    setResetStates( props );
+    setInitStates( props );
     setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
     setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
 
   }, [props]);
 
-  function setResetStates( result ) {
+  function setInitStates( result ) {
     // const newsData = JSON.parse(props.dataTable);
     // const langData = JSON.parse(props.langTable);
     setLangTable(JSON.parse(result.langTable));
@@ -130,7 +131,7 @@ export default function NewsList(props) {
     () => { setLoginForm( true ) },
   );
   if ( res.status == 200 ) {
-    setResetStates( result );
+    setInitStates( result );
   }
   setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
   setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -157,7 +158,7 @@ export default function NewsList(props) {
       () => { setLoginForm( true ) },
     );
     if ( res.status == 200 ) {
-      setResetStates( result );
+      setInitStates( result );
     }
     setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
     setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -185,7 +186,7 @@ export default function NewsList(props) {
       () => { setLoginForm( true ) },
     );
     if ( res.status == 200 ) {
-      setResetStates( result );
+      setInitStates( result );
     }
     setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
     setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -214,7 +215,7 @@ export default function NewsList(props) {
       () => { setLoginForm( true ) },
     );
     if ( res.status == 200 ) {
-      setResetStates( result );
+      setInitStates( result );
     }
     setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
     setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -242,7 +243,7 @@ export default function NewsList(props) {
       () => { setLoginForm( true ) },
     );
     if ( res.status == 200 ) {
-      setResetStates( result );
+      setInitStates( result );
     }
     setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
     setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -270,7 +271,7 @@ export default function NewsList(props) {
       () => { setLoginForm( true ) },
     );
     if ( res.status == 200 ) {
-      setResetStates( result );
+      setInitStates( result );
     }
     setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
     setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -294,7 +295,7 @@ export default function NewsList(props) {
       let orderby;
       if (sorter.columnKey === "date")
         orderby =
-          statusPara === process.env.NEXT_PUBLIC_PS_PUBLISH
+          statusPara === myConstant.post.POST_STATUS_PUBLISH
             ? "post_date"
             : "post_modified";
       else orderby = sorter.columnKey;
@@ -328,7 +329,7 @@ export default function NewsList(props) {
       () => { setLoginForm( true ) },
     );
     if ( res.status == 200 ) {
-      setResetStates( result );
+      setInitStates( result );
     }
     setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
     setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -353,7 +354,7 @@ export default function NewsList(props) {
       () => { setLoginForm( true ) },
     );
     if ( res.status == 200 ) {
-      setResetStates( result );
+      setInitStates( result );
     }
     setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
     setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -392,7 +393,7 @@ export default function NewsList(props) {
                 )}
             </div>
             <div className="flex gap-2">
-              {record.post_status !== process.env.NEXT_PUBLIC_PS_TRASH ? (
+              {record.post_status !== myConstant.post.POST_STATUS_TRASH ? (
                 <>
                 { props.roles[props.user.role]?.news?.edit === true && (
                   <>
@@ -422,7 +423,7 @@ export default function NewsList(props) {
                             () => { setLoginForm( true ) },
                           );
                           if ( res.status == 200 ) {
-                            setResetStates( result );
+                            setInitStates( result );
                           }
                           setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
                           setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -462,7 +463,7 @@ export default function NewsList(props) {
                             () => { setLoginForm( true ) },
                           );
                           if ( res.status == 200 ) {
-                            setResetStates( result );
+                            setInitStates( result );
                           }
                           setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
                           setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -490,7 +491,7 @@ export default function NewsList(props) {
                                 () => { setLoginForm( true ) },
                               );
                               if ( res.status == 200 ) {
-                                setResetStates( result );
+                                setInitStates( result );
                               }
                               setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
                               setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -588,7 +589,7 @@ export default function NewsList(props) {
       render: (_, record) => {
         return (
           <div>
-            {record.post_status == process.env.NEXT_PUBLIC_PS_PUBLISH ? (
+            {record.post_status == myConstant.post.POST_STATUS_PUBLISH ? (
               <>
                 Published
                 <br />
@@ -624,7 +625,7 @@ export default function NewsList(props) {
             </Link>
           )}
           <Select
-            defaultValue={process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE}
+            defaultValue={myConstant.DEFAULT_LANGUAGE}
             value={lang}
             style={{
               width: 120,
@@ -653,7 +654,9 @@ export default function NewsList(props) {
           disabled={!hasSelected}
           loading={loading}
         >
-          Bulk Delete
+          <span>
+            Bulk Delete <DeleteOutlined />
+          </span>
         </Button>
         <span
           style={{
@@ -675,16 +678,16 @@ export default function NewsList(props) {
             buttonStyle="solid"
           >
             <Radio.Button value="">All ({totals.all})</Radio.Button>
-            <Radio.Button value={process.env.NEXT_PUBLIC_PS_DRAFT}>
+            <Radio.Button value={myConstant.post.POST_STATUS_DRAFT}>
               Draft({totals.draft})
             </Radio.Button>
-            <Radio.Button value={process.env.NEXT_PUBLIC_PS_PUBLISH}>
+            <Radio.Button value={myConstant.post.POST_STATUS_PUBLISH}>
               Publish ({totals.publish})
             </Radio.Button>
-            <Radio.Button value={process.env.NEXT_PUBLIC_PS_PRIORITY}>
+            <Radio.Button value={myConstant.post.POST_STATUS_PRIORITY}>
               Priority ({totals.priority})
             </Radio.Button>
-            <Radio.Button value={process.env.NEXT_PUBLIC_PS_TRASH}>
+            <Radio.Button value={myConstant.post.POST_STATUS_TRASH}>
               Trash ({totals.trash})
             </Radio.Button>
           </Radio.Group>

@@ -1,6 +1,7 @@
 import { db } from "@/config/db";
 import { NextResponse } from "next/server";
 import { QueryTypes } from "sequelize";
+import { myConstant } from "@/store/constant";
 
 export async function GET(req, res) {
   const { searchParams } = new URL(req.url);
@@ -59,7 +60,7 @@ export async function GET(req, res) {
     }
     try {
       //get total number of articles in All Status
-      let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status!='${process.env.POST_STATUS_TRASH}'`;
+      let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status!='${ myConstant.post.POST_STATUS_TRASH }'`;
       //let results = await pool.query(sqlquery);
       let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
       totals.all = results[0].total;
@@ -70,7 +71,7 @@ export async function GET(req, res) {
     }
     try {
       //get total number of articles in draft status
-      let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status='${process.env.POST_STATUS_DRAFT}'`;
+      let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status='${ myConstant.post.POST_STATUS_DRAFT }'`;
       let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
       totals.draft = results[0].total;
     } catch (error) {
@@ -80,7 +81,7 @@ export async function GET(req, res) {
     }
     try {
       //get total number of articles in published status
-      let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status='${process.env.POST_STATUS_PUBLISH}'`;
+      let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status='${ process.env.POST_STATUS_PUBLISH}'`;
       let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
       totals.publish = results[0].total;
     } catch (error) {
@@ -90,7 +91,7 @@ export async function GET(req, res) {
     }
     try {
       //get total number of articles in trash status
-      let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status='${process.env.POST_STATUS_TRASH}'`;
+      let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status='${myConstant.post.POST_STATUS_TRASH}'`;
       let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
       totals.trash = results[0].total;
     } catch (error) {
@@ -156,8 +157,8 @@ export async function POST(req, res) {
 function getStatusQuery(post_status) {
   switch (post_status) {
     case "":
-      return `post_status!='${process.env.POST_STATUS_TRASH}'`;
-    case process.env.POST_STATUS_PRIORITY:
+      return `post_status!='${myConstant.post.POST_STATUS_TRASH}'`;
+    case myConstant.post.POST_STATUS_PRIORITY:
       return `article_position=1`;
     default:
       return `post_status='${post_status}'`;

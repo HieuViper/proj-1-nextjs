@@ -1,4 +1,5 @@
 import { db } from "@/config/db";
+import { myConstant } from "@/store/constant";
 import { Op } from "sequelize";
 
 //BULK DELETE ARTICLE
@@ -7,9 +8,9 @@ export async function PUT(req, context) {
     const body = await req.json();
     const keysArr = body.arrDell.split(",");
     const status = body.status;
-    if (status != process.env.POST_STATUS_TRASH)
+    if (status != myConstant.post.POST_STATUS_TRASH)
       await db.Articles.update(
-        { post_status: process.env.POST_STATUS_TRASH },
+        { post_status: myConstant.post.POST_STATUS_TRASH },
         {
           where: {
             id: {

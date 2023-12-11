@@ -2,6 +2,7 @@ import { funcImage } from "@/library/funcImages";
 import { funcNews } from "@/library/funcNews";
 import { redirect } from "next/navigation";
 import { NewsForm } from "../../_components/NewsForm";
+import { myConstant } from "@/store/constant";
 
 export const dynamic = "force-dynamic";
 async function EditNews({ params, searchParams }) {
@@ -49,8 +50,8 @@ async function EditNews({ params, searchParams }) {
   }
   const data = await funcNews.getNews(params.id);
   const mainImage = await funcImage.getImage(data[0]?.image ?? "");
-  const cate = await funcNews.getCategories( process.env.DEFAULT_LANGUAGE );
-  const tags = await funcNews.getTags(process.env.DEFAULT_LANGUAGE);
+  const cate = await funcNews.getCategories( myConstant.DEFAULT_LANGUAGE );
+  const tags = await funcNews.getTags(myConstant.DEFAULT_LANGUAGE);
   const langTable = await funcNews.getLanguages();
   return (
     <div className="">

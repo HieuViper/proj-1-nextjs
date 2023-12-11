@@ -1,4 +1,5 @@
 
+import { myConstant } from "@/store/constant";
 import { DataTypes } from "sequelize";
 
 export function newsModel(sequelize) {
@@ -57,12 +58,12 @@ export function newsModel(sequelize) {
         post_status: {
             type: DataTypes.STRING(20),
             collate: 'utf8mb4_unicode_520_ci',
-            defaultValue: process.env.POST_STATUS_DRAFT,
+            defaultValue: myConstant.post.POST_STATUS_DRAFT,
             allowNull: false,
             comment: 'post status has 3 states: draft, publish, trash',
             validate: {
                 isIn: {
-                    args: [[process.env.POST_STATUS_DRAFT, process.env.POST_STATUS_PUBLISH, process.env.POST_STATUS_TRASH]],
+                    args: [[myConstant.post.POST_STATUS_DRAFT, myConstant.post.POST_STATUS_PUBLISH, myConstant.post.POST_STATUS_TRASH]],
                     msg: 'Invalid status of post',
                 }
             },

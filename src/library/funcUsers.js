@@ -22,9 +22,19 @@ export const funcUsers = {
 function getSearchQuery(search) {
   return search == ""
     ? ""
-    : `AND (username LIKE '%${search}%' OR first_name LIKE '%${search}%' OR last_name LIKE '%${search}%' OR email LIKE '%${search}%' OR role LIKE '%${search}%')`;
+    : ` (username LIKE '%${search}%' OR first_name LIKE '%${search}%' OR last_name LIKE '%${search}%' OR email LIKE '%${search}%' OR role LIKE '%${search}%')`;
 }
 
+//get Where Query for select users query
+function getWhereQuery( roleQuery, searchQuery ) {
+  let andStr = '';
+  if ( roleQuery != '' && searchQuery != '' ) {
+    andStr = ' AND ';
+  }
+  const whereQuery = ( roleQuery == "" && searchQuery == "" ) ? ""
+                        : `WHERE (${roleQuery}${andStr}${searchQuery})`;
+  return whereQuery;
+}
 //GetNews for tab "All,published, trash"
 export async function getUsers(
   role,
@@ -39,8 +49,8 @@ export async function getUsers(
     const roleQuery = role == "" ? "" : `role='${role}'`
     const searchQuery = getSearchQuery(search);
     const orderQuery = orderby == "" ? "" : `ORDER BY ${orderby} ${order}`;
-    const whereQuery = ( roleQuery == "" && searchQuery == "" ) ? ""
-                        : `WHERE (${roleQuery} ${searchQuery})`;
+
+    const whereQuery = getWhereQuery(roleQuery, searchQuery);
 
     let sqlquery = `SELECT username, image, display_name, role, num_posts, email  FROM users ${whereQuery} ${orderQuery} LIMIT ${fromNews}, ${size}`;
 
@@ -66,8 +76,7 @@ export async function getTotalNumOfUsers( role, search ) {
     //get total number of users in the return user table
     const roleQuery = role == "" ? "" : `role='${role}'`
     const searchQuery = getSearchQuery(search);
-    const whereQuery = ( roleQuery == "" && searchQuery == "" ) ? ""
-                        : `WHERE (${roleQuery} ${searchQuery})`;
+    const whereQuery = getWhereQuery( roleQuery, searchQuery );
 
     let sqlquery = `SELECT count(*) AS total FROM users ${whereQuery}`;
     //let results = await pool.query(sqlquery, [post_type]);
@@ -106,14 +115,15 @@ export async function getTotalNumOfUsers( role, search ) {
 export async function deleteBulkUsers(keys) {
   try {
     const keysArr = keys.split(",");
-
-      await db.Users.destroy({
-        where: {
-          username: {
-            [Op.in]: keysArr,
-          },
+    if ( keysArr.includes('admin') )
+      throw new Error('Cannot delete default user admin');
+    await db.Users.destroy({
+      where: {
+        username: {
+          [Op.in]: keysArr,
         },
-      });
+      },
+    });
   } catch (error) {
     console.log(error);
     throw new Error("Fail to delete users - " + error.message);
@@ -123,6 +133,8 @@ export async function deleteBulkUsers(keys) {
 
 //Delete forever a news
 export async function deleteUser(key) {
+  if( key == 'admin' )
+    throw new Error(' Cannot delete default user');
   try {
     await db.Users.destroy({
       where: {

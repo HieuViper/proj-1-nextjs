@@ -43,3 +43,9 @@ body {
 .btn-delete {
   color: #ef4444;
 }
+/* Optional: Style for the disabled link */
+.disabled-link {
+  color: gray; /* Change the color to visually indicate it's disabled */
+  pointer-events: none; /* Disable pointer events to prevent clicks */
+  cursor: not-allowed; /* Change the cursor */
+}

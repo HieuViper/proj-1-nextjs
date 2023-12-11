@@ -15,7 +15,7 @@ const nextConfig = {
           delete: true,
         },
         news: {
-            add: false,
+            add: true,
             edit: true,
             delete: true,
             publish: true,

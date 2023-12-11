@@ -105,84 +105,70 @@ async function dellImage(url) {
 }
 
 
-// Function to check if a folder exists
-const doesFolderExist = async (folderPath) => {
+// Function to check to make sure the folder exists, if not , make the folder
+const checkAndCreateFolder = async ( folderPath ) => {
   console.log(folderPath);
   try {
     // Use 'access' method to check if the folder exists
-    await fsPromises.access(folderPath);
-
-    // If 'access' is successful, the folder exists
-    return true;
+    await fsPromises.access( folderPath );
   } catch (error) {
     // If 'access' throws an error, the folder does not exist
-    return false;
+    await fsPromises.mkdir( folderPath );
   }
 };
 
 // Function to convert from isostring to custom name like 'jan2023'
-function convertISOToCustomFormat(isoString) {
-  // Parse the ISO string and create a Date object
-  const date = new Date(isoString);
+function getFolderName( imageFile ) {
 
+  let imageDate = new Date(imageFile.lastModified); //get modified date
   // Get the month and year from the Date object
-  const month = date.toLocaleString("en-US", { month: "short" });
-  const year = date.getFullYear();
+  const month = imageDate.toLocaleString("en-US", { month: "short" });
+  const year = imageDate.getFullYear();
 
   // Combine the month and year in the desired format
-  const result = month.toLowerCase() + year;
-
-  return result;
+  const folderName = month.toLowerCase() + year;
+  return folderName;
 }
+
+async function checkAndCreateFileName( fileName, folderPath ) {
+  const fileList = await fsPromises.readdir( folderPath );
+  const isDuplicate = fileList.includes( fileName );
+
+  // if duplicate then change filename to unique
+  if (isDuplicate == true) {
+    const temp = fileName.split(".");
+    fileName = temp[0] + "-" + Date.now().toString() + "." + temp[1];
+  }
+  return fileName;
+}
+
 
 //save image to folder and return image URL
 export async function saveImage( imageFile ) {
   if ( !imageFile )
     throw new Error('No image file to save');
 
-  let lastModifiedDate = new Date(imageFile.lastModified); //get modified date
-  let nameFolderInCustom = convertISOToCustomFormat(
-    //get name folder in format like 'jan2023'
-    lastModifiedDate.toISOString()
-  );
-
-  //replace space in file name by '_'
-  const buffer = Buffer.from(await imageFile.arrayBuffer());
-  let filename = imageFile.name.replaceAll(" ", "_");
-
+    //get Folder's Name to save the image
+  let folderName = getFolderName( imageFile );
+  let folderPath = `public/${process.env.FOLDER_UPLOAD}/${folderName}`;
+  let fileName = imageFile.name.replaceAll(" ", "_");     //replace space in file name by '_'
   try {
-    // check folder exist
-    await doesFolderExist(`public/${process.env.FOLDER_UPLOAD}/${nameFolderInCustom}`).then(
-      async (exists) => {
-        if (exists) {   //no need
-          // console.log("Folder exists!");
-          // const temp = filename.split(".");
-          // filename = temp[0] + "-" + Date.now().toString() + "." + temp[1]; //no need, it is duplicate the below step at row 73
-        } else {
-          console.log("Folder does not exist.");
-          await fsPromises.mkdir(`public/${process.env.FOLDER_UPLOAD}/${nameFolderInCustom}`);
-        }
-      }
-    );
+    // check folder, if it doesn't exit, create new folder
+    await checkAndCreateFolder( folderPath );
 
-    // Check if the filename is already present in the folder
-    const files = await fs.readdir(`public/${process.env.FOLDER_UPLOAD}/${nameFolderInCustom}`);
-    const isDuplicate = files.includes(filename);
+    // Check if the filename is already present in the folder, if it already exit, change to new filename
+    fileName = await checkAndCreateFileName( fileName, folderPath );
 
-    // if duplicate then change filename to unique
-    if (isDuplicate == true) {
-      const temp = filename.split(".");
-      filename = temp[0] + "-" + Date.now().toString() + "." + temp[1];
-    }
+    const buffer = Buffer.from(await imageFile.arrayBuffer());
 
-    await writeFile(
+    await fsPromises.writeFile(
       path.join(
         process.cwd(),
-        `public/${process.env.FOLDER_UPLOAD}/${nameFolderInCustom}/` + filename
+        `public/${process.env.FOLDER_UPLOAD}/${folderName}/` + fileName
       ),
       buffer
     );
-    return `/uploads/${nameFolderInCustom}/` + filename;
+    return `/${process.env.FOLDER_UPLOAD}/${folderName}/` + fileName;
   } catch (error) {
     throw new Error( 'Cannot save image file:' + error.message );
   }

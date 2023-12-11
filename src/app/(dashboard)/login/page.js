@@ -1,23 +1,22 @@
-import { Card } from "antd";
-import LoginForm from "./_components/LoginForm";
 import { funcLogin } from "@/library/funcLogin";
+import { Card } from "antd";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import { myConstant } from "@/store/constant";
+import LoginForm from "./_components/LoginForm";
 // import { now } from "sequelize/types/utils";
 
 const LoginPage = () => {
-
   //Handle login's process
-  async function login( username, password ) {
-    'use server'
+  async function login(username, password) {
+    "use server";
     let message;
     let token;
     try {
-      token = await funcLogin.checkLogin( username, password );
+      token = await funcLogin.checkLogin(username, password);
       cookies().set({
-        name: 'Authorization',
+        name: "Authorization",
         value: token,
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -25,16 +24,14 @@ const LoginPage = () => {
         sameSite: 'lax',  //Strict
         maxAge: myConstant.LOGIN_TIME,
       });
-
     } catch (error) {
       message = error.message;
     }
-    if( token ) {
-      redirect('/admin');
+    if (token) {
+      redirect("/admin");
     }
     return message;
   }
-
 
   funcLogin.checkAuthenticationForLoginPage();
 
@@ -46,7 +43,7 @@ const LoginPage = () => {
           <h1 className="font-semibold text-2xl">Admin Portal</h1>
           <p className="font-[500]">Admin Portal for CMS Website</p>
         </div>
-        <LoginForm {...{login}} />
+        <LoginForm {...{ login }} />
       </Card>
     </div>
   );

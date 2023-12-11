@@ -3,11 +3,9 @@ import { funcLogin } from "@/library/funcLogin";
 // import { userRoles } from "@/library/userRoles";
 import getConfig from "next/config";
 
-
-
-export default async function DashBLayout ({ children, params, searchParams }) {
-  async function logout () {
-    'use server'
+export default async function DashBLayout({ children, params, searchParams }) {
+  async function logout() {
+    "use server";
     funcLogin.logout();
   }
 
@@ -22,4 +20,3 @@ export default async function DashBLayout ({ children, params, searchParams }) {
     </DashboardLayout>;
 
 }
-

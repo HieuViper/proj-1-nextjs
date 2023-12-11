@@ -9,7 +9,7 @@ const Layout = (props) => {
 
   const specificRoute = ["admin", "login"]; // exclude specific router
   return (
-    <html lang="en">
+    <html lang={props.lang}>
       <body>
         {headersList.includes(specificRoute) && <Navbar />}
         <RootStyleRegistry>{props.child}</RootStyleRegistry>

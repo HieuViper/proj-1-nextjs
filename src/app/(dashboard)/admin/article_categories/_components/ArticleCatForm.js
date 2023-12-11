@@ -1,4 +1,5 @@
 "use client";
+import { myConstant } from "@/store/constant";
 import { Button, Form, Input, Tabs } from "antd";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -104,7 +105,7 @@ export function ArticleForm(props) {
           ]}
           className="mb-0"
         >
-          {lang == process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE ?
+          {lang == myConstant.DEFAULT_LANGUAGE ?
             <Input onChange={(e) => generateArticleCode(e.target.value)} placeholder="Input name" />
             :
             <Input placeholder="Input name" />}

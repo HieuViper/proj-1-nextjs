@@ -1,11 +1,12 @@
 import { db } from "@/config/db";
+import { myConstant } from "@/store/constant";
 import { NextResponse } from "next/server";
 import { Op, QueryTypes } from "sequelize";
 
 export async function GET(req, res) {
   try {
     const results = await db.Languages.findAll({
-      order: db.seq.literal(`code='${process.env.DEFAULT_LANGUAGE}' DESC`),
+      order: db.seq.literal(`code='${myConstant.DEFAULT_LANGUAGE}' DESC`),
     });
     // return results;
     return NextResponse.json({ data: results });

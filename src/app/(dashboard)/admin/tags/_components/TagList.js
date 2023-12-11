@@ -16,6 +16,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { TagForm } from "./TagForm";
+import { myConstant } from "@/store/constant";
 
 function TagList(props) {
   const { getAllTag, getTag, addTag, editTag, delTag, delBulkTag, searchTag } =
@@ -30,7 +31,7 @@ function TagList(props) {
   const [langTable, setLangTable] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dataTag, setDataTag] = useState();
-  const [lang, setLang] = useState(process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE);
+  const [lang, setLang] = useState(myConstant.DEFAULT_LANGUAGE);
   const [search, setSearch] = useState("");
   const [pagination, setPagination] = useState({
     pageSize: 10,
@@ -190,7 +191,7 @@ function TagList(props) {
           <Select
             defaultValue={
               searchParams.get("lang") ??
-              process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE
+              myConstant.DEFAULT_LANGUAGE
             }
             // value={lang}
             style={{

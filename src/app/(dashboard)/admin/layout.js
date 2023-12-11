@@ -11,12 +11,12 @@ export default async function DashBLayout({ children, params, searchParams }) {
 
   const loginInfo = funcLogin.checkAuthenticationForLayout();
 
-  return (
-    <DashboardLayout
-      children={children}
-      user={loginInfo?.user}
-      roles={getConfig().serverRuntimeConfig.userRoles}
-      {...{ logout }}
-    />
-  );
+  return <DashboardLayout
+                          user={loginInfo?.user}
+                          roles={ getConfig().serverRuntimeConfig.userRoles }
+                          {...{logout}}
+  >
+      { children }
+    </DashboardLayout>;
+
 }

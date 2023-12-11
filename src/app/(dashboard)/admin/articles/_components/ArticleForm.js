@@ -1,4 +1,5 @@
 "use client";
+import { myConstant } from "@/store/constant";
 import { SwapLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import {
   Button,
@@ -98,7 +99,7 @@ export function ArticleForm(props) {
   //generate slug from title
   function generateArticleCode() {
     let articleCode = form
-      .getFieldValue(`title_${process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE}`)
+      .getFieldValue(`title_${myConstant.DEFAULT_LANGUAGE}`)
       .trim()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
@@ -138,8 +139,8 @@ export function ArticleForm(props) {
         >
           {
             //only generate article_code when post status is not published
-            lang == process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE &&
-            data?.post_status != process.env.NEXT_PUBLIC_PS_PUBLISH ? (
+            lang == myConstant.DEFAULT_LANGUAGE &&
+            data?.post_status != myConstant.post.POST_STATUS_PUBLISH ? (
               <Input onChange={() => generateArticleCode()} />
             ) : (
               <Input />
@@ -254,7 +255,7 @@ export function ArticleForm(props) {
 
     //editing article
     if (params?.id) {
-      if (value.post_status == process.env.NEXT_PUBLIC_PS_TRASH)
+      if (value.post_status == myConstant.post.POST_STATUS_TRASH)
         await props.dellArticle(newValue, articleLangs, params.id);
       else {
         await props
@@ -265,7 +266,7 @@ export function ArticleForm(props) {
               setPostStatus(form.getFieldValue("post_status")); //set postStatus state to rerender action buttons
               let messageNotify =
                 form.getFieldValue("post_status") ==
-                process.env.NEXT_PUBLIC_PS_DRAFT
+                myConstant.post.POST_STATUS_DRAFT
                   ? "Save Draft Success"
                   : "Save Publish Success";
               toast.success(messageNotify, {
@@ -399,7 +400,7 @@ export function ArticleForm(props) {
                   ghost
                   htmlType="submit"
                   onClick={() =>
-                    setStatusHidden(process.env.NEXT_PUBLIC_PS_DRAFT)
+                    setStatusHidden(myConstant.post.POST_STATUS_DRAFT)
                   }
                 >
                   Switch to Draft
@@ -410,7 +411,7 @@ export function ArticleForm(props) {
                   danger
                   htmlType="submit"
                   onClick={() =>
-                    setStatusHidden(process.env.NEXT_PUBLIC_PS_TRASH)
+                    setStatusHidden(myConstant.post.POST_STATUS_TRASH)
                   }
                 >
                   Move to trash
@@ -437,7 +438,7 @@ export function ArticleForm(props) {
                   danger
                   htmlType="submit"
                   onClick={() =>
-                    setStatusHidden(process.env.NEXT_PUBLIC_PS_TRASH)
+                    setStatusHidden(myConstant.post.POST_STATUS_TRASH)
                   }
                 >
                   Move to trash
@@ -450,7 +451,7 @@ export function ArticleForm(props) {
                   type="dashed"
                   htmlType="submit"
                   onClick={() => {
-                    setStatusHidden(process.env.NEXT_PUBLIC_PS_DRAFT);
+                    setStatusHidden(myConstant.post.POST_STATUS_DRAFT);
                   }}
                 >
                   Save Draft
@@ -461,7 +462,7 @@ export function ArticleForm(props) {
                   type="primary"
                   htmlType="submit"
                   onClick={() =>
-                    setStatusHidden(process.env.NEXT_PUBLIC_PS_PUBLISH, true)
+                    setStatusHidden(myConstant.post.POST_STATUS_PUBLISH, true)
                   }
                 >
                   Publish
@@ -474,7 +475,7 @@ export function ArticleForm(props) {
         <Form.Item label="Slug" name="article_code">
           <Input
             disabled={
-              data?.post_status == process.env.NEXT_PUBLIC_PS_PUBLISH
+              data?.post_status == myConstant.post.POST_STATUS_PUBLISH
                 ? true
                 : false //disabled this field if the post already has article_code
             }
@@ -551,11 +552,11 @@ export function ArticleForm(props) {
 
                 const isLt5M =
                   file.size / 1024 / 1024 <=
-                  process.env.NEXT_PUBLIC_FILE_LIMITED_SIZE;
+                  myConstant.image.FILE_LIMITED_SIZE;
                 // check the file size
                 if (!isLt5M) {
                   message.error(
-                    `Image must smaller than ${process.env.NEXT_PUBLIC_FILE_LIMITED_SIZE}MB!`
+                    `Image must smaller than ${myConstant.image.FILE_LIMITED_SIZE}MB!`
                   );
                   reject(false);
                 } else {

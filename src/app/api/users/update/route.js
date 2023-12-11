@@ -23,9 +23,6 @@ export async function POST(req, { params }) {
     } catch ( error ) {
         return NextResponse.json( { msg: error.message }, { status: 400 });
     }
-    console.log('users:', user);
-    console.log('imageInfo:', imageInfo);
-    console.log('loginInfo at API:', loginInfo);
     try {
         let imageUrl = null;
         //save image File

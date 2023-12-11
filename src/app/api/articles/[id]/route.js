@@ -22,10 +22,10 @@ export async function PUT(req, context) {
     const articleLangs = body.articleLangs;
     //update into article Table
     const currentLoginUser = "huy"; //we add information of modifier huy
-    data = { ...data, modified_by: currentLoginUser };
-    if (data.post_date) data.post_date = db.seq.literal("now()"); //user has press publish button, set time for post_date
-    console.log("data :", data);
-    await db.Articles.update(data, {
+    let data1 = { ...data, modified_by: currentLoginUser };
+    if (data1.post_date) data1.post_date = db.seq.literal("now()"); //user has press publish button, set time for post_date
+    console.log("data1 :", data1);
+    await db.Articles.update(data1, {
       where: {
         id: id,
       },

@@ -59,14 +59,14 @@ const UserList = (props) => {
       );
     }
 
-    setResetStates( props );
+    setInitStates( props );
     setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
     setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
 
-  }, [props]);
+  }, [props, router]);
 
   //Set and reset States after receving data from server component or APIs
-  function setResetStates( result ) {
+  function setInitStates( result ) {
     setUsers( JSON.parse( result.dataTable ) );
     setPaginationServer( result.pagination );
     // console.log('pagination:', result.pagination);
@@ -122,7 +122,7 @@ const UserList = (props) => {
       () => { setLoginForm( true ) },
     );
     if ( res.status == 200 ) {
-      setResetStates( result );
+      setInitStates( result );
     }
     setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
     setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -149,7 +149,7 @@ const UserList = (props) => {
       () => { setLoginForm( true ) },
     );
     if ( res.status == 200 ) {
-      setResetStates( result );
+      setInitStates( result );
     }
     setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
     setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -175,7 +175,7 @@ const UserList = (props) => {
     );
     if ( res.status == 200 ) {
       // result = await res.json();
-      setResetStates( result );
+      setInitStates( result );
     }
     setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
     setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -221,7 +221,7 @@ const UserList = (props) => {
       () => { setLoginForm( true ) },
     );
     if ( res.status == 200 ) {
-      setResetStates( result );
+      setInitStates( result );
     }
     setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
     setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -365,7 +365,7 @@ const UserList = (props) => {
                           () => { setLoginForm( true ) },
                         );
                         if ( res.status == 200 ) {
-                          setResetStates( result );
+                          setInitStates( result );
                         }
                         setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
                         setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
@@ -522,9 +522,9 @@ const UserList = (props) => {
           disabled={!hasSelected}
           loading={loading}
         >
-          <div className="flex justify-center items-center gap-2">
+          <span>
             Bulk Delete <DeleteOutlined />
-          </div>
+          </span>
         </Button>
        </Popconfirm>
 

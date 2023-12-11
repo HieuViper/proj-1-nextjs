@@ -15,10 +15,12 @@ import {
 } from "@ant-design/icons";
 import { Avatar, Button, Layout, Menu, Modal, theme } from "antd";
 import Image from "next/image";
-import Link from "next/link";
+
+
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import LoginSmallForm from "./LoginSmallForm";
+import Link from "next/link";
 
 const { Header, Sider, Content } = Layout;
 
@@ -156,7 +158,7 @@ const DashboardLayout = (props) => {
             target="_blank"
             className="sidebar-logo p-4 flex justify-center items-center gap-2"
           >
-            <img src="https://ng.ant.design/assets/img/logo.svg" alt="logo" />
+            <Image src="https://ng.ant.design/assets/img/logo.svg" alt="logo" width={200} height={200} />
             {!collapsed && (
               <div className="font-semibold">ADMIN&nbsp;DASHBOARD</div>
             )}

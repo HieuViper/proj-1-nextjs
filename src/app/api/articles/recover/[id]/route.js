@@ -1,10 +1,11 @@
 import { db } from "@/config/db";
+import { myConstant } from "@/store/constant";
 
 export async function PUT(req, context) {
   const id = context.params.id;
   try {
     await db.Articles.update(
-      { post_status: process.env.POST_STATUS_DRAFT },
+      { post_status: myConstant.post.POST_STATUS_DRAFT },
       {
         where: {
           id: id,

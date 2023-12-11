@@ -2,6 +2,8 @@ import { funcLogin } from "@/library/funcLogin";
 import { Card } from "antd";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import Image from "next/image";
+import { myConstant } from "@/store/constant";
 import LoginForm from "./_components/LoginForm";
 // import { now } from "sequelize/types/utils";
 
@@ -17,10 +19,10 @@ const LoginPage = () => {
         name: "Authorization",
         value: token,
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        sameSite: "lax", //Strict
-        maxAge: process.env.LOGIN_TIME,
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        sameSite: 'lax',  //Strict
+        maxAge: myConstant.LOGIN_TIME,
       });
     } catch (error) {
       message = error.message;
@@ -37,7 +39,7 @@ const LoginPage = () => {
     <div className="bg-[url('/background.jpg')] bg-no-repeat bg-center bg-cover min-h-screen flex justify-center items-center">
       <Card className="w-[400px] mx-auto">
         <div className="flex justify-center items-center flex-col gap-3 mb-5">
-          <img src="/next.svg" alt="" className="w-32 h-10" />
+          <Image src="/next.svg" width={30} height={30} alt="" className="w-32 h-10" />
           <h1 className="font-semibold text-2xl">Admin Portal</h1>
           <p className="font-[500]">Admin Portal for CMS Website</p>
         </div>

@@ -1,13 +1,18 @@
 /** @type {import('next').NextConfig} */
 const withNextIntl = require("next-intl/plugin")();
-const nextConfig = {
+
+module.exports = withNextIntl({
   experimental: {
     serverComponentsExternalPackages: ["sequelize"],
     // serverActions: true,
   },
   reactStrictMode: false,
   serverRuntimeConfig: {
-    secret: "my-32-character-ultra-secure-and-ultra-long-secret",
+    secret: 'my-32-character-ultra-secure-and-ultra-long-secret',
+    SALT_ROUND: 10,
+    MAIL_USER: 'nagaoreishi@gmail.com',
+    MAIL_PASS: 'uillswsqlfyulgfk',
+    MAIL_SERVICE: 'gmail',
     userRoles: {
       Administrator: {
         users: {
@@ -152,10 +157,7 @@ const nextConfig = {
       },
     },
   },
-  publicRuntimeConfig: {
-    login_checkLogin: "/api/login",
-    api2: "",
-  },
-};
 
-module.exports = withNextIntl({ nextConfig });
+});
+
+// module.exports = nextConfig;

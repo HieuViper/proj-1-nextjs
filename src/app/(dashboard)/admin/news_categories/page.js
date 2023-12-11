@@ -1,6 +1,7 @@
 import { funcLanguage } from "@/library/funcLanguages";
 import { funcNewsCategories } from "@/library/funcNewsCategories";
 import CategoryList from "./_components/NewsCatList";
+import { myConstant } from "@/store/constant";
 
 async function CategoriesPage() {
   // if (!db.initialized) {
@@ -60,7 +61,7 @@ async function CategoriesPage() {
     return newsCategories;
   }
   const allNewsCategories = await funcNewsCategories.getAllNewsCategories(
-    process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE
+    myConstant.DEFAULT_LANGUAGE
   );
   const langTable = await funcLanguage.getLanguages();
 

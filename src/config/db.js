@@ -71,18 +71,18 @@ export const db = {
 // initialize db and models, called on first api request from /helpers/api/api-handler.js
 async function initialize() {
   // create db if it doesn't already exist
-  //const { host, port, user, password, database } = serverRuntimeConfig.dbConfig;
+
   console.log("Starting initialize database, wait ....");
   const config = {
     host: process.env.DB_HOST, // Change to your MySQL server host
     user: process.env.DB_USER, // Change to your MySQL username
     password: process.env.DB_PASSWORD, // Change to your MySQL password
-    //database: process.env.DB_DBNAME,    // The name of your database
+    // database: process.env.DB_DBNAME,    // The name of your database
   };
-  const connection = await mysql.createConnection(config);
-  await connection.query(
-    `CREATE DATABASE IF NOT EXISTS \`${process.env.DB_DBNAME}\`;`
-  );
+  // const connection = await mysql.createConnection(config);
+  // await connection.query(
+  //   `CREATE DATABASE IF NOT EXISTS \`${process.env.DB_DBNAME}\`;`
+  // );
 
   //relationship with table languages
   db.News.belongsToMany(db.Languages, { through: db.News_languages });

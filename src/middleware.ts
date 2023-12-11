@@ -6,9 +6,10 @@ export default createMiddleware({
 
   // Used when no locale matches
   defaultLocale: "en",
+
 });
 
 export const config = {
   // Match only internationalized pathnames
-  matcher: ["/", "/(vi|en)/:path*", "/([\\w-]+)"],
+  matcher: ["/", "/(vi|en)/:path*", "/((?!api|_next/static|_next/image|favicon.ico|admin|login|background.jpg|next.svg|).*)"],
 };

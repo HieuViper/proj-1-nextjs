@@ -9,6 +9,7 @@ import jwt from 'jsonwebtoken';
 import { log } from "console";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { myConstant } from "@/store/constant";
 
 export const funcLogin = {
   checkLogin,   //check password, username
@@ -36,7 +37,7 @@ function createToken( user ) {
     username: user.username,
     display: user.display_name,
     // issuedAt: new Date(),
-    // expire: new Date( currentTime.getTime() + process.env.LOGIN_TIME * 1000 ),
+    // expire: new Date( currentTime.getTime() + myConstant.LOGIN_TIME * 1000 ),
     nbefore: currentTime,
     role: user.role,
     image: user.image,
@@ -45,7 +46,7 @@ function createToken( user ) {
   }
   const key = getConfig().serverRuntimeConfig.secret;
   try{
-     token = jwt.sign( payload, key, { expiresIn: parseInt(process.env.LOGIN_TIME) });
+     token = jwt.sign( payload, key, { expiresIn: parseInt(myConstant.LOGIN_TIME) });
   } catch ( error ){
     throw new Error("Error from creating Token");
   }
@@ -86,7 +87,7 @@ export async function checkLogin(username, password) {
     if( message )
       throw new Error ( error.message );
     else
-      throw new Error ( 'System Error, Inform Admin' );
+      throw new Error ( 'System Error, Inform Admin ' + error.message );
   }
 }
 

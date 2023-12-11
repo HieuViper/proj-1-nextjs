@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { ArticleForm } from "./ArticleCatForm";
 import toast from "react-hot-toast";
 import Search from "antd/es/input/Search";
+import { myConstant } from "@/store/constant";
 
 function ArticleList(props) {
     const { getAllArticle, getArticle, addArticle, editArticle, delArticle, delBulkArticle, searchArticle } = props
@@ -18,7 +19,7 @@ function ArticleList(props) {
     const [langTable, setLangTable] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [dataArticle, setDataArticle] = useState();
-    const [lang, setLang] = useState(process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE);
+    const [lang, setLang] = useState(myConstant.DEFAULT_LANGUAGE);
 
 
     // SEARCH ARTICLE
@@ -90,7 +91,7 @@ function ArticleList(props) {
     let langOptions = langTable.map((lang) => {
         return { value: lang.code, label: lang.name };
     });
-    // 
+    //
     useEffect(() => {
         setLangTable(JSON.parse(props.langTable));
         setArticles(JSON.parse(props.dataTable));
@@ -165,7 +166,7 @@ function ArticleList(props) {
                 </div>
                 <div className="flex gap-4">
                     <Select
-                        defaultValue={process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE}
+                        defaultValue={myConstant.DEFAULT_LANGUAGE}
                         value={lang}
                         style={{
                             width: 120,

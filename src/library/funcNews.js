@@ -3,13 +3,14 @@ import { db } from "@/config/db";
 import { Op, QueryTypes } from "sequelize";
 import { funcLogin } from "./funcLogin";
 import { log } from "console";
+import { myConstant } from "@/store/constant";
 
 //get Status query from parameter post_status
 function getStatusQuery(post_status) {
   switch (post_status) {
     case "":
-      return `post_status!='${process.env.POST_STATUS_TRASH}'`;
-    case process.env.POST_STATUS_PRIORITY:
+      return `post_status!='${myConstant.post.POST_STATUS_TRASH}'`;
+    case myConstant.post.POST_STATUS_PRIORITY:
       return `news_position=1`;
     default:
       return `post_status='${post_status}'`;
@@ -67,7 +68,7 @@ export async function getAllNews(
 
     return results;
   } catch (error) {
-    throw new Error("Fail to get news from database" + error.message);
+    throw new Error("Fail to get news from databas: " + error.message);
   }
 }
 
@@ -107,7 +108,7 @@ export async function getTotalNumOfNews(
   }
   try {
     //get total number of news in All Status
-    let sqlquery = `SELECT count(*) AS total FROM news WHERE post_status!='${process.env.POST_STATUS_TRASH}'`;
+    let sqlquery = `SELECT count(*) AS total FROM news WHERE post_status!='${myConstant.post.POST_STATUS_TRASH}'`;
     //let results = await pool.query(sqlquery);
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.all = results[0].total;
@@ -116,7 +117,7 @@ export async function getTotalNumOfNews(
   }
   try {
     //get total number of news in draft status
-    let sqlquery = `SELECT count(*) AS total FROM news WHERE post_status='${process.env.POST_STATUS_DRAFT}'`;
+    let sqlquery = `SELECT count(*) AS total FROM news WHERE post_status='${myConstant.post.POST_STATUS_DRAFT}'`;
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.draft = results[0].total;
   } catch (error) {
@@ -126,7 +127,7 @@ export async function getTotalNumOfNews(
   }
   try {
     //get total number of news in published status
-    let sqlquery = `SELECT count(*) AS total FROM news WHERE post_status='${process.env.POST_STATUS_PUBLISH}'`;
+    let sqlquery = `SELECT count(*) AS total FROM news WHERE post_status='${myConstant.post.POST_STATUS_PUBLISH}'`;
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.publish = results[0].total;
   } catch (error) {
@@ -136,7 +137,7 @@ export async function getTotalNumOfNews(
   }
   try {
     //get total number of news in trash status
-    let sqlquery = `SELECT count(*) AS total FROM news WHERE post_status='${process.env.POST_STATUS_TRASH}'`;
+    let sqlquery = `SELECT count(*) AS total FROM news WHERE post_status='${myConstant.post.POST_STATUS_TRASH}'`;
     let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
     totals.trash = results[0].total;
   } catch (error) {
@@ -162,7 +163,7 @@ export async function getTotalNumOfNews(
 export async function trashNews(key) {
   try {
     await db.News.update(
-      { post_status: process.env.POST_STATUS_TRASH },
+      { post_status: myConstant.post.POST_STATUS_TRASH },
       {
         where: {
           id: key,
@@ -178,9 +179,9 @@ export async function trashNews(key) {
 export async function deleteBulkNews(keys, status) {
   try {
     const keysArr = keys.split(",");
-    if (status != process.env.POST_STATUS_TRASH)
+    if (status != myConstant.post.POST_STATUS_TRASH)
       await db.News.update(
-        { post_status: process.env.POST_STATUS_TRASH },
+        { post_status: myConstant.post.POST_STATUS_TRASH },
         {
           where: {
             id: {
@@ -207,7 +208,7 @@ export async function deleteBulkNews(keys, status) {
 export async function recoverNews(key) {
   try {
     await db.News.update(
-      { post_status: process.env.POST_STATUS_DRAFT },
+      { post_status: myConstant.post.POST_STATUS_DRAFT },
       {
         where: {
           id: key,
@@ -275,7 +276,7 @@ export async function getLanguages() {
   //console.log('db in language:', db);
   try {
     const results = await db.Languages.findAll({
-      order: db.seq.literal(`code='${process.env.DEFAULT_LANGUAGE}' DESC`),
+      order: db.seq.literal(`code='${myConstant.DEFAULT_LANGUAGE}' DESC`),
     });
     return results;
   } catch (error) {
@@ -364,13 +365,13 @@ async function newsList( loginInfo, searchParams ) {
   const status = searchParams?.get('status') ?? "";
   const search = searchParams?.get('search') ?? "";
   const page = searchParams?.get('page') ?? 1;
-  const size = searchParams?.get('size') ?? process.env.PAGE_SIZE;
+  const size = searchParams?.get('size') ?? myConstant.post.PAGE_SIZE;
   let orderby = searchParams?.get('orderby') ?? "";
   let order = searchParams?.get('order') ?? "";
   const author = searchParams?.get('author') ?? "";
   const category = searchParams?.get('category') ?? "";
   const tag = searchParams?.get('tag') ?? "";
-  const lang = searchParams?.get('lang') ?? process.env.DEFAULT_LANGUAGE;
+  const lang = searchParams?.get('lang') ?? myConstant.DEFAULT_LANGUAGE;
 
   let result = {
     error: null,

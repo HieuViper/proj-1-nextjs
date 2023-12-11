@@ -2,6 +2,7 @@ import { funcArticle } from "@/library/funcArticles";
 import { funcImage } from "@/library/funcImages";
 import { redirect } from "next/navigation";
 import { ArticleForm } from "../../_components/ArticleForm";
+import { myConstant } from "@/store/constant";
 
 export const dynamic = "force-dynamic";
 const EditArticlePage = async ({ params, searchParams }) => {
@@ -65,7 +66,7 @@ const EditArticlePage = async ({ params, searchParams }) => {
   const data = await funcArticle.getArticle(params.id);
   console.log("🚀 ~ file: page.js:25 ~ EditArticlePage ~ data:", data);
   const mainImage = await funcImage.getImage(data[0]?.image ?? "");
-  const cate = await funcArticle.getCategories(process.env.DEFAULT_LANGUAGE);
+  const cate = await funcArticle.getCategories(myConstant.DEFAULT_LANGUAGE);
   const langTable = await funcArticle.getLanguages();
   return (
     <div>

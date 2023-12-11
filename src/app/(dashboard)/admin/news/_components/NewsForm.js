@@ -23,6 +23,9 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 // import Editor from "@/components/Editor";
 import dynamic from "next/dynamic";
+import { useLogin } from "@/store/login";
+import { myConstant } from "@/store/constant";
+
 
 export function NewsForm(props) {
   const { TextArea } = Input;
@@ -39,7 +42,10 @@ export function NewsForm(props) {
   const [catTree, setCatTree] = useState([]);
   const [picURL, setPicURL] = useState(null);
   const [previewPic, setPreviewPic] = useState(null);
-  const Editor = dynamic(() => import("@/components/Editor"), { ssr: false });
+  const { setLoginForm } = useLogin();    //use to set global state allowing enable the login form.
+  const [editor, setEditor] = useState(null);
+
+  const Editor2 = dynamic(() => import("@/components/Editor2"), { ssr: false });
   const authors = [
     {
       value: "huy",
@@ -127,7 +133,7 @@ export function NewsForm(props) {
   //Generate newsCode for the post. It pick the Title of the default language
   function generateNewsCode() {
     let newsCode = form
-      .getFieldValue(`title_${process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE}`)
+      .getFieldValue(`title_${myConstant.DEFAULT_LANGUAGE}`)
       .trim()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
@@ -247,7 +253,7 @@ export function NewsForm(props) {
 
     // editing news
     if (params?.id) {
-      if (value.post_status == process.env.NEXT_PUBLIC_PS_TRASH)
+      if (value.post_status == myConstant.post.POST_STATUS_TRASH)
         //await delNews(value, newsLangs, params.id);
         await props.dell(newValue, newsLangs, params.id);
       else {
@@ -257,7 +263,7 @@ export function NewsForm(props) {
             setPostStatus(form.getFieldValue("post_status")); //set postStatus state to rerender action buttons
             let messageNotify =
               form.getFieldValue("post_status") ==
-              process.env.NEXT_PUBLIC_PS_DRAFT
+              myConstant.post.POST_STATUS_DRAFT
                 ? "Save Draft Success"
                 : "Save Publish Success";
             toast.success(messageNotify, {
@@ -406,7 +412,12 @@ export function NewsForm(props) {
       setMainCat("");
     }
   };
-
+  function printImg( editor ) {
+      const imageUtils = editor.plugins.get( 'ImageUtils' );
+      imageUtils.insertImage( { src: '/uploads/nov2023/4kpic.jpg',
+          srcset: '/uploads/nov2023/ava3_150.jpeg 150w, /uploads/nov2023/ava3_350.jpeg 350w, /uploads/nov2023/ava3_700.jpeg 700w',
+      } );
+  }
   // tab handle
   const TabComponent = ({ lang }) => {
     return (
@@ -423,8 +434,8 @@ export function NewsForm(props) {
         >
           {
             //only generate news_code when post status is not published
-            lang == process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE &&
-            data?.post_status != process.env.NEXT_PUBLIC_PS_PUBLISH ? (
+            lang == myConstant.DEFAULT_LANGUAGE &&
+            data?.post_status != myConstant.post.POST_STATUS_PUBLISH ? (
               <Input onChange={() => generateNewsCode()} />
             ) : (
               <Input />
@@ -454,7 +465,9 @@ export function NewsForm(props) {
           // ]}
         >
           {/* <Input /> */}
-          <Editor />
+          <Editor2 initialData='<h2>Hello everybody</h2>'
+                    {...{setLoginForm, printImg}}
+          />
         </Form.Item>
       </>
     );
@@ -509,7 +522,7 @@ export function NewsForm(props) {
                     ghost
                     htmlType="submit"
                     onClick={() =>
-                      setStatusHidden(process.env.NEXT_PUBLIC_PS_DRAFT)
+                      setStatusHidden(myConstant.post.POST_STATUS_DRAFT)
                     }
                   >
                     Switch to Draft
@@ -520,7 +533,7 @@ export function NewsForm(props) {
                     danger
                     htmlType="submit"
                     onClick={() =>
-                      setStatusHidden(process.env.NEXT_PUBLIC_PS_TRASH)
+                      setStatusHidden(myConstant.post.POST_STATUS_TRASH)
                     }
                   >
                     Move to trash
@@ -549,7 +562,7 @@ export function NewsForm(props) {
                     danger
                     htmlType="submit"
                     onClick={() =>
-                      setStatusHidden(process.env.NEXT_PUBLIC_PS_TRASH)
+                      setStatusHidden(myConstant.post.POST_STATUS_TRASH)
                     }
                   >
                     Move to trash
@@ -562,7 +575,7 @@ export function NewsForm(props) {
                     type="dashed"
                     htmlType="submit"
                     onClick={() =>
-                      setStatusHidden(process.env.NEXT_PUBLIC_PS_DRAFT)
+                      setStatusHidden(myConstant.post.POST_STATUS_DRAFT)
                     }
                   >
                     Save Draft
@@ -573,7 +586,7 @@ export function NewsForm(props) {
                     type="primary"
                     htmlType="submit"
                     onClick={() =>
-                      setStatusHidden(process.env.NEXT_PUBLIC_PS_PUBLISH, true)
+                      setStatusHidden(myConstant.post.POST_STATUS_PUBLISH, true)
                     }
                   >
                     Publish
@@ -593,7 +606,7 @@ export function NewsForm(props) {
         <Form.Item label="Slug" name="news_code">
           <Input
             disabled={
-              data?.post_status == process.env.NEXT_PUBLIC_PS_PUBLISH
+              data?.post_status == myConstant.post.POST_STATUS_PUBLISH
                 ? true
                 : false //disabled this field if the post already has newscode
             }
@@ -705,11 +718,11 @@ export function NewsForm(props) {
 
                 const isLt5M =
                   file.size / 1024 / 1024 <=
-                  process.env.NEXT_PUBLIC_FILE_LIMITED_SIZE;
+                  myConstant.image.FILE_LIMITED_SIZE;
                 // check the file size
                 if (!isLt5M) {
                   message.error(
-                    `Image must smaller than ${process.env.NEXT_PUBLIC_FILE_LIMITED_SIZE}MB!`
+                    `Image must smaller than ${myConstant.image.FILE_LIMITED_SIZE}MB!`
                   );
                   reject(false);  //put some reason here
                 } else {

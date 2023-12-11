@@ -1,4 +1,5 @@
 "use client";
+import { myConstant } from "@/store/constant";
 import { Button, Form, Input, Tabs, TreeSelect } from "antd";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -105,7 +106,7 @@ export function CategoryForm(props) {
           ]}
           className="mb-0"
         >
-          {lang == process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE ?
+          {lang == myConstant.DEFAULT_LANGUAGE ?
             <Input onChange={(e) => generateCateCode(e.target.value)} placeholder="Input name" />
             :
             <Input placeholder="Input name" />}

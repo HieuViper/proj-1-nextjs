@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { funcLogin } from "@/library/funcLogin";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 
 export const dynamic = 'force-dynamic' // defaults to force-static
 

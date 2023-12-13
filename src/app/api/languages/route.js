@@ -1,12 +1,11 @@
-import { db } from "@/config/db";
-import { myConstant } from "@/store/constant";
+const db = require("@/app/models");
 import { NextResponse } from "next/server";
 import { Op, QueryTypes } from "sequelize";
 
 export async function GET(req, res) {
   try {
     const results = await db.Languages.findAll({
-      order: db.seq.literal(`code='${myConstant.DEFAULT_LANGUAGE}' DESC`),
+      order: db.sequelize.literal(`code='${process.env.DEFAULT_LANGUAGE}' DESC`),
     });
     // return results;
     return NextResponse.json({ data: results });
@@ -37,8 +36,8 @@ export async function POST(req, res) {
         FROM article_languages n
         WHERE n.articleId = m.id AND n.languageCode = '${body.data.code}'
       );`;
-      await db.seq.query(sqlqueryNews, { type: QueryTypes.INSERT });
-      await db.seq.query(sqlqueryArticle, { type: QueryTypes.INSERT });
+      await db.sequelize.query(sqlqueryNews, { type: QueryTypes.INSERT });
+      await db.sequelize.query(sqlqueryArticle, { type: QueryTypes.INSERT });
     }
     const result = await db.Languages.findAll();
     return NextResponse.json({ data: result });

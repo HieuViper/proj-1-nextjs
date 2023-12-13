@@ -2,7 +2,7 @@ import { funcArticle } from "@/library/funcArticles";
 import { funcImage } from "@/library/funcImages";
 import { redirect } from "next/navigation";
 import { ArticleForm } from "../_components/ArticleForm";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 
 const AddArticlePage = async () => {
   async function addArticle(data, articleLangs) {

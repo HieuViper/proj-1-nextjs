@@ -1,10 +1,10 @@
-import { db } from "@/config/db";
+const db = require("@/app/models");
 import { NextResponse } from "next/server";
 import { Op } from "sequelize";
 
 export async function PUT(req, context) {
   const id = context.params.id;
-  const t = await db.seq.transaction();
+  const t = await db.sequelize.transaction();
   try {
     const body = await req.json();
     let data = body.data;
@@ -12,7 +12,7 @@ export async function PUT(req, context) {
     //update into tag Table
     const currentLoginUser = "huy"; //we add information of modifier huy
     data = { ...data, modified_by: currentLoginUser };
-    if (data.post_date) data.post_date = db.seq.literal("now()"); //user has press publish button, set time for post_date
+    if (data.post_date) data.post_date = db.sequelize.literal("now()"); //user has press publish button, set time for post_date
     console.log("data :", data);
     await db.Tags.update(data, {
       where: {

@@ -1,11 +1,11 @@
-import { db } from "@/config/db";
+const db = require("@/app/models");
 import { createSampleData } from "@/library/createSamples";
 
 const StartPage = async () => {
-  if (!db.initialized) {
-    await db.initialize();
+  // if (!db.initialized) {
+  //   await db.initialize();
     await createSampleData();
-  }
+  // }
 
   return (
     <div>Start database Page Database is initialized: {db.initialized}</div>

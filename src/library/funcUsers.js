@@ -1,11 +1,11 @@
-import { db } from "@/config/db";
+const db = require("@/app/models");
 import { request } from "http";
 import { Op, QueryTypes } from "sequelize";
 import { userRoles } from "./userRoles";
 import bcrypt from 'bcrypt';
 import { funcLogin } from "./funcLogin";
 import getConfig from "next/config";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 
 export const funcUsers = {
   getUsers,
@@ -56,7 +56,7 @@ export async function getUsers(
 
     let sqlquery = `SELECT username, image, display_name, role, num_posts, email  FROM users ${whereQuery} ${orderQuery} LIMIT ${fromNews}, ${size}`;
 
-    const results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    const results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
 
     return results;
   } catch (error) {
@@ -82,7 +82,7 @@ export async function getTotalNumOfUsers( role, search ) {
 
     let sqlquery = `SELECT count(*) AS total FROM users ${whereQuery}`;
     //let results = await pool.query(sqlquery, [post_type]);
-    let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.itemsOfTable = results[0].total;
   } catch (error) {
     throw new Error("cannot get items Of Table:" + error.message);
@@ -91,7 +91,7 @@ export async function getTotalNumOfUsers( role, search ) {
 //get total number of users in All Status
   try {
     let sqlquery = `SELECT count(*) AS total FROM users`;
-    let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.all = results[0].total;
   } catch (error) {
     throw new Error("cannot get number of news in All Tab:" + error.message);
@@ -101,7 +101,7 @@ export async function getTotalNumOfUsers( role, search ) {
     try {
       //get total number of news in draft status
       let sqlquery = `SELECT count(*) AS total FROM users WHERE role='${role}'`;
-      let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+      let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
       totals[role] = results[0].total ;
     } catch (error) {
       throw new Error(

@@ -1,5 +1,5 @@
-import { db } from "@/config/db";
-import { myConstant } from "@/store/constant";
+const db = require("@/app/models");
+const myConstant = require('@/store/constant')
 import { Op } from "sequelize";
 
 export const funcLanguage = {
@@ -15,7 +15,7 @@ export const funcLanguage = {
 async function getLanguages() {
   try {
     const results = await db.Languages.findAll({
-      order: db.seq.literal(`code='${myConstant.DEFAULT_LANGUAGE}' DESC`),
+      order: db.sequelize.literal(`code='${myConstant.DEFAULT_LANGUAGE}' DESC`),
     });
     return results;
   } catch (error) {

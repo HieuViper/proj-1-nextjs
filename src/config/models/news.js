@@ -1,5 +1,5 @@
 
-import { myConstant } from "@/store/constant";
+const myConstant = require("@/store/constant");
 import { DataTypes } from "sequelize";
 
 export function newsModel(sequelize) {

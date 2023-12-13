@@ -2,7 +2,7 @@ import { funcImage } from "@/library/funcImages";
 import { funcNews } from "@/library/funcNews";
 import { redirect } from "next/navigation";
 import { NewsForm } from "../../_components/NewsForm";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 
 export const dynamic = "force-dynamic";
 async function EditNews({ params, searchParams }) {

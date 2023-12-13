@@ -1,9 +1,10 @@
 //'use server';
-import { db } from "@/config/db";
+// const db = require("@/app/models");
+const db = require("@/app/models")
 import { Op, QueryTypes } from "sequelize";
 import { funcLogin } from "./funcLogin";
 import { log } from "console";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 
 //get Status query from parameter post_status
 function getStatusQuery(post_status) {
@@ -64,7 +65,7 @@ export async function getAllNews(
 
     let sqlquery = `SELECT * FROM news_all WHERE (${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}) ${orderQuery} LIMIT ${fromNews}, ${size}`;
 
-    const results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    const results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
 
     return results;
   } catch (error) {
@@ -101,7 +102,7 @@ export async function getTotalNumOfNews(
 
     let sqlquery = `SELECT count(*) AS total FROM news_all WHERE ${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}`;
     //let results = await pool.query(sqlquery, [post_type]);
-    let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.itemsOfTable = results[0].total;
   } catch (error) {
     throw new Error("cannot get items Of Table:" + error.message);
@@ -110,7 +111,7 @@ export async function getTotalNumOfNews(
     //get total number of news in All Status
     let sqlquery = `SELECT count(*) AS total FROM news WHERE post_status!='${myConstant.post.POST_STATUS_TRASH}'`;
     //let results = await pool.query(sqlquery);
-    let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.all = results[0].total;
   } catch (error) {
     throw new Error("cannot get number of news in All Tab:" + error.message);
@@ -118,7 +119,7 @@ export async function getTotalNumOfNews(
   try {
     //get total number of news in draft status
     let sqlquery = `SELECT count(*) AS total FROM news WHERE post_status='${myConstant.post.POST_STATUS_DRAFT}'`;
-    let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.draft = results[0].total;
   } catch (error) {
     throw new Error(
@@ -128,7 +129,7 @@ export async function getTotalNumOfNews(
   try {
     //get total number of news in published status
     let sqlquery = `SELECT count(*) AS total FROM news WHERE post_status='${myConstant.post.POST_STATUS_PUBLISH}'`;
-    let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.publish = results[0].total;
   } catch (error) {
     throw new Error(
@@ -138,7 +139,7 @@ export async function getTotalNumOfNews(
   try {
     //get total number of news in trash status
     let sqlquery = `SELECT count(*) AS total FROM news WHERE post_status='${myConstant.post.POST_STATUS_TRASH}'`;
-    let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.trash = results[0].total;
   } catch (error) {
     throw new Error(
@@ -148,7 +149,7 @@ export async function getTotalNumOfNews(
   try {
     //get total number of news in priority status
     let sqlquery = `SELECT count(*) AS total FROM news WHERE news_position=1`;
-    let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.priority = results[0].total;
 
     return totals;
@@ -237,7 +238,7 @@ export async function deleteNews(key) {
 export async function getNews(id) {
   try {
     const sqlquery = `SELECT * FROM news_all WHERE id=${id}`;
-    const result = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    const result = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     return result;
   } catch (error) {
     throw new Error("Fail to get news:", error.message);
@@ -251,7 +252,7 @@ export async function getCategories(lang) {
     if (lang)
       strquery = `SELECT * FROM news_cat_all WHERE languageCode='${lang}'`;
     else strquery = "SELECT * FROM news_cat_all";
-    const results = await db.seq.query(strquery, { type: QueryTypes.SELECT });
+    const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
     return results;
   } catch (error) {
     throw new Error("Fail to get categories: " + error.message);
@@ -264,7 +265,7 @@ export async function getTags(lang) {
     let strquery;
     if (lang) strquery = `SELECT * FROM tags_all WHERE languageCode='${lang}'`;
     else strquery = "SELECT * FROM tags_all";
-    const results = await db.seq.query(strquery, { type: QueryTypes.SELECT });
+    const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
     return results;
   } catch (error) {
     throw new Error("Fail to get Tags: " + error.message);
@@ -276,7 +277,7 @@ export async function getLanguages() {
   //console.log('db in language:', db);
   try {
     const results = await db.Languages.findAll({
-      order: db.seq.literal(`code='${myConstant.DEFAULT_LANGUAGE}' DESC`),
+      order: db.sequelize.literal(`code='${myConstant.DEFAULT_LANGUAGE}' DESC`),
     });
     return results;
   } catch (error) {
@@ -289,12 +290,12 @@ export async function getLanguages() {
 //           newsLangs: contain updated value for news_languages Table
 //           id:  contain id of the news that need to be updated
 export async function updateANews(data, newsLangs, id) {
-  const t = await db.seq.transaction();
+  const t = await db.sequelize.transaction();
   try {
     //update into news Table
     const currentLoginUser = "huy"; //we add information of modifier huy
     data = { ...data, modified_by: currentLoginUser };
-    if (data.post_date) data.post_date = db.seq.literal("now()"); //user has press publish button, set time for post_date
+    if (data.post_date) data.post_date = db.sequelize.literal("now()"); //user has press publish button, set time for post_date
     console.log("data :", data);
     await db.News.update(data, {
       where: {
@@ -325,11 +326,11 @@ export async function updateANews(data, newsLangs, id) {
 //parameter: data: contain updated value for news Table
 //           newsLangs: contain updated value for news_languages Table
 export async function addANews(data, newsLangs) {
-  const t = await db.seq.transaction();
+  const t = await db.sequelize.transaction();
   try {
     //update into news Table
     const currentLoginUser = "huy"; //we add information of modifier huy
-    if (data.post_date) data.post_date = db.seq.literal("now()"); //user has press publish button, set time for post_date
+    if (data.post_date) data.post_date = db.sequelize.literal("now()"); //user has press publish button, set time for post_date
     console.log("data :", data);
     const news = await db.News.create(data, { transaction: t });
     //add newsId property to the newsLangs

@@ -1,7 +1,7 @@
 import { funcArticleCategories } from "@/library/funcArticleCategories";
 import { funcLanguage } from "@/library/funcLanguages";
 import ArticleList from "./_components/ArticleCatList";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 
 async function ArticlePage() {
   // if (!db.initialized) {

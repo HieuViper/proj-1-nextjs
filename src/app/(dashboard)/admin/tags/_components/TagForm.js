@@ -1,5 +1,5 @@
 "use client";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 import { Button, Form, Input, Tabs } from "antd";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";

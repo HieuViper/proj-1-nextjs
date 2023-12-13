@@ -24,7 +24,7 @@ import toast from "react-hot-toast";
 // import Editor from "@/components/Editor";
 import dynamic from "next/dynamic";
 import { useLogin } from "@/store/login";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 
 
 export function NewsForm(props) {

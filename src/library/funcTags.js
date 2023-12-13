@@ -1,4 +1,4 @@
-import { db } from "@/config/db";
+const db = require("@/app/models");
 import { Op, QueryTypes } from "sequelize";
 
 export const funcTags = {
@@ -20,7 +20,7 @@ async function getAllTags(page, size, search, lang) {
         let strquery;
         if (lang)
             strquery = `SELECT * FROM tags_all WHERE languageCode='${lang}' ${searchQuery} ORDER BY id DESC LIMIT ${fromTags}, ${size}`;
-        const results = await db.seq.query(strquery, { type: QueryTypes.SELECT });
+        const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
         return results;
     } catch (error) {
         console.log(error);
@@ -33,7 +33,7 @@ export async function getTotalTags(search, lang) {
     try {
         const searchQuery = getSearchQuery(search);
         let sqlquery = `SELECT count(*) AS total FROM tags_all WHERE languageCode='${lang}' ${searchQuery} `;
-        let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+        let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
         total = results[0].total;
         return total
     } catch (error) {
@@ -49,7 +49,7 @@ function getSearchQuery(search) {
 async function getTags(id) {
     try {
         const sqlquery = `SELECT * FROM tags_all WHERE id=${id}`;
-        const result = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+        const result = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
         return result;
     } catch (error) {
         throw new Error("Fail to get tag Tags:" + error.message);
@@ -57,13 +57,13 @@ async function getTags(id) {
 }
 
 async function updateTags(data, tagLangs, id) {
-    const t = await db.seq.transaction();
+    const t = await db.sequelize.transaction();
     try {
         //update into tag Table
         const currentLoginUser = 'huy'; //we add information of modifier huy
         data = { ...data, modified_by: currentLoginUser };
         if (data.post_date)
-            data.post_date = db.seq.literal('now()');   //user has press publish button, set time for post_date
+            data.post_date = db.sequelize.literal('now()');   //user has press publish button, set time for post_date
         console.log('data :', data);
         await db.Tags.update(
             data,
@@ -100,7 +100,7 @@ async function updateTags(data, tagLangs, id) {
 }
 
 async function addTags(data, tagLangs) {
-    const t = await db.seq.transaction();
+    const t = await db.sequelize.transaction();
     try {
         //update into tag Table
         const currentLoginUser = 'huy'; //we add information of modifier huy

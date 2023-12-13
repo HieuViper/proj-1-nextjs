@@ -1,4 +1,4 @@
-import { db } from "@/config/db";
+const db = require("@/app/models");
 import { Op, QueryTypes } from "sequelize";
 
 export const funcNewsCategories = {
@@ -21,7 +21,7 @@ async function getAllNewsCategories(lang) {
       strquery = `SELECT * FROM news_cat_all WHERE languageCode='${lang}'`;
     // else
     //     strquery = 'SELECT * FROM news_cat_all';
-    const results = await db.seq.query(strquery, { type: QueryTypes.SELECT });
+    const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
     console.log(
       "🚀 ~ file: funcNewsCategories.js:25 ~ getAllNewsCategories ~ results:",
       results
@@ -36,7 +36,7 @@ async function getAllNewsCategories(lang) {
 async function getNewsCategories(id) {
   try {
     const sqlquery = `SELECT * FROM news_cat_all WHERE id=${id}`;
-    const result = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    const result = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     return result;
   } catch (error) {
     throw new Error("Fail to get news cates:" + error.message);
@@ -44,12 +44,12 @@ async function getNewsCategories(id) {
 }
 
 async function updateNewsCategories(data, newsLangs, id) {
-  const t = await db.seq.transaction();
+  const t = await db.sequelize.transaction();
   try {
     //update into news Table
     const currentLoginUser = "huy"; //we add information of modifier huy
     data = { ...data, modified_by: currentLoginUser };
-    if (data.post_date) data.post_date = db.seq.literal("now()"); //user has press publish button, set time for post_date
+    if (data.post_date) data.post_date = db.sequelize.literal("now()"); //user has press publish button, set time for post_date
     console.log("data :", data);
     await db.News_categories.update(data, {
       where: {
@@ -77,7 +77,7 @@ async function updateNewsCategories(data, newsLangs, id) {
 }
 
 async function addNewsCategories(data, newsLangs) {
-  const t = await db.seq.transaction();
+  const t = await db.sequelize.transaction();
   try {
     //update into news Table
     const currentLoginUser = "huy"; //we add information of modifier huy
@@ -150,7 +150,7 @@ async function getSearchQuery(search, lang) {
     strquery =
       strquery + ` (name LIKE '%${search}%' OR description LIKE '%${search}%')`;
     if (lang) strquery = strquery + ` AND languageCode='${lang}')`;
-    const results = await db.seq.query(strquery, { type: QueryTypes.SELECT });
+    const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
     return results;
   } catch (error) {
     console.log(error);

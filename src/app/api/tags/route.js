@@ -1,4 +1,4 @@
-import { db } from "@/config/db";
+const db = require("@/app/models");
 import { NextResponse } from "next/server";
 import { Op, QueryTypes } from "sequelize";
 
@@ -19,13 +19,13 @@ export async function GET(req, res) {
     let strqueryData;
     if (lang)
       strqueryData = `SELECT * FROM tags_all WHERE languageCode='${lang}' ${searchQuery} ORDER BY id DESC LIMIT ${fromTags}, ${size}`;
-    const results = await db.seq.query(strqueryData, {
+    const results = await db.sequelize.query(strqueryData, {
       type: QueryTypes.SELECT,
     });
 
     // get total tags
     let sqlqueryTotal = `SELECT count(*) AS total FROM tags_all WHERE languageCode='${lang}' ${searchQuery} `;
-    let resultsTotal = await db.seq.query(sqlqueryTotal, {
+    let resultsTotal = await db.sequelize.query(sqlqueryTotal, {
       type: QueryTypes.SELECT,
     });
     const total = resultsTotal[0].total;
@@ -37,7 +37,7 @@ export async function GET(req, res) {
 }
 export async function POST(req, res) {
   try {
-    const t = await db.seq.transaction();
+    const t = await db.sequelize.transaction();
     try {
       const body = await req.json();
       const data = body.data;

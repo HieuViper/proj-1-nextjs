@@ -1,5 +1,5 @@
 "use client";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 import { SwapLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import {
   Button,

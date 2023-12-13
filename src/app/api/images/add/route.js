@@ -32,7 +32,7 @@ export async function POST(req) {
         imageUrl = await funcImage.saveImage( imageFile );
         console.log('saving image successfully');
         //add new Image to table
-        imageInfo.url = imageUrl;
+        imageInfo.url = imageUrl.url;
         imageInfo.author = loginInfo.user.username;
         await funcImage.addImage( imageInfo );
         console.log("saving image to database successfully");

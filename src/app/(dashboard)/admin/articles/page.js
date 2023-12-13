@@ -8,7 +8,7 @@ import {
   trashArticle,
 } from "@/library/funcArticles";
 import ArticleList from "./_components/ArticleList";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 
 // This part is important!
 export const dynamic = "force-dynamic";

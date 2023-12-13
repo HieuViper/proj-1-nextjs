@@ -66,13 +66,7 @@ export function productsModel(sequelize) {
             collate: 'utf8mb4_unicode_520_ci',
             allowNull: true,
             defaultValue: 'default',
-            //unique: '',
-            //unique: true,
-            //field: 'real name of the column',
-            /*references: {
-                model: BarProp,
-                key: 'id'
-            }*/
+
             comment: 'Categories has the format: category1, category2, category3',
         },
         manufacturerId: {

@@ -3,7 +3,7 @@ import { Card } from "antd";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Image from "next/image";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 import LoginForm from "./_components/LoginForm";
 // import { now } from "sequelize/types/utils";
 

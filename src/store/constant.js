@@ -1,4 +1,4 @@
-export const myConstant = {
+const myConstant = {
     image: {
         PAGE_SIZE: 36,
         COLUMNS: 6,
@@ -15,3 +15,4 @@ export const myConstant = {
     DEFAULT_LANGUAGE: 'vi',
     LOGIN_TIME: 3600,
 }
+module.exports = myConstant;

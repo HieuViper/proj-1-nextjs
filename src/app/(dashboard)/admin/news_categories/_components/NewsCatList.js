@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { CategoryForm } from "./NewsCatForm";
 import toast from "react-hot-toast";
 import Search from "antd/es/input/Search";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 
 function CategoryList(props) {
     const { getAllNewsCate, getNewsCate, addNewsCate, editNewsCate, delNewsCate, delBulkNewsCate, searchNewsCate } = props

@@ -1,7 +1,7 @@
 import { callNon } from "@/library/api";
 import { funcTags } from "@/library/funcTags";
 import TagList from "./_components/TagList";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 
 async function TagsPage({ searchParams }) {
   const page = searchParams?.page ?? 1;

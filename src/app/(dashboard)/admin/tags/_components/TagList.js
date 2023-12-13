@@ -16,7 +16,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { TagForm } from "./TagForm";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 
 function TagList(props) {
   const { getAllTag, getTag, addTag, editTag, delTag, delBulkTag, searchTag } =

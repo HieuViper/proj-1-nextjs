@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 import PasswordStrengthBar from "react-password-strength-bar";
 import { callAPI, handleNotAuthorized } from "@/library/client/callAPI";
 import { useLogin } from "@/store/login";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 
 const UserForm = (props) => {
   const router = useRouter();

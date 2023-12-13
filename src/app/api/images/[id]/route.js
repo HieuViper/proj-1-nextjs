@@ -1,4 +1,4 @@
-import { db } from "@/config/db";
+const db = require("@/app/models");
 import fs from "fs";
 import { NextResponse } from "next/server";
 

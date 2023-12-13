@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import { callAPI, handleNotAuthorized } from "@/library/client/callAPI";
 import { useLogin } from "@/store/login";
 import { Span } from "next/dist/trace";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 
 export default function NewsList(props) {
   const router = useRouter();

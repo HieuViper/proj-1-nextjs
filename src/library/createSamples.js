@@ -1,5 +1,5 @@
-import { db } from "@/config/db";
-import { myConstant } from "@/store/constant";
+const db = require("@/app/models");
+const myConstant = require('@/store/constant')
 
 const createLanguage = async () => {
   console.log("Start creating samples for languages table");
@@ -28,8 +28,8 @@ export const createUsers = async () => {
       password: "$2b$10$rPaOOP0Qz/5tEfm5BqFfwOzrDAVBfpjiB2radK82ybwnylPUqXKZa", //admin
       nick_name: "admin",
       role: "Administrator",
-      createdAt: db.seq.literal("now()"),
-      updatedAt: db.seq.literal("now()"),
+      createdAt: db.sequelize.literal("now()"),
+      updatedAt: db.sequelize.literal("now()"),
     },
   ]);
 };
@@ -202,8 +202,8 @@ export const createSampleData = async () => {
           post_author: "admin",
           post_status: myConstant.post.POST_STATUS_DRAFT,
           news_code: `url_news_code${i}`,
-          createdAt: db.seq.literal("now()"),
-          post_modified: db.seq.literal("now()"),
+          createdAt: db.sequelize.literal("now()"),
+          post_modified: db.sequelize.literal("now()"),
         });
       } else if (i % 5 == 1) {
         news = await db.News.create({
@@ -212,8 +212,8 @@ export const createSampleData = async () => {
           post_author: "admin",
           post_status: myConstant.post.POST_STATUS_DRAFT,
           news_code: `url_news_code${i}`,
-          createdAt: db.seq.literal("now()"),
-          post_modified: db.seq.literal("now()"),
+          createdAt: db.sequelize.literal("now()"),
+          post_modified: db.sequelize.literal("now()"),
         });
       } else {
         news = await db.News.create({
@@ -222,8 +222,8 @@ export const createSampleData = async () => {
           post_author: "admin",
           post_status: myConstant.post.POST_STATUS_DRAFT,
           news_code: `url_news_code${i}`,
-          createdAt: db.seq.literal("now()"),
-          post_modified: db.seq.literal("now()"),
+          createdAt: db.sequelize.literal("now()"),
+          post_modified: db.sequelize.literal("now()"),
         });
       }
 

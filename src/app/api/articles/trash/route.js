@@ -1,5 +1,5 @@
-import { db } from "@/config/db";
-import { myConstant } from "@/store/constant";
+const db = require("@/app/models");
+const myConstant = require('@/store/constant')
 import { Op } from "sequelize";
 
 //BULK DELETE ARTICLE

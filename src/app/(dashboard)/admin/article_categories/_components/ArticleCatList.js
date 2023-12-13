@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { ArticleForm } from "./ArticleCatForm";
 import toast from "react-hot-toast";
 import Search from "antd/es/input/Search";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 
 function ArticleList(props) {
     const { getAllArticle, getArticle, addArticle, editArticle, delArticle, delBulkArticle, searchArticle } = props

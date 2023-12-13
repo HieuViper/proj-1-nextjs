@@ -1,6 +1,6 @@
 //"use server";
-import { db } from "@/config/db";
-import { myConstant } from "@/store/constant";
+const db = require("@/app/models");
+const myConstant = require('@/store/constant')
 import { Op, QueryTypes } from "sequelize";
 
 //get Status query from parameter post_status
@@ -60,7 +60,7 @@ export async function getAllArticle(
 
     let sqlquery = `SELECT * FROM articles_all WHERE (${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}) ${orderQuery} LIMIT ${fromarticle}, ${size}`;
 
-    const results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    const results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     return results;
   } catch (error) {
     throw new Error("Fail to get articles from database" + error.message);
@@ -96,7 +96,7 @@ export async function getTotalNumOfarticle(
 
     let sqlquery = `SELECT count(*) AS total FROM articles_all WHERE ${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}`;
     //let results = await pool.query(sqlquery, [post_type]);
-    let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.itemsOfTable = results[0].total;
   } catch (error) {
     throw new Error("cannot get items Of Table:" + error.message);
@@ -105,7 +105,7 @@ export async function getTotalNumOfarticle(
     //get total number of articles in All Status
     let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status!='${myConstant.post.POST_STATUS_TRASH}'`;
     //let results = await pool.query(sqlquery);
-    let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.all = results[0].total;
   } catch (error) {
     throw new Error(
@@ -115,7 +115,7 @@ export async function getTotalNumOfarticle(
   try {
     //get total number of articles in draft status
     let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status='${myConstant.post.POST_STATUS_DRAFT}'`;
-    let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.draft = results[0].total;
   } catch (error) {
     throw new Error(
@@ -125,7 +125,7 @@ export async function getTotalNumOfarticle(
   try {
     //get total number of articles in published status
     let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status='${myConstant.post.POST_STATUS_PUBLISH}'`;
-    let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.publish = results[0].total;
   } catch (error) {
     throw new Error(
@@ -135,7 +135,7 @@ export async function getTotalNumOfarticle(
   try {
     //get total number of articles in trash status
     let sqlquery = `SELECT count(*) AS total FROM articles WHERE post_status='${myConstant.post.POST_STATUS_TRASH}'`;
-    let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.trash = results[0].total;
   } catch (error) {
     throw new Error(
@@ -145,7 +145,7 @@ export async function getTotalNumOfarticle(
   try {
     //get total number of articles in priority status
     let sqlquery = `SELECT count(*) AS total FROM articles WHERE article_position=1`;
-    let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.priority = results[0].total;
 
     return totals;
@@ -235,7 +235,7 @@ export async function getArticle(id) {
   try {
     let sqlquery = `SELECT * FROM articles_all WHERE id=${id}`;
     //let results = await pool.query(sqlquery, [post_type]);
-    let result = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let result = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     // const result = await db.Article_categories.findOne({ where: { id: id } });
     return result;
   } catch (error) {
@@ -251,7 +251,7 @@ export async function getCategories(lang) {
     if (lang)
       strquery = `SELECT * FROM article_cat_all WHERE languageCode='${lang}'`;
     else strquery = "SELECT * FROM article_cat_all";
-    const results = await db.seq.query(strquery, { type: QueryTypes.SELECT });
+    const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
 
     return results;
   } catch (error) {
@@ -264,7 +264,7 @@ export async function getLanguages() {
   //console.log('db in language:', db);
   try {
     const results = await db.Languages.findAll({
-      order: db.seq.literal(`code='${myConstant.DEFAULT_LANGUAGE}' DESC`),
+      order: db.sequelize.literal(`code='${myConstant.DEFAULT_LANGUAGE}' DESC`),
     });
     return results;
   } catch (error) {
@@ -276,11 +276,11 @@ export async function getLanguages() {
 //parameter: data: contain updated value for article Table
 //           articleLangs: contain updated value for article_languages Table
 export async function addAarticle(data, articleLangs) {
-  const t = await db.seq.transaction();
+  const t = await db.sequelize.transaction();
   try {
     //update into article Table
     const currentLoginUser = "huy"; //we add information of modifier huy
-    if (data.post_date) data.post_date = db.seq.literal("now()"); //user has press publish button, set time for post_date
+    if (data.post_date) data.post_date = db.sequelize.literal("now()"); //user has press publish button, set time for post_date
     console.log("data :", data);
 
     const article = await db.Articles.create(data, { transaction: t });
@@ -310,12 +310,12 @@ export async function addAarticle(data, articleLangs) {
 //           articleLangs: contain updated value for article_languages Table
 //           id:  contain id of the article that need to be updated
 export async function updateAarticle(data, articleLangs, id) {
-  const t = await db.seq.transaction();
+  const t = await db.sequelize.transaction();
   try {
     //update into article Table
     const currentLoginUser = "huy"; //we add information of modifier huy
     data = { ...data, modified_by: currentLoginUser };
-    if (data.post_date) data.post_date = db.seq.literal("now()"); //user has press publish button, set time for post_date
+    if (data.post_date) data.post_date = db.sequelize.literal("now()"); //user has press publish button, set time for post_date
     console.log("data :", data);
     await db.Articles.update(data, {
       where: {

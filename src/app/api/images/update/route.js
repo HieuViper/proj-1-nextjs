@@ -12,7 +12,7 @@ export async function PUT(req, { params }) {
 
     let formData;
     let imageInfo;
-    // let query;
+    let query;
     let imgData = {
         alt: null,
         caption: null
@@ -21,7 +21,7 @@ export async function PUT(req, { params }) {
     try{
         formData = await req.json();
         imageInfo = formData.imageInfo;
-        // query = formData.query;
+        query = formData.query;
         imgData.alt = imageInfo.alt;
         imgData.caption = imageInfo.caption;
     } catch ( error ) {
@@ -33,7 +33,23 @@ export async function PUT(req, { params }) {
         await funcImage.updateImgById( imgData, imageInfo.id );
         console.log("updating image to database successfully");
 
-        return NextResponse.json( {}, { status: 200 });
+        //get new imageList
+        let result = {
+            images: null,
+            pagination: null,
+            totals: null,
+        }
+        result.images = await funcImage.getAllImages( query.page, query.size, query.search );
+        result.totals = await funcImage.getTotalNumOfImg( query.search );
+        result.pagination = {
+            pageSize: parseInt(query.size),
+            total: result.totals.itemsOfTable,
+            current: parseInt(query.page),
+        };
+        return NextResponse.json( { data: JSON.stringify(result.images),
+                                    pagination: result.pagination,
+                                    totals: result.totals,
+                                  }, { status: 200 });
     } catch ( error ) {
         return NextResponse.json( { msg: error.message }, { status: 500 });
     }

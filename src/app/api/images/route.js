@@ -1,4 +1,3 @@
-import { db } from "@/config/db";
 import { NextResponse } from "next/server";
 import { funcImage } from "@/library/funcImages";
 import { funcLogin } from "@/library/funcLogin";

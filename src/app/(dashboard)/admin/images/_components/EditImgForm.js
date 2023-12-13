@@ -1,12 +1,21 @@
+import { Form, Input } from "antd";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
-export function EditImgForm() {
+export function EditImgForm( props ) {
+    const [formEdit] = Form.useForm();
+    const [metadata, setMetadata] =useState();
+    useEffect (() => {
+        formEdit.setFieldsValue( props.image );
+        setMetadata( props.metadata );
+    }, [props]);
 
     return (
         <>
             <div className="p-3">
             <div className="text-sm flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                <p className="font-[500]">Upload On: </p> {metadata?.creationTime}
+                <p className="font-[500]">Upload On: </p> { metadata?.creationTime }
                 </div>
                 <div className="flex items-center gap-2">
                 <p className="font-[500]">File Name: </p> {metadata?.fileName}
@@ -28,8 +37,8 @@ export function EditImgForm() {
             <div className="flex items-center justify-center gap-6 ">
                 <div className="basis-1/3">
                 <Image
-                    src={formEdit.getFieldValue("url")}
-                    alt={formEdit.getFieldValue("alt")}
+                    src={props.image.url}
+                    alt={props.image.alt}
                     sizes="100vw"
                     style={{ width: "100%", height: "auto" }}
                     width={0}
@@ -51,8 +60,8 @@ export function EditImgForm() {
                     style={{
                     maxWidth: 600,
                     }}
-                    onFinish={onFinishEdit}
-                    onFinishFailed={onFinishFailed}
+                    onFinish={props.onFinishEdit}
+                    onFinishFailed={props.onFinishFailed}
                     autoComplete="off"
                 >
                     <Form.Item label="id" name="id" className="hidden">

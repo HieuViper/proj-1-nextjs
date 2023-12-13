@@ -1,4 +1,4 @@
-import { db } from "@/config/db";
+const db = require("@/app/models");
 import { request } from "http";
 import { NOW, Op, QueryTypes } from "sequelize";
 import { userRoles } from "./userRoles";
@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken';
 import { log } from "console";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 
 export const funcLogin = {
   checkLogin,   //check password, username

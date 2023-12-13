@@ -1,4 +1,4 @@
-import { db } from "@/config/db";
+const db = require("@/app/models");
 
 export async function DELETE(req, context) {
   const id = context.params.id;
@@ -15,7 +15,7 @@ export async function DELETE(req, context) {
 
 export async function PUT(req, context) {
   const id = context.params.id;
-  const t = await db.seq.transaction();
+  const t = await db.sequelize.transaction();
   try {
     const body = await req.json();
     const data = body.data;
@@ -23,7 +23,7 @@ export async function PUT(req, context) {
     //update into article Table
     const currentLoginUser = "huy"; //we add information of modifier huy
     let data1 = { ...data, modified_by: currentLoginUser };
-    if (data1.post_date) data1.post_date = db.seq.literal("now()"); //user has press publish button, set time for post_date
+    if (data1.post_date) data1.post_date = db.sequelize.literal("now()"); //user has press publish button, set time for post_date
     console.log("data1 :", data1);
     await db.Articles.update(data1, {
       where: {

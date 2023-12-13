@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently \"next dev\" \"node main.js\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "dotenv": "^10.0.0",
     "@ant-design/cssinjs": "^1.18.0",
     "@ckeditor/ckeditor5-react": "^6.2.0",
     "@types/node": "20.10.3",
@@ -49,7 +50,8 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
-    "@types/react": "18.2.41"
+    "@types/react": "18.2.41",
+    "concurrently": "^8.2.2"
   },
   "browser": {
     "fs": false,

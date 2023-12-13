@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-async-client-component */
 "use client";
-import { myConstant } from "@/store/constant";
+const myConstant = require('@/store/constant')
 import {
   DeleteOutlined,
   EditOutlined,

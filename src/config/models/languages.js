@@ -18,14 +18,6 @@ export function languagesModel(sequelize) {
                     msg: 'You have to insert name of the language',
                 }
             },
-            //unique: '',
-            //unique: true,
-            //field: 'real name of the column',
-            /*references: {
-                model: BarProp,
-                key: 'id'
-            }*/
-            //comment: 'Categories has the format: category1, category2, category3',
         },
         description: {
             type: DataTypes.STRING(200),

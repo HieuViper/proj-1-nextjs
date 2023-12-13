@@ -1,4 +1,4 @@
-import { db } from "@/config/db";
+const db = require("@/app/models");
 import { Op, QueryTypes } from "sequelize";
 
 export const funcArticleCategories = {
@@ -16,7 +16,7 @@ async function getAllArticleCat(lang) {
         let strquery;
         if (lang)
             strquery = `SELECT * FROM article_cat_all WHERE languageCode='${lang}'`;
-        const results = await db.seq.query(strquery, { type: QueryTypes.SELECT });
+        const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
         return results;
     } catch (error) {
         console.log(error);
@@ -27,7 +27,7 @@ async function getAllArticleCat(lang) {
 async function getArticleCat(id) {
     try {
         const sqlquery = `SELECT * FROM article_cat_all WHERE id=${id}`;
-        const result = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+        const result = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
         return result;
     } catch (error) {
         throw new Error("Fail to get articleCat :" + error.message);
@@ -35,13 +35,13 @@ async function getArticleCat(id) {
 }
 
 async function updateArticleCat(data, articleLangs, id) {
-    const t = await db.seq.transaction();
+    const t = await db.sequelize.transaction();
     try {
         //update into articleCat Table
         const currentLoginUser = 'huy'; //we add information of modifier huy
         data = { ...data, modified_by: currentLoginUser };
         if (data.post_date)
-            data.post_date = db.seq.literal('now()');   //user has press publish button, set time for post_date
+            data.post_date = db.sequelize.literal('now()');   //user has press publish button, set time for post_date
         console.log('data :', data);
         await db.Article_categories.update(
             data,
@@ -78,7 +78,7 @@ async function updateArticleCat(data, articleLangs, id) {
 }
 
 async function addArticleCat(data, articleLangs) {
-    const t = await db.seq.transaction();
+    const t = await db.sequelize.transaction();
     try {
         //update into articleCat Table
         const currentLoginUser = 'huy'; //we add information of modifier huy
@@ -136,7 +136,7 @@ async function getSearchQuery(search, lang) {
         strquery = strquery + ` (name LIKE '%${search}%' OR description LIKE '%${search}%')`;
         if (lang)
             strquery = strquery + ` AND languageCode='${lang}')`;
-        const results = await db.seq.query(strquery, { type: QueryTypes.SELECT });
+        const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
         return results;
     } catch (error) {
         console.log(error);

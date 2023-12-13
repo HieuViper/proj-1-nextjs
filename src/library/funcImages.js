@@ -1,11 +1,14 @@
-import { db } from "@/config/db";
-import { myConstant } from "@/store/constant";
+const db = require("@/app/models");
+const myConstant = require('@/store/constant')
 // import fs from "fs";
 import { promises as fsPromises } from "fs";
 import fs, { writeFile } from "fs/promises";
 import path from "path";
 import { QueryTypes } from "sequelize";
 import { funcLogin } from "./funcLogin";
+import sharp from "sharp";
+import imageCompression from "browser-image-compression";
+
 
 export const funcImage = {
   getImage,
@@ -18,7 +21,7 @@ export const funcImage = {
   deleteImg,
   saveImage,
   imageList,
-
+  getMetaImgInfo,
 };
 
 function getSearchQuery(search) {
@@ -35,7 +38,7 @@ export async function getAllImages( page, size, search ) {
 
     let sqlquery = `SELECT * FROM imgs ${searchQuery} ${orderQuery} LIMIT ${fromNews}, ${size}`;
 
-    const results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    const results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
 
     return results;
   } catch (error) {
@@ -54,7 +57,7 @@ export async function getTotalNumOfImg( search ) {
     const searchQuery = getSearchQuery(search);
 
     let sqlquery = `SELECT count(*) AS total FROM imgs ${searchQuery}`;
-    let results = await db.seq.query(sqlquery, { type: QueryTypes.SELECT });
+    let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.itemsOfTable = results[0].total;
   } catch ( error ) {
     throw new Error("Cannot get items Of Table:" + error.message);
@@ -105,6 +108,47 @@ export async function imageList( loginInfo, searchParams ) {
     result.msg = error.message;
     return result;
   }
+}
+
+//Get Image Info
+export async function getMetaImgInfo( imageUrl ) {
+  let result;
+  try {
+
+    const buffer = await fsPromises.readFile(`public${imageUrl}`)
+    // Use Sharp to get image information
+    const metadata = await sharp(buffer).metadata();
+
+    // Get file creation time using the fs module
+    const stats = await fsPromises.stat(
+      `public${imageUrl}`
+    );
+    const creationTime = stats.ctime;
+    const dateObj = new Date(creationTime.toString() );
+    const imageInfo = {
+      creationTime: `${dateObj.toLocaleDateString("en-US", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })} ${dateObj.toLocaleTimeString("en-US", { hour12: false })}`, // convert isostring to date time format dd/mm/yyyy hh:mm:ss
+      fileName: imageUrl.split("/").pop(),
+      fileType: metadata.format,
+      dimensions: {
+        width: metadata.width,
+        height: metadata.height,
+      },
+      size: Math.floor(buffer.length / 1024), // File size in kb
+    };
+    console.log(
+      "🚀 ~ file: page.js:67 ~ getInfoImage ~ imageInfo:",
+      imageInfo
+    );
+
+    return imageInfo;
+  } catch (error) {
+    throw new Error ('Cannot get metadata of image:' + error.message);
+  }
+
 }
 
 
@@ -173,7 +217,7 @@ async function deleteImg( id ) {
 //this function doesn't not update table products yet, return to this function after working
 //with the table products
 async function dellImage(url) {
-  const t = await db.seq.transaction();
+  const t = await db.sequelize.transaction();
   try {
     //Update table Articles
     await db.Articles.update(
@@ -267,6 +311,27 @@ async function checkAndCreateFileName( fileName, folderPath ) {
   return fileName;
 }
 
+//save one image on the specific foler path and specific image name
+async function saveSpecificImage( imageFileBuffer, name, folderPath, folderName ) {
+  try {
+    let fileName = await checkAndCreateFileName( name, folderPath );
+
+    //const buffer = Buffer.from(await imageFile.arrayBuffer());
+
+    await fsPromises.writeFile(
+      path.join(
+        process.cwd(),
+        `${folderPath}/` + fileName
+      ),
+      imageFileBuffer
+    );
+
+    return `/${myConstant.image.FOLDER_UPLOAD}/${folderName}/` + fileName;
+  }
+  catch ( error ) {
+    throw new Error('Cannot save a specific Image:' + error.message);
+  }
+}
 
 //save image to folder and return image URL
 export async function saveImage( imageFile ) {
@@ -277,23 +342,113 @@ export async function saveImage( imageFile ) {
   let folderName = getFolderName( imageFile );
   let folderPath = `public/${myConstant.image.FOLDER_UPLOAD}/${folderName}`;
   let fileName = imageFile.name.replaceAll(" ", "_");     //replace space in file name by '_'
+  let fileType = imageFile.type;
+  console.log('fileType of image:', fileType );
+  let result = {
+    url: null,
+    srcset: ''
+  }
   try {
     // check folder, if it doesn't exit, create new folder
     await checkAndCreateFolder( folderPath );
+    //save the origin image to the disk
+    console.log('before create imgBuffer');
+    let imgBuffer = Buffer.from( await imageFile.arrayBuffer() );
+    console.log('aftere create imgBuffer');
+    result.url = await saveSpecificImage( imgBuffer, fileName, folderPath, folderName );
 
-    // Check if the filename is already present in the folder, if it already exit, change to new filename
-    fileName = await checkAndCreateFileName( fileName, folderPath );
+    //all the file dimension need to be saved
+    const fileSizeCompress = [150, 350, 700];
+    // Compression options
+    const compressionOptions = {
+      quality: 70,
+      chromaSubsampling: '4:4:4',
+    };
 
-    const buffer = Buffer.from(await imageFile.arrayBuffer());
+    // Resize options
+    const resizeOptions = {
+      width: 150, // Set the desired width
+      withoutEnlargement: true, // Prevent enlarging the image if it's smaller than the specified dimensions
+    };
+    for (let i = 0; i < fileSizeCompress.length; i++) {
+      //Create new file from compression
+      let subFileName = `${fileName[0]}_${fileSizeCompress[i]}.${fileName[1]}`;
+      //config resize dimension
+      resizeOptions.width = fileSizeCompress[i]; //define width of the image
+      //resize file
+      console.log('come here before sharp resize');
+      const sharpResize = sharp( imgBuffer ).resize( resizeOptions );
 
-    await fsPromises.writeFile(
-      path.join(
-        process.cwd(),
-        `public/${myConstant.image.FOLDER_UPLOAD}/${folderName}/` + fileName
-      ),
-      buffer
-    );
-    return `/${myConstant.image.FOLDER_UPLOAD}/${folderName}/` + fileName;
+      let subFile;
+      switch ( fileType ) {
+        case "image/jpeg":
+          console.log('inside switch');
+          sharpResize.jpeg( compressionOptions ).toBuffer( (err, outputBuffer) => {
+            if( err ) {
+              throw new Error('Coundnt compress file jpeg');
+            }
+            subFile = outputBuffer;
+          } );
+          break;
+        case  "image/jpg" :
+          sharpResize.jpeg( compressionOptions ).toBuffer( (err, outputBuffer) => {
+            if( err ) {
+              throw new Error('Coundnt compress file jpg');
+            }
+            subFile = outputBuffer;
+          } );
+          break;
+        case "image/png":
+          sharpResize.png( compressionOptions ).toBuffer( (err, outputBuffer) => {
+            if( err ) {
+              throw new Error('Coundnt compress file png');
+            }
+            subFile = outputBuffer;
+          } );
+          break;
+        case "image/gif":
+          sharpResize.gif( compressionOptions ).toBuffer( (err, outputBuffer) => {
+            if( err ) {
+              throw new Error('Coundnt compress file gif');
+            }
+            subFile = outputBuffer;
+          } );
+          break;
+        case "image/webp":
+          sharpResize.webp( compressionOptions ).toBuffer( (err, outputBuffer) => {
+            if( err ) {
+              throw new Error('Coundnt compress file webp');
+            }
+            subFile = outputBuffer;
+          } );
+          break;
+        case "image/tiff":
+          sharpResize.tiff( compressionOptions ).toBuffer( (err, outputBuffer) => {
+            if( err ) {
+              throw new Error('Coundnt compress file tiff');
+            }
+            subFile = outputBuffer;
+          } );
+          break;
+        default:
+          throw new Error('This image type is not supported');
+
+      }
+
+      // save sub file to the disk
+      let subUrl = await saveSpecificImage( subFile, subFileName, folderPath, folderName );
+      let buildSrcSet;
+      if( i == 0 ) {
+        buildSrcSet = subUrl + ` ${fileSizeCompress[i]}w`;
+      }
+      else {
+        buildSrcSet = ', ' + subUrl + ` ${fileSizeCompress[i]}w`;
+      }
+      result.srcset += buildSrcSet;
+      console.log('srcset:', result.srcset);
+
+    }
+    return result;
   } catch (error) {
     throw new Error( 'Cannot save image file:' + error.message );
   }

@@ -1,4 +1,4 @@
-import { db } from "@/config/db";
+const db = require("@/app/models");
 import { NextResponse } from "next/server";
 
 export async function GET(req, context) {

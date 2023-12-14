@@ -14,7 +14,7 @@ export function articleCateLanguageModel(sequelize) {
             allowNull: true,
             comment: 'Description',
         },
-        articleCategoryId: {
+        ArticleCategoryId: {
             type: DataTypes.BIGINT(20).UNSIGNED,
             primaryKey: true,
             references: {
@@ -22,7 +22,7 @@ export function articleCateLanguageModel(sequelize) {
                 key: 'id'
             }
         },
-        languageCode: {
+        LanguageCode: {
             type: DataTypes.STRING(10),
             primaryKey: true,
             references: {

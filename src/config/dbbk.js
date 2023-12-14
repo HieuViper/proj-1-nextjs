@@ -133,14 +133,14 @@ async function initialize() {
   db.Products.belongsTo(db.Manufacturers);
 
   //relation ship one-to-many with images table
-  // db.Imgs.hasMany( db.Users, { foreignKey: 'image' } );
-  // db.Users.belongsTo( db.Imgs );
+  // db.News_imgs.hasMany( db.Users, { foreignKey: 'image' } );
+  // db.Users.belongsTo( db.News_imgs );
 
-  // db.Imgs.hasMany( db.News, { foreignKey: 'image' }  );
-  // db.News.belongsTo( db.Imgs);
+  // db.News_imgs.hasMany( db.News, { foreignKey: 'image' }  );
+  // db.News.belongsTo( db.News_imgs);
 
-  // db.Imgs.hasMany( db.Articles );
-  // db.Articles.belongsTo( db.Imgs, { foreignKey: 'image' } );
+  // db.News_imgs.hasMany( db.Articles );
+  // db.Articles.belongsTo( db.News_imgs, { foreignKey: 'image' } );
 
   // sync all models with database
   await sequelize.sync({ force: true });

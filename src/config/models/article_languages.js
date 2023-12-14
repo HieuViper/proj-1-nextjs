@@ -29,7 +29,7 @@ export function articleLanguageModel(sequelize) {
       allowNull: true,
       defaultValue: "undefined",
     },
-    articleId: {
+    ArticleId: {
       type: DataTypes.BIGINT(20).UNSIGNED,
       primaryKey: true,
       references: {
@@ -37,7 +37,7 @@ export function articleLanguageModel(sequelize) {
         key: 'id'
       },
     },
-    languageCode: {
+    LanguageCode: {
         type: DataTypes.STRING(10),
         primaryKey: true,
         references: {

@@ -6,7 +6,7 @@ import { funcUsers } from "@/library/funcUsers";
 import { userRoles } from "@/library/userRoles";
 import { headers, cookies } from "next/headers";
 import { funcLogin } from "@/library/funcLogin";
-import { funcImage } from "@/library/funcImages";
+import { newsImgs } from "@/library/newsImgs";
 
 const EditUserPage = async ({ params }) => {
   const loginInfo = funcLogin.checkAuthentication();
@@ -15,7 +15,7 @@ const EditUserPage = async ({ params }) => {
   let mainImage;
   const user = await funcUsers.getUser(params.id);
   if ( user.image )
-    mainImage = await funcImage.getImage(user.image);
+    mainImage = await newsImgs.getImage(user.image);
 
 //just for testing headers
   // const headerInst = headers();

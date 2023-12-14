@@ -1,4 +1,4 @@
-import { funcImage } from "@/library/funcImages";
+import { newsImgs } from "@/library/newsImgs";
 import { funcNews } from "@/library/funcNews";
 import { redirect } from "next/navigation";
 import { NewsForm } from "../_components/NewsForm";
@@ -27,7 +27,7 @@ async function AddNews() {
     "use server";
     let result;
     try {
-      rs = await funcImage.addImage(data);
+      rs = await newsImgs.addImage(data);
       console.log("🚀 ~ file: page.js:14 ~ addArticle ~ rs:", rs);
       result = rs;
     } catch (error) {

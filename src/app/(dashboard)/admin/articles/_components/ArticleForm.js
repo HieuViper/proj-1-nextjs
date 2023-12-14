@@ -51,7 +51,7 @@ export function ArticleForm(props) {
   function getArticleValue(property, article, lang) {
     let rs;
     article.forEach((element) => {
-      if (element.languageCode == lang) {
+      if (element.LanguageCode == lang) {
         rs = element[property];
       }
     });
@@ -237,8 +237,8 @@ export function ArticleForm(props) {
         title: form.getFieldValue(`title_${lang.code}`) ?? "",
         excerpt: form.getFieldValue(`excerpt_${lang.code}`) ?? "",
         content: form.getFieldValue(`excerpt_${lang.code}`) ?? "",
-        languageCode: lang.code,
-        articleId: params?.id,
+        LanguageCode: lang.code,
+        ArticleId: params?.id,
       };
     });
 
@@ -552,11 +552,11 @@ export function ArticleForm(props) {
 
                 const isLt5M =
                   file.size / 1024 / 1024 <=
-                  myConstant.image.FILE_LIMITED_SIZE;
+                  myConstant.news.image.FILE_LIMITED_SIZE;
                 // check the file size
                 if (!isLt5M) {
                   message.error(
-                    `Image must smaller than ${myConstant.image.FILE_LIMITED_SIZE}MB!`
+                    `Image must smaller than ${myConstant.news.image.FILE_LIMITED_SIZE}MB!`
                   );
                   reject(false);
                 } else {

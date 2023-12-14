@@ -63,7 +63,7 @@ export async function getAllNews(
     const searchQuery = getSearchQuery(search);
     const orderQuery = orderby == "" ? "" : `ORDER BY ${orderby} ${order}`;
 
-    let sqlquery = `SELECT * FROM news_all WHERE (${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}) ${orderQuery} LIMIT ${fromNews}, ${size}`;
+    let sqlquery = `SELECT * FROM news_all WHERE (${statusQuery} AND LanguageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}) ${orderQuery} LIMIT ${fromNews}, ${size}`;
 
     const results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
 
@@ -100,7 +100,7 @@ export async function getTotalNumOfNews(
       category == "" ? "" : `AND categories LIKE '%${category}%'`;
     const tagQuery = tag == "" ? "" : `AND tags like '%${tag}%'`;
 
-    let sqlquery = `SELECT count(*) AS total FROM news_all WHERE ${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}`;
+    let sqlquery = `SELECT count(*) AS total FROM news_all WHERE ${statusQuery} AND LanguageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}`;
     //let results = await pool.query(sqlquery, [post_type]);
     let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.itemsOfTable = results[0].total;
@@ -176,7 +176,7 @@ export async function trashNews(key) {
   }
 }
 
-//Delete bulk of news, articles based on newsid
+//Delete bulk of news, articles based on NewsId
 export async function deleteBulkNews(keys, status) {
   try {
     const keysArr = keys.split(",");
@@ -250,7 +250,7 @@ export async function getCategories(lang) {
   try {
     let strquery;
     if (lang)
-      strquery = `SELECT * FROM news_cat_all WHERE languageCode='${lang}'`;
+      strquery = `SELECT * FROM news_cat_all WHERE LanguageCode='${lang}'`;
     else strquery = "SELECT * FROM news_cat_all";
     const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
     return results;
@@ -263,7 +263,7 @@ export async function getCategories(lang) {
 export async function getTags(lang) {
   try {
     let strquery;
-    if (lang) strquery = `SELECT * FROM tags_all WHERE languageCode='${lang}'`;
+    if (lang) strquery = `SELECT * FROM tags_all WHERE LanguageCode='${lang}'`;
     else strquery = "SELECT * FROM tags_all";
     const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
     return results;
@@ -306,10 +306,10 @@ export async function updateANews(data, newsLangs, id) {
     //update into news_languages Table
     for (const element of newsLangs) {
       console.log("element:", element);
-      const { languageCode, newsId, ...newsLangRow } = element;
+      const { LanguageCode, NewsId, ...newsLangRow } = element;
       await db.News_languages.update(newsLangRow, {
         where: {
-          [Op.and]: [{ newsId: id }, { languageCode: languageCode }],
+          [Op.and]: [{ NewsId: id }, { LanguageCode: LanguageCode }],
         },
         transaction: t,
       });
@@ -333,9 +333,9 @@ export async function addANews(data, newsLangs) {
     if (data.post_date) data.post_date = db.sequelize.literal("now()"); //user has press publish button, set time for post_date
     console.log("data :", data);
     const news = await db.News.create(data, { transaction: t });
-    //add newsId property to the newsLangs
+    //add NewsId property to the newsLangs
     for (const element of newsLangs) {
-      element.newsId = news.id;
+      element.NewsId = news.id;
     }
     //create records in news_languages Table
     await db.News_languages.bulkCreate(newsLangs, {

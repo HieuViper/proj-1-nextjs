@@ -60,7 +60,7 @@ module.exports = withNextIntl({
           moveTrash: true,
           recover: true,
         },
-        images: {
+        news_imgs: {
           add: true,
           edit: true,
           delete: true,

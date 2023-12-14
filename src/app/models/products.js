@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     });
     db.Languages.hasMany(db.ProductLanguages, {
       as: 'product_languages',
-      foreignKey: "languageCode",
+      foreignKey: "LanguageCode",
     });
     // db.ProductLanguages.belongsTo(db.Languages, {
     //   as: 'languages',

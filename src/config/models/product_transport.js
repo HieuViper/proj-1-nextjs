@@ -18,7 +18,7 @@ export function productTransportModel(sequelize) {
       },
       comment: "Transport description",
     },
-    languageCode: {
+    LanguageCode: {
       type: DataTypes.STRING(10),
      // primaryKey: true,
       references: {

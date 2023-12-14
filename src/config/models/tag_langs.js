@@ -14,7 +14,7 @@ export function tagLangsModel(sequelize) {
             allowNull: true,
             comment: 'Description',
         },
-        tagId: {
+        TagId: {
             type: DataTypes.BIGINT(20).UNSIGNED,
             primaryKey: true,
             references: {
@@ -22,7 +22,7 @@ export function tagLangsModel(sequelize) {
                 key: 'id'
             }
         },
-        languageCode: {
+        LanguageCode: {
             type: DataTypes.STRING(10),
             primaryKey: true,
             references: {

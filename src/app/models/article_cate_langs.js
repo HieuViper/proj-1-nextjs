@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
             comment: 'Description',
         },
-        // articleCategoryId: {
+        // ArticleCategoryId: {
         //     type: DataTypes.BIGINT(20).UNSIGNED,
         //     primaryKey: true,
         //     references: {
@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         //         key: 'id'
         //     }
         // },
-        // languageCode: {
+        // LanguageCode: {
         //     type: DataTypes.STRING(10),
         //     primaryKey: true,
         //     references: {

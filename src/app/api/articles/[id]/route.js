@@ -34,10 +34,10 @@ export async function PUT(req, context) {
     //update into article_languages Table
     for (const element of articleLangs) {
       console.log("element:", element);
-      const { languageCode, articleId, ...articleLangRow } = element;
+      const { LanguageCode, ArticleId, ...articleLangRow } = element;
       await db.Article_languages.update(articleLangRow, {
         where: {
-          [Op.and]: [{ articleId: id }, { languageCode: languageCode }],
+          [Op.and]: [{ ArticleId: id }, { LanguageCode: LanguageCode }],
         },
         transaction: t,
       });

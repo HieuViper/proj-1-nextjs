@@ -17,7 +17,7 @@ export function TagForm(props) {
   function getTagValue(property, tag, lang) {
     let rs;
     tag.forEach((element) => {
-      if (element.languageCode == lang) {
+      if (element.LanguageCode == lang) {
         rs = element[property];
       }
     });
@@ -32,7 +32,7 @@ export function TagForm(props) {
       return {
         name: form.getFieldValue(`name_${lang.code}`) ?? "",
         description: form.getFieldValue(`description_${lang.code}`) ?? "",
-        languageCode: lang.code,
+        LanguageCode: lang.code,
         TagId: id,
       };
     });

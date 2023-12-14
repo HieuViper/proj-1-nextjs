@@ -45,16 +45,16 @@ const createNewsCate = async () => {
 
     await db.News_cate_langs.bulkCreate([
       {
-        newsCategoryId: newsCate0.id,
+        NewsCategoryId: newsCate0.id,
         name: "Kinh tế",
         description: "Hoạt động kinh tế nổi bật trong vòng 24h qua ",
-        languageCode: "vi",
+        LanguageCode: "vi",
       },
       {
-        newsCategoryId: newsCate0.id,
+        NewsCategoryId: newsCate0.id,
         name: "Economy",
         description: "Featured economic activities",
-        languageCode: "en",
+        LanguageCode: "en",
       },
     ]);
     //second record of news category
@@ -65,16 +65,16 @@ const createNewsCate = async () => {
 
     await db.News_cate_langs.bulkCreate([
       {
-        newsCategoryId: newsCate1.id,
+        NewsCategoryId: newsCate1.id,
         name: "Xã hội",
         description: "Các sự kiện xã hội trong nước",
-        languageCode: "vi",
+        LanguageCode: "vi",
       },
       {
-        newsCategoryId: newsCate1.id,
+        NewsCategoryId: newsCate1.id,
         name: "Society",
         description: "The social events in the dosmetic country",
-        languageCode: "en",
+        LanguageCode: "en",
       },
     ]);
 
@@ -86,16 +86,16 @@ const createNewsCate = async () => {
 
     await db.News_cate_langs.bulkCreate([
       {
-        newsCategoryId: newsCate.id,
+        NewsCategoryId: newsCate.id,
         name: "Bất động sản",
         description: "Thông tin các dự án mới đang được triển khai",
-        languageCode: "vi",
+        LanguageCode: "vi",
       },
       {
-        newsCategoryId: newsCate.id,
+        NewsCategoryId: newsCate.id,
         name: "Real Estate",
         description: "New starting projects's information ",
-        languageCode: "en",
+        LanguageCode: "en",
       },
     ]);
 
@@ -107,16 +107,16 @@ const createNewsCate = async () => {
 
     await db.News_cate_langs.bulkCreate([
       {
-        newsCategoryId: newsCate4.id,
+        NewsCategoryId: newsCate4.id,
         name: "Chứng khoán",
         description: "Thông tin tức thời trên thị trường chứng khoán",
-        languageCode: "vi",
+        LanguageCode: "vi",
       },
       {
         newsCate4goryId: newsCate.id,
         name: "Stock market",
         description: "Instant news of stock market",
-        languageCode: "en",
+        LanguageCode: "en",
       },
     ]);
   } catch (error) {
@@ -135,16 +135,16 @@ const createArticleCategories = async () => {
 
       await db.Article_cate_langs.bulkCreate([
         {
-          articleCategoryId: articleCate.id,
+          ArticleCategoryId: articleCate.id,
           name: "Tên cate " + articleCate.id,
           description: "mô tả của cate " + articleCate.id,
-          languageCode: "vi",
+          LanguageCode: "vi",
         },
         {
-          articleCategoryId: articleCate.id,
+          ArticleCategoryId: articleCate.id,
           name: "Name cate " + articleCate.id,
           description: "description about cate " + articleCate.id,
-          languageCode: "en",
+          LanguageCode: "en",
         },
       ]);
     } catch (error) {
@@ -164,16 +164,16 @@ const createTags = async () => {
 
       await db.Tag_langs.bulkCreate([
         {
-          tagId: tag.id,
+          TagId: tag.id,
           name: "Tên tag " + tag.id,
           description: "mô tả của tag " + tag.id,
-          languageCode: "vi",
+          LanguageCode: "vi",
         },
         {
-          tagId: tag.id,
+          TagId: tag.id,
           name: "Name tag " + tag.id,
           description: "description about tag " + tag.id,
-          languageCode: "en",
+          LanguageCode: "en",
         },
       ]);
     } catch (error) {
@@ -229,18 +229,18 @@ export const createSampleData = async () => {
 
       await db.News_languages.bulkCreate([
         {
-          newsId: news.id,
+          NewsId: news.id,
           title: "tiêu đề của tin " + news.id,
           excerpt: "mô tả ngắn của tin " + news.id,
           content: "Nội dung của tin " + news.id,
-          languageCode: "vi",
+          LanguageCode: "vi",
         },
         {
-          newsId: news.id,
+          NewsId: news.id,
           title: "Title of news " + news.id,
           excerpt: "Excerpt of news " + news.id,
           content: "Content of news " + news.id,
-          languageCode: "en",
+          LanguageCode: "en",
         },
       ]);
       //create sample for articles
@@ -255,18 +255,18 @@ export const createSampleData = async () => {
 
       await db.Article_languages.bulkCreate([
         {
-          articleId: article.id,
+          ArticleId: article.id,
           title: "tiêu đề của tin " + article.id,
           excerpt: "mô tả ngắn của tin " + article.id,
           content: "Nội dung của tin " + article.id,
-          languageCode: "vi",
+          LanguageCode: "vi",
         },
         {
-          articleId: article.id,
+          ArticleId: article.id,
           title: "Title of news " + article.id,
           excerpt: "Excerpt of news " + article.id,
           content: "Content of news " + article.id,
-          languageCode: "en",
+          LanguageCode: "en",
         },
       ]);
     } catch (error) {

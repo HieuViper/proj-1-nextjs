@@ -18,7 +18,7 @@ export function productGuaranteeModel(sequelize) {
       },
       comment: "Guarantee description",
     },
-    languageCode: {
+    LanguageCode: {
       type: DataTypes.STRING(10),
      // primaryKey: true,
       references: {

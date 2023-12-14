@@ -14,7 +14,6 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { callAPI, handleNotAuthorized } from "@/library/client/callAPI";
 import { useLogin } from "@/store/login";
-import { Span } from "next/dist/trace";
 const myConstant = require('@/store/constant')
 
 export default function NewsList(props) {
@@ -130,7 +129,7 @@ export default function NewsList(props) {
     () => { router.push('/login') },
     () => { setLoginForm( true ) },
   );
-  if ( res.status == 200 ) {
+  if ( res.ok == true ) {
     setInitStates( result );
   }
   setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components

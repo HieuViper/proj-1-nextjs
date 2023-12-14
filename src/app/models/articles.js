@@ -15,10 +15,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(200),
         allowNull: true,
         comment: "feature image of the post",
-        references: {
-          model: 'imgs',
-          key: 'url'
-      }
+      //   references: {
+      //     model: 'imgs',
+      //     key: 'url'
+      // }
       },
       categories: {
         type: DataTypes.STRING(200),

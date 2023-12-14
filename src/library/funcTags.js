@@ -19,7 +19,7 @@ async function getAllTags(page, size, search, lang) {
         const searchQuery = getSearchQuery(search);
         let strquery;
         if (lang)
-            strquery = `SELECT * FROM tags_all WHERE languageCode='${lang}' ${searchQuery} ORDER BY id DESC LIMIT ${fromTags}, ${size}`;
+            strquery = `SELECT * FROM tags_all WHERE LanguageCode='${lang}' ${searchQuery} ORDER BY id DESC LIMIT ${fromTags}, ${size}`;
         const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
         return results;
     } catch (error) {
@@ -32,7 +32,7 @@ export async function getTotalTags(search, lang) {
     let total
     try {
         const searchQuery = getSearchQuery(search);
-        let sqlquery = `SELECT count(*) AS total FROM tags_all WHERE languageCode='${lang}' ${searchQuery} `;
+        let sqlquery = `SELECT count(*) AS total FROM tags_all WHERE LanguageCode='${lang}' ${searchQuery} `;
         let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
         total = results[0].total;
         return total
@@ -77,14 +77,14 @@ async function updateTags(data, tagLangs, id) {
         //update into tag_languages Table
         for (const element of tagLangs) {
             console.log('element:', element);
-            const { languageCode, tagId, ...tagLangRow } = element;
+            const { LanguageCode, TagId, ...tagLangRow } = element;
             await db.Tag_langs.update(
                 tagLangRow,
                 {
                     where: {
                         [Op.and]: [
-                            { tagId: id },
-                            { languageCode: languageCode }
+                            { TagId: id },
+                            { LanguageCode: LanguageCode }
                         ]
                     },
                     transaction: t,
@@ -106,9 +106,9 @@ async function addTags(data, tagLangs) {
         const currentLoginUser = 'huy'; //we add information of modifier huy
         console.log('data :', data);
         const tag = await db.Tags.create(data, { transaction: t });
-        //add tagId property to the tagLangs
+        //add TagId property to the tagLangs
         for (const element of tagLangs) {
-            element.tagId = tag.id;
+            element.TagId = tag.id;
         }
         //create records in tag_languages Table
         await db.Tag_langs.bulkCreate(tagLangs, { validate: true, transaction: t });

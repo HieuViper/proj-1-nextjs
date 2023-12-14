@@ -71,6 +71,15 @@ const DashboardLayout = (props) => {
           <MailOutlined />
         )
       );
+      if (role?.news_imgs) {
+        subItems.push(
+          getItem(
+            "/admin/news_imgs",
+            <Link href="/admin/news_imgs">Images</Link>,
+            <FileImageOutlined />
+          )
+        );
+      }
     items.push(getItem("/news", "News", <ReadOutlined />, subItems));
   }
   if (role?.articles) {
@@ -139,15 +148,7 @@ const DashboardLayout = (props) => {
       )
     );
   }
-  if (role?.images) {
-    items.push(
-      getItem(
-        "/admin/images",
-        <Link href="/admin/images">Images</Link>,
-        <FileImageOutlined />
-      )
-    );
-  }
+
 
   return (
     <Layout hasSider style={{ minHeight: "100vh" }}>

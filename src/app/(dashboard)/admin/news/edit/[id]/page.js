@@ -1,4 +1,4 @@
-import { funcImage } from "@/library/funcImages";
+import { newsImgs } from "@/library/newsImgs";
 import { funcNews } from "@/library/funcNews";
 import { redirect } from "next/navigation";
 import { NewsForm } from "../../_components/NewsForm";
@@ -26,7 +26,7 @@ async function EditNews({ params, searchParams }) {
     "use server";
     let result;
     try {
-      rs = await funcImage.addImage(data);
+      rs = await newsImgs.addImage(data);
       console.log("🚀 ~ file: page.js:14 ~ addArticle ~ rs:", rs);
       result = rs;
     } catch (error) {
@@ -39,7 +39,7 @@ async function EditNews({ params, searchParams }) {
     "use server";
     let result;
     try {
-      let rs = await funcImage.updateImage(data, url);
+      let rs = await newsImgs.updateImage(data, url);
       console.log("🚀 ~ file: page.js:14 ~ updateImage ~ rs:", rs);
       result = rs;
     } catch (error) {
@@ -49,7 +49,7 @@ async function EditNews({ params, searchParams }) {
     return result;
   }
   const data = await funcNews.getNews(params.id);
-  const mainImage = await funcImage.getImage(data[0]?.image ?? "");
+  const mainImage = await newsImgs.getImage(data[0]?.image ?? "");
   const cate = await funcNews.getCategories( myConstant.DEFAULT_LANGUAGE );
   const tags = await funcNews.getTags(myConstant.DEFAULT_LANGUAGE);
   const langTable = await funcNews.getLanguages();

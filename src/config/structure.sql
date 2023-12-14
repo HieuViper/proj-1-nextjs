@@ -229,15 +229,15 @@ INSERT INTO `article_categories` (`id`, `category_code`) VALUES
 CREATE TABLE `article_cate_langs` (
   `name` varchar(200) DEFAULT 'undefined',
   `description` longtext DEFAULT NULL COMMENT 'Description',
-  `articleCategoryId` bigint(20) UNSIGNED NOT NULL,
-  `languageCode` varchar(10) NOT NULL
+  `ArticleCategoryId` bigint(20) UNSIGNED NOT NULL,
+  `LanguageCode` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `article_cate_langs`
 --
 
-INSERT INTO `article_cate_langs` (`name`, `description`, `articleCategoryId`, `languageCode`) VALUES
+INSERT INTO `article_cate_langs` (`name`, `description`, `ArticleCategoryId`, `LanguageCode`) VALUES
 ('Name cate 1', 'description about cate 1', 1, 'en'),
 ('Tên cate 1', 'mô tả của cate 1', 1, 'vi'),
 ('Name cate 2', 'description about cate 2', 2, 'en'),
@@ -259,15 +259,15 @@ CREATE TABLE `article_languages` (
   `title` varchar(300) DEFAULT 'undefined' COMMENT 'Title can be null',
   `excerpt` text DEFAULT NULL COMMENT 'Short Description',
   `content` text DEFAULT NULL COMMENT 'Content of article',
-  `articleId` bigint(20) UNSIGNED NOT NULL,
-  `languageCode` varchar(10) NOT NULL
+  `ArticleId` bigint(20) UNSIGNED NOT NULL,
+  `LanguageCode` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `article_languages`
 --
 
-INSERT INTO `article_languages` (`title`, `excerpt`, `content`, `articleId`, `languageCode`) VALUES
+INSERT INTO `article_languages` (`title`, `excerpt`, `content`, `ArticleId`, `LanguageCode`) VALUES
 ('Title of news 1', 'Excerpt of news 1', 'Content of news 1', 1, 'en'),
 ('tiêu đề của tin 1', 'mô tả ngắn của tin 1', 'Nội dung của tin 1', 1, 'vi'),
 ('Title of news 2', 'Excerpt of news 2', 'Content of news 2', 2, 'en'),
@@ -499,7 +499,7 @@ CREATE TABLE `manufacturer_languages` (
   `name` varchar(300) DEFAULT 'undefined' COMMENT 'Name can be null',
   `description` text DEFAULT NULL COMMENT 'Description',
   `manufacturerId` bigint(20) UNSIGNED NOT NULL,
-  `languageCode` varchar(10) NOT NULL
+  `LanguageCode` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -663,15 +663,15 @@ INSERT INTO `news_categories` (`id`, `parent`, `category_code`) VALUES
 CREATE TABLE `news_cate_langs` (
   `name` varchar(200) DEFAULT 'undefined',
   `description` longtext DEFAULT NULL COMMENT 'Description',
-  `newsCategoryId` bigint(20) UNSIGNED NOT NULL,
-  `languageCode` varchar(10) NOT NULL
+  `NewsCategoryId` bigint(20) UNSIGNED NOT NULL,
+  `LanguageCode` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `news_cate_langs`
 --
 
-INSERT INTO `news_cate_langs` (`name`, `description`, `newsCategoryId`, `languageCode`) VALUES
+INSERT INTO `news_cate_langs` (`name`, `description`, `NewsCategoryId`, `LanguageCode`) VALUES
 ('Economy', 'Featured economic activities', 1, 'en'),
 ('Kinh tế', 'Hoạt động kinh tế nổi bật trong vòng 24h qua ', 1, 'vi'),
 ('Society', 'The social events in the dosmetic country', 2, 'en'),
@@ -689,15 +689,15 @@ CREATE TABLE `news_languages` (
   `title` varchar(300) DEFAULT 'undefined' COMMENT 'Title can be null',
   `excerpt` text DEFAULT NULL COMMENT 'Short Description',
   `content` text DEFAULT NULL COMMENT 'Content of News',
-  `newsId` bigint(20) UNSIGNED NOT NULL,
-  `languageCode` varchar(10) NOT NULL
+  `NewsId` bigint(20) UNSIGNED NOT NULL,
+  `LanguageCode` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `news_languages`
 --
 
-INSERT INTO `news_languages` (`title`, `excerpt`, `content`, `newsId`, `languageCode`) VALUES
+INSERT INTO `news_languages` (`title`, `excerpt`, `content`, `NewsId`, `LanguageCode`) VALUES
 ('Title of news 1', 'Excerpt of news 1', 'Content of news 1', 1, 'en'),
 ('tiêu đề của tin 1', 'mô tả ngắn của tin 1', 'Nội dung của tin 1', 1, 'vi'),
 ('Title of news 2', 'Excerpt of news 2', 'Content of news 2', 2, 'en'),
@@ -938,7 +938,7 @@ CREATE TABLE `products_languages` (
   `transport` text DEFAULT NULL COMMENT 'Transport Description',
   `description` text DEFAULT NULL COMMENT 'Description',
   `productId` bigint(20) UNSIGNED NOT NULL,
-  `languageCode` varchar(10) NOT NULL
+  `LanguageCode` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -963,7 +963,7 @@ CREATE TABLE `product_cate_langs` (
   `name` varchar(200) DEFAULT 'undefined',
   `description` longtext DEFAULT NULL COMMENT 'Description',
   `productCategoryId` bigint(20) UNSIGNED NOT NULL,
-  `languageCode` varchar(10) NOT NULL
+  `LanguageCode` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -975,7 +975,7 @@ CREATE TABLE `product_cate_langs` (
 CREATE TABLE `product_guarantee` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `guarantee` text NOT NULL COMMENT 'Guarantee description',
-  `languageCode` varchar(10) DEFAULT NULL
+  `LanguageCode` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -987,7 +987,7 @@ CREATE TABLE `product_guarantee` (
 CREATE TABLE `product_transport` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `transport` text NOT NULL COMMENT 'Transport description',
-  `languageCode` varchar(10) DEFAULT NULL
+  `LanguageCode` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1021,15 +1021,15 @@ INSERT INTO `tags` (`id`, `tag_code`) VALUES
 CREATE TABLE `tag_langs` (
   `name` varchar(200) DEFAULT 'undefined',
   `description` longtext DEFAULT NULL COMMENT 'Description',
-  `tagId` bigint(20) UNSIGNED NOT NULL,
-  `languageCode` varchar(10) NOT NULL
+  `TagId` bigint(20) UNSIGNED NOT NULL,
+  `LanguageCode` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tag_langs`
 --
 
-INSERT INTO `tag_langs` (`name`, `description`, `tagId`, `languageCode`) VALUES
+INSERT INTO `tag_langs` (`name`, `description`, `TagId`, `LanguageCode`) VALUES
 ('Name tag 1', 'description about tag 1', 1, 'en'),
 ('Tên tag 1', 'mô tả của tag 1', 1, 'vi'),
 ('Name tag 2', 'description about tag 2', 2, 'en'),
@@ -1100,17 +1100,17 @@ ALTER TABLE `article_categories`
 -- Indexes for table `article_cate_langs`
 --
 ALTER TABLE `article_cate_langs`
-  ADD PRIMARY KEY (`articleCategoryId`,`languageCode`),
-  ADD UNIQUE KEY `article_cate_langs_languageCode_articleCategoryId_unique` (`articleCategoryId`,`languageCode`),
-  ADD KEY `languageCode` (`languageCode`);
+  ADD PRIMARY KEY (`ArticleCategoryId`,`LanguageCode`),
+  ADD UNIQUE KEY `article_cate_langs_LanguageCode_ArticleCategoryId_unique` (`ArticleCategoryId`,`LanguageCode`),
+  ADD KEY `LanguageCode` (`LanguageCode`);
 
 --
 -- Indexes for table `article_languages`
 --
 ALTER TABLE `article_languages`
-  ADD PRIMARY KEY (`articleId`,`languageCode`),
-  ADD UNIQUE KEY `article_languages_languageCode_articleId_unique` (`articleId`,`languageCode`),
-  ADD KEY `languageCode` (`languageCode`);
+  ADD PRIMARY KEY (`ArticleId`,`LanguageCode`),
+  ADD UNIQUE KEY `article_languages_LanguageCode_ArticleId_unique` (`ArticleId`,`LanguageCode`),
+  ADD KEY `LanguageCode` (`LanguageCode`);
 
 --
 -- Indexes for table `icons`
@@ -1142,9 +1142,9 @@ ALTER TABLE `manufacturers`
 -- Indexes for table `manufacturer_languages`
 --
 ALTER TABLE `manufacturer_languages`
-  ADD PRIMARY KEY (`manufacturerId`,`languageCode`),
-  ADD UNIQUE KEY `manufacturer_languages_languageCode_manufacturerId_unique` (`manufacturerId`,`languageCode`),
-  ADD KEY `languageCode` (`languageCode`);
+  ADD PRIMARY KEY (`manufacturerId`,`LanguageCode`),
+  ADD UNIQUE KEY `manufacturer_languages_LanguageCode_manufacturerId_unique` (`manufacturerId`,`LanguageCode`),
+  ADD KEY `LanguageCode` (`LanguageCode`);
 
 --
 -- Indexes for table `news`
@@ -1165,17 +1165,17 @@ ALTER TABLE `news_categories`
 -- Indexes for table `news_cate_langs`
 --
 ALTER TABLE `news_cate_langs`
-  ADD PRIMARY KEY (`newsCategoryId`,`languageCode`),
-  ADD UNIQUE KEY `news_cate_langs_languageCode_newsCategoryId_unique` (`newsCategoryId`,`languageCode`),
-  ADD KEY `languageCode` (`languageCode`);
+  ADD PRIMARY KEY (`NewsCategoryId`,`LanguageCode`),
+  ADD UNIQUE KEY `news_cate_langs_LanguageCode_NewsCategoryId_unique` (`NewsCategoryId`,`LanguageCode`),
+  ADD KEY `LanguageCode` (`LanguageCode`);
 
 --
 -- Indexes for table `news_languages`
 --
 ALTER TABLE `news_languages`
-  ADD PRIMARY KEY (`newsId`,`languageCode`),
-  ADD UNIQUE KEY `news_languages_languageCode_newsId_unique` (`newsId`,`languageCode`),
-  ADD KEY `languageCode` (`languageCode`);
+  ADD PRIMARY KEY (`NewsId`,`LanguageCode`),
+  ADD UNIQUE KEY `news_languages_LanguageCode_NewsId_unique` (`NewsId`,`LanguageCode`),
+  ADD KEY `LanguageCode` (`LanguageCode`);
 
 --
 -- Indexes for table `products`
@@ -1194,9 +1194,9 @@ ALTER TABLE `products`
 -- Indexes for table `products_languages`
 --
 ALTER TABLE `products_languages`
-  ADD PRIMARY KEY (`productId`,`languageCode`),
-  ADD UNIQUE KEY `products_languages_languageCode_productId_unique` (`productId`,`languageCode`),
-  ADD KEY `languageCode` (`languageCode`);
+  ADD PRIMARY KEY (`productId`,`LanguageCode`),
+  ADD UNIQUE KEY `products_languages_LanguageCode_productId_unique` (`productId`,`LanguageCode`),
+  ADD KEY `LanguageCode` (`LanguageCode`);
 
 --
 -- Indexes for table `product_categories`
@@ -1209,23 +1209,23 @@ ALTER TABLE `product_categories`
 -- Indexes for table `product_cate_langs`
 --
 ALTER TABLE `product_cate_langs`
-  ADD PRIMARY KEY (`productCategoryId`,`languageCode`),
-  ADD UNIQUE KEY `product_cate_langs_languageCode_productCategoryId_unique` (`productCategoryId`,`languageCode`),
-  ADD KEY `languageCode` (`languageCode`);
+  ADD PRIMARY KEY (`productCategoryId`,`LanguageCode`),
+  ADD UNIQUE KEY `product_cate_langs_LanguageCode_productCategoryId_unique` (`productCategoryId`,`LanguageCode`),
+  ADD KEY `LanguageCode` (`LanguageCode`);
 
 --
 -- Indexes for table `product_guarantee`
 --
 ALTER TABLE `product_guarantee`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `languageCode` (`languageCode`);
+  ADD KEY `LanguageCode` (`LanguageCode`);
 
 --
 -- Indexes for table `product_transport`
 --
 ALTER TABLE `product_transport`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `languageCode` (`languageCode`);
+  ADD KEY `LanguageCode` (`LanguageCode`);
 
 --
 -- Indexes for table `tags`
@@ -1237,9 +1237,9 @@ ALTER TABLE `tags`
 -- Indexes for table `tag_langs`
 --
 ALTER TABLE `tag_langs`
-  ADD PRIMARY KEY (`tagId`,`languageCode`),
-  ADD UNIQUE KEY `tag_langs_languageCode_tagId_unique` (`tagId`,`languageCode`),
-  ADD KEY `languageCode` (`languageCode`);
+  ADD PRIMARY KEY (`TagId`,`LanguageCode`),
+  ADD UNIQUE KEY `tag_langs_LanguageCode_TagId_unique` (`TagId`,`LanguageCode`),
+  ADD KEY `LanguageCode` (`LanguageCode`);
 
 --
 -- Indexes for table `users`
@@ -1332,22 +1332,22 @@ ALTER TABLE `articles`
 -- Constraints for table `article_cate_langs`
 --
 ALTER TABLE `article_cate_langs`
-  ADD CONSTRAINT `article_cate_langs_ibfk_1` FOREIGN KEY (`articleCategoryId`) REFERENCES `article_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `article_cate_langs_ibfk_2` FOREIGN KEY (`languageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `article_cate_langs_ibfk_1` FOREIGN KEY (`ArticleCategoryId`) REFERENCES `article_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `article_cate_langs_ibfk_2` FOREIGN KEY (`LanguageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `article_languages`
 --
 ALTER TABLE `article_languages`
-  ADD CONSTRAINT `article_languages_ibfk_1` FOREIGN KEY (`articleId`) REFERENCES `articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `article_languages_ibfk_2` FOREIGN KEY (`languageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `article_languages_ibfk_1` FOREIGN KEY (`ArticleId`) REFERENCES `articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `article_languages_ibfk_2` FOREIGN KEY (`LanguageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `manufacturer_languages`
 --
 ALTER TABLE `manufacturer_languages`
   ADD CONSTRAINT `manufacturer_languages_ibfk_1` FOREIGN KEY (`manufacturerId`) REFERENCES `manufacturers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `manufacturer_languages_ibfk_2` FOREIGN KEY (`languageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `manufacturer_languages_ibfk_2` FOREIGN KEY (`LanguageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `news`
@@ -1359,15 +1359,15 @@ ALTER TABLE `news`
 -- Constraints for table `news_cate_langs`
 --
 ALTER TABLE `news_cate_langs`
-  ADD CONSTRAINT `news_cate_langs_ibfk_1` FOREIGN KEY (`newsCategoryId`) REFERENCES `news_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `news_cate_langs_ibfk_2` FOREIGN KEY (`languageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `news_cate_langs_ibfk_1` FOREIGN KEY (`NewsCategoryId`) REFERENCES `news_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `news_cate_langs_ibfk_2` FOREIGN KEY (`LanguageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `news_languages`
 --
 ALTER TABLE `news_languages`
-  ADD CONSTRAINT `news_languages_ibfk_1` FOREIGN KEY (`newsId`) REFERENCES `news` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `news_languages_ibfk_2` FOREIGN KEY (`languageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `news_languages_ibfk_1` FOREIGN KEY (`NewsId`) REFERENCES `news` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `news_languages_ibfk_2` FOREIGN KEY (`LanguageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `products`
@@ -1385,33 +1385,33 @@ ALTER TABLE `products`
 --
 ALTER TABLE `products_languages`
   ADD CONSTRAINT `products_languages_ibfk_1` FOREIGN KEY (`productId`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `products_languages_ibfk_2` FOREIGN KEY (`languageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `products_languages_ibfk_2` FOREIGN KEY (`LanguageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `product_cate_langs`
 --
 ALTER TABLE `product_cate_langs`
   ADD CONSTRAINT `product_cate_langs_ibfk_1` FOREIGN KEY (`productCategoryId`) REFERENCES `product_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `product_cate_langs_ibfk_2` FOREIGN KEY (`languageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `product_cate_langs_ibfk_2` FOREIGN KEY (`LanguageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `product_guarantee`
 --
 ALTER TABLE `product_guarantee`
-  ADD CONSTRAINT `product_guarantee_ibfk_1` FOREIGN KEY (`languageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `product_guarantee_ibfk_1` FOREIGN KEY (`LanguageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `product_transport`
 --
 ALTER TABLE `product_transport`
-  ADD CONSTRAINT `product_transport_ibfk_1` FOREIGN KEY (`languageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `product_transport_ibfk_1` FOREIGN KEY (`LanguageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `tag_langs`
 --
 ALTER TABLE `tag_langs`
-  ADD CONSTRAINT `tag_langs_ibfk_1` FOREIGN KEY (`tagId`) REFERENCES `tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `tag_langs_ibfk_2` FOREIGN KEY (`languageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `tag_langs_ibfk_1` FOREIGN KEY (`TagId`) REFERENCES `tags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `tag_langs_ibfk_2` FOREIGN KEY (`LanguageCode`) REFERENCES `languages` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `users`

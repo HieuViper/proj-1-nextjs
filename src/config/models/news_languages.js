@@ -39,7 +39,7 @@ export function newsLanguageModel(sequelize) {
             allowNull: true,
             defaultValue: 'undefined',
         },
-        newsId: {
+        NewsId: {
             type: DataTypes.BIGINT.UNSIGNED,
             primaryKey: true,
             references: {
@@ -47,7 +47,7 @@ export function newsLanguageModel(sequelize) {
                 key: 'id'
             }
         },
-        languageCode: {
+        LanguageCode: {
             type: DataTypes.STRING(10),
             primaryKey: true,
             references: {

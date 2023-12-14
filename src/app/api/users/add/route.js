@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { funcLogin } from "@/library/funcLogin";
 import { funcUsers } from "@/library/funcUsers";
-import { funcImage } from "@/library/funcImages";
+import { newsImgs } from "@/library/newsImgs";
 
 export const dynamic = 'force-dynamic' // defaults to force-static
 
@@ -27,12 +27,12 @@ export async function POST(req) {
         let imageUrl = null;
         //save image File
         if ( imageFile ) {
-            imageUrl = await funcImage.saveImage( imageFile );
+            imageUrl = await newsImgs.saveImage( imageFile );
             console.log('saving image successfully');
             //add new Image to table
             imageInfo.url = imageUrl;
             imageInfo.author = loginInfo.user.username;
-            await funcImage.addImage( imageInfo );
+            await newsImgs.addImage( imageInfo );
             console.log("saving image to database successfully");
             user.image = imageUrl;  //set image for user
         } else {

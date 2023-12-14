@@ -21,10 +21,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING(200),
             allowNull: true,
             comment: 'profile image of user',
-            references: {
-                model: 'imgs',
-                key: 'url'
-            }
+            // references: {
+            //     model: 'imgs',
+            //     key: 'url'
+            // }
         },
         first_name: {
             type: DataTypes.STRING(200),

@@ -22,7 +22,7 @@ export function productCateLanguageModel(sequelize) {
                 key: 'id'
             }
         },
-        languageCode: {
+        LanguageCode: {
             type: DataTypes.STRING(10),
             primaryKey: true,
             references: {

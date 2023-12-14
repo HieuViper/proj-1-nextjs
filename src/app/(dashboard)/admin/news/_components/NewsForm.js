@@ -24,6 +24,7 @@ import toast from "react-hot-toast";
 // import Editor from "@/components/Editor";
 import dynamic from "next/dynamic";
 import { useLogin } from "@/store/login";
+import ImageList from "@/components/NewsImgsList";
 const myConstant = require('@/store/constant')
 
 
@@ -43,6 +44,7 @@ export function NewsForm(props) {
   const [picURL, setPicURL] = useState(null);
   const [previewPic, setPreviewPic] = useState(null);
   const { setLoginForm } = useLogin();    //use to set global state allowing enable the login form.
+  const [isModalPicOpen, setIsModalPicOpen] = useState( false );
   const [editor, setEditor] = useState(null);
 
   const Editor2 = dynamic(() => import("@/components/Editor2"), { ssr: false });
@@ -65,7 +67,7 @@ export function NewsForm(props) {
     // console.log('vao day');
     let rs;
     news.forEach((element) => {
-      if (element.languageCode == lang) {
+      if (element.LanguageCode == lang) {
         rs = element[property];
       }
     });
@@ -227,8 +229,8 @@ export function NewsForm(props) {
         excerpt: form.getFieldValue(`excerpt_${lang.code}`) ?? "",
         content:
           filterContentEditor(form.getFieldValue(`content_${lang.code}`)) ?? "",
-        languageCode: lang.code,
-        newsId: params?.id,
+        LanguageCode: lang.code,
+        NewsId: params?.id,
       };
     });
 
@@ -417,6 +419,13 @@ export function NewsForm(props) {
       imageUtils.insertImage( { src: '/uploads/nov2023/4kpic.jpg',
           srcset: '/uploads/nov2023/ava3_150.jpeg 150w, /uploads/nov2023/ava3_350.jpeg 350w, /uploads/nov2023/ava3_700.jpeg 700w',
       } );
+  }
+  function onFinishAddPic( values ) {
+      //get the item picture has picked from values
+  }
+
+  function handleCancelModalPic() {
+    setIsModalPicOpen( false );
   }
   // tab handle
   const TabComponent = ({ lang }) => {
@@ -718,11 +727,11 @@ export function NewsForm(props) {
 
                 const isLt5M =
                   file.size / 1024 / 1024 <=
-                  myConstant.image.FILE_LIMITED_SIZE;
+                  myConstant.news.image.FILE_LIMITED_SIZE;
                 // check the file size
                 if (!isLt5M) {
                   message.error(
-                    `Image must smaller than ${myConstant.image.FILE_LIMITED_SIZE}MB!`
+                    `Image must smaller than ${myConstant.news.image.FILE_LIMITED_SIZE}MB!`
                   );
                   reject(false);  //put some reason here
                 } else {
@@ -790,6 +799,32 @@ export function NewsForm(props) {
           <Switch />
         </Form.Item>
       </Form>
+
+      {/* Modal for picking images */}
+      <Modal
+        title="Pick an Image"
+        open={isModalPicOpen}
+        onCancel={handleCancelModalPic}
+        getContainer={false}
+        width={720}
+        footer={[
+          <Button key="back" onClick={handleCancelModalPic}>
+            Cancel
+          </Button>,
+          <Button
+            // key="submit"
+            // form="formImage"
+            // htmlType="submit"
+            // type="primary"
+          >
+            Pick Image
+          </Button>,
+        ]}
+      >
+        <ImageList
+            {...{ onFinishAddPic, handleSubmitFailed }}
+        />
+      </Modal>
     </>
   );
 }

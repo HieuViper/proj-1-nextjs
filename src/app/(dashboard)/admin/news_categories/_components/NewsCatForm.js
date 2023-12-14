@@ -19,7 +19,7 @@ export function CategoryForm(props) {
   function getNewsValue(property, news, lang) {
     let rs
     news.forEach(element => {
-      if (element.languageCode == lang) {
+      if (element.LanguageCode == lang) {
         rs = element[property];
       }
     });
@@ -34,8 +34,8 @@ export function CategoryForm(props) {
       return {
         name: form.getFieldValue(`name_${lang.code}`) ?? '',
         description: form.getFieldValue(`description_${lang.code}`) ?? '',
-        languageCode: lang.code,
-        newsCategoryId: id,
+        LanguageCode: lang.code,
+        NewsCategoryId: id,
       };
     });
     setLoading(true)

@@ -1,9 +1,21 @@
 const myConstant = {
-    image: {
-        PAGE_SIZE: 36,
-        COLUMNS: 6,
-        FILE_LIMITED_SIZE: 2,
-        FOLDER_UPLOAD: 'uploads',
+    news: {
+        image: {
+            PAGE_SIZE: 36,
+            COLUMNS: 6,
+            FILE_LIMITED_SIZE: 2,
+            FOLDER_UPLOAD: '/uploads/news',
+            QUALITY: 70
+        },
+    },
+    articles: {
+        image: {
+            PAGE_SIZE: 36,
+            COLUMNS: 6,
+            FILE_LIMITED_SIZE: 2,
+            FOLDER_UPLOAD: '/uploads/articles',
+            QUALITY: 70
+        },
     },
     post: {
         POST_STATUS_DRAFT: 'draft',

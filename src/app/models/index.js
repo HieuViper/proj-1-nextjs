@@ -21,10 +21,8 @@ let sequelize = new Sequelize(
       timezone: "+07:00",
     }
 );
-console.log('filename: ', __filename);
-console.log('dirname: ', __dirname);
+
 const  dirName = __dirname.includes('.next')?path.resolve(process.cwd(), 'src/app/models'):__dirname;
-console.log('dirname:', dirName);
 fs.readdirSync(dirName)
   .filter((file) => {
     return (

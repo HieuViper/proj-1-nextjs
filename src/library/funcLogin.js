@@ -172,19 +172,24 @@ function checkAuthenticationForApi() {
 async function checkAuthorize( user,  module = null, feature = null) {
   const roles = getConfig().serverRuntimeConfig.userRoles;
   let isAuthorize = false;
-  if( feature ) {
-    isAuthorize = roles[user.role][module][feature];
-    console.log('authorize with feature:', isAuthorize);
+  try{
+    if( feature ) {
+      isAuthorize = roles[user.role][module][feature];
+      console.log('authorize with feature:', isAuthorize);
+    }
+    else if ( module ) {
+      isAuthorize = roles[user.role][module] ? true : false
+      console.log('authorize without feature:', isAuthorize);
+    }
+    else {
+      isAuthorize = roles[user.role] ? true : false
+      console.log('basic authorization:', isAuthorize);
+    }
   }
-  else if ( module ) {
-    isAuthorize = roles[user.role][module] ? true : false
-    console.log('authorize without feature:', isAuthorize);
+  catch ( error ) {
+    throw new Error('Wrong module name or feature name: ' + error.message );
   }
-  else {
-    isAuthorize = roles[user.role] ? true : false
-    console.log('basic authorization:', isAuthorize);
-  }
-  return isAuthorize;
+    return isAuthorize;
 }
 
   //Check for protected API before allowing using the API
@@ -196,9 +201,14 @@ async function checkAuthorize( user,  module = null, feature = null) {
     if( loginInfo.isLogin == false ) {
       return  { reqStatus: 401 };
     }
-
+    let isAuthorize;
     //Check authorization before using API
-    const isAuthorize = await checkAuthorize( loginInfo.user, module, feature );
+    try {
+      isAuthorize = await checkAuthorize( loginInfo.user, module, feature );
+    }
+    catch ( error ) {
+      return { reqStatus: 403 };
+    }
     console.log('isAuthorized?', isAuthorize) ;
     if( isAuthorize == false ) {
       return { reqStatus: 403 };

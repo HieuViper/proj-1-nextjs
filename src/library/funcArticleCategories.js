@@ -15,7 +15,7 @@ async function getAllArticleCat(lang) {
 
         let strquery;
         if (lang)
-            strquery = `SELECT * FROM article_cat_all WHERE languageCode='${lang}'`;
+            strquery = `SELECT * FROM article_cat_all WHERE LanguageCode='${lang}'`;
         const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
         return results;
     } catch (error) {
@@ -55,14 +55,14 @@ async function updateArticleCat(data, articleLangs, id) {
         //update into articleCat_languages Table
         for (const element of articleLangs) {
             console.log('element:', element);
-            const { languageCode, articleCategoryId, ...articleCatLangRow } = element;
+            const { LanguageCode, ArticleCategoryId, ...articleCatLangRow } = element;
             await db.Article_cate_langs.update(
                 articleCatLangRow,
                 {
                     where: {
                         [Op.and]: [
-                            { articleCategoryId: id },
-                            { languageCode: languageCode }
+                            { ArticleCategoryId: id },
+                            { LanguageCode: LanguageCode }
                         ]
                     },
                     transaction: t,
@@ -84,9 +84,9 @@ async function addArticleCat(data, articleLangs) {
         const currentLoginUser = 'huy'; //we add information of modifier huy
         console.log('data :', data);
         const articleCat = await db.Article_categories.create(data, { transaction: t });
-        //add articleCategoryId  property to the articleLangs
+        //add ArticleCategoryId  property to the articleLangs
         for (const element of articleLangs) {
-            element.articleCategoryId = articleCat.id;
+            element.ArticleCategoryId = articleCat.id;
         }
         //create records in articleCat_languages Table
         await db.Article_cate_langs.bulkCreate(articleLangs, { validate: true, transaction: t });
@@ -135,7 +135,7 @@ async function getSearchQuery(search, lang) {
 
         strquery = strquery + ` (name LIKE '%${search}%' OR description LIKE '%${search}%')`;
         if (lang)
-            strquery = strquery + ` AND languageCode='${lang}')`;
+            strquery = strquery + ` AND LanguageCode='${lang}')`;
         const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
         return results;
     } catch (error) {

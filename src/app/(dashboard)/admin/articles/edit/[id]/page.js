@@ -1,5 +1,5 @@
 import { funcArticle } from "@/library/funcArticles";
-import { funcImage } from "@/library/funcImages";
+import { newsImgs } from "@/library/newsImgs";
 import { redirect } from "next/navigation";
 import { ArticleForm } from "../../_components/ArticleForm";
 const myConstant = require('@/store/constant')
@@ -26,7 +26,7 @@ const EditArticlePage = async ({ params, searchParams }) => {
     "use server";
     let result;
     try {
-      let rs = await funcImage.updateImage(data, url);
+      let rs = await newsImgs.updateImage(data, url);
       console.log("🚀 ~ file: page.js:14 ~ updateImage ~ rs:", rs);
       result = rs;
     } catch (error) {
@@ -39,7 +39,7 @@ const EditArticlePage = async ({ params, searchParams }) => {
     "use server";
     let result;
     try {
-      rs = await funcImage.addImage(data);
+      rs = await newsImgs.addImage(data);
       console.log("🚀 ~ file: page.js:14 ~ addArticle ~ rs:", rs);
       result = rs;
     } catch (error) {
@@ -52,7 +52,7 @@ const EditArticlePage = async ({ params, searchParams }) => {
     "use server";
     let isExisted;
     try {
-      let rs = await funcImage.getImage(url);
+      let rs = await newsImgs.getImage(url);
       if (rs) {
         isExisted = true;
       } else {
@@ -65,7 +65,7 @@ const EditArticlePage = async ({ params, searchParams }) => {
   }
   const data = await funcArticle.getArticle(params.id);
   console.log("🚀 ~ file: page.js:25 ~ EditArticlePage ~ data:", data);
-  const mainImage = await funcImage.getImage(data[0]?.image ?? "");
+  const mainImage = await newsImgs.getImage(data[0]?.image ?? "");
   const cate = await funcArticle.getCategories(myConstant.DEFAULT_LANGUAGE);
   const langTable = await funcArticle.getLanguages();
   return (

@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
                 comment: 'feature image of the post',
                 references: {
-                    model: 'Imgs',
+                    model: 'news_imgs',
                     key: 'url'
                 }
             },

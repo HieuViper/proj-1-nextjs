@@ -18,7 +18,7 @@ async function getAllNewsCategories(lang) {
     // return results;
     let strquery;
     if (lang)
-      strquery = `SELECT * FROM news_cat_all WHERE languageCode='${lang}'`;
+      strquery = `SELECT * FROM news_cat_all WHERE LanguageCode='${lang}'`;
     // else
     //     strquery = 'SELECT * FROM news_cat_all';
     const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
@@ -60,10 +60,10 @@ async function updateNewsCategories(data, newsLangs, id) {
     //update into news_languages Table
     for (const element of newsLangs) {
       console.log("element:", element);
-      const { languageCode, newsCategoryId, ...newsLangRow } = element;
+      const { LanguageCode, NewsCategoryId, ...newsLangRow } = element;
       await db.News_cate_langs.update(newsLangRow, {
         where: {
-          [Op.and]: [{ newsCategoryId: id }, { languageCode: languageCode }],
+          [Op.and]: [{ NewsCategoryId: id }, { LanguageCode: LanguageCode }],
         },
         transaction: t,
       });
@@ -83,9 +83,9 @@ async function addNewsCategories(data, newsLangs) {
     const currentLoginUser = "huy"; //we add information of modifier huy
     console.log("data :", data);
     const news = await db.News_categories.create(data, { transaction: t });
-    //add newsCategoryId property to the newsLangs
+    //add NewsCategoryId property to the newsLangs
     for (const element of newsLangs) {
-      element.newsCategoryId = news.id;
+      element.NewsCategoryId = news.id;
     }
     //create records in news_languages Table
     await db.News_cate_langs.bulkCreate(newsLangs, {
@@ -103,7 +103,7 @@ async function addNewsCategories(data, newsLangs) {
   //     // const news = await db.News_categories.create(data)
   //     await db.News_categories.create(data, { transaction: t });
   //     // for (const element of newsLangs) {
-  //     //     element.newsCategoryId = news.id;
+  //     //     element.NewsCategoryId = news.id;
   //     // }
   //     // await db.News_cate_langs.bulkCreate(newsLangs)
   // }
@@ -149,7 +149,7 @@ async function getSearchQuery(search, lang) {
 
     strquery =
       strquery + ` (name LIKE '%${search}%' OR description LIKE '%${search}%')`;
-    if (lang) strquery = strquery + ` AND languageCode='${lang}')`;
+    if (lang) strquery = strquery + ` AND LanguageCode='${lang}')`;
     const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
     return results;
   } catch (error) {

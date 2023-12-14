@@ -1,5 +1,5 @@
 import { funcArticle } from "@/library/funcArticles";
-import { funcImage } from "@/library/funcImages";
+import { newsImgs } from "@/library/newsImgs";
 import { redirect } from "next/navigation";
 import { ArticleForm } from "../_components/ArticleForm";
 const myConstant = require('@/store/constant')
@@ -26,7 +26,7 @@ const AddArticlePage = async () => {
     "use server";
     let result;
     try {
-      rs = await funcImage.addImage(data);
+      rs = await newsImgs.addImage(data);
       console.log("🚀 ~ file: page.js:14 ~ addArticle ~ rs:", rs);
       result = rs;
     } catch (error) {

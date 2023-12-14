@@ -2,7 +2,7 @@ import { promises as fsPromises } from "fs";
 import { writeFile } from "fs/promises";
 import { NextResponse } from "next/server";
 import path from "path";
-import { funcImage } from "@/library/funcImages";
+import { newsImgs } from "@/library/newsImgs";
 import { funcLogin } from "@/library/funcLogin";
 
 
@@ -27,7 +27,7 @@ export async function POST(req, res) {
 
   try {
       //save image to database
-      let imgUrl = await funcImage.saveImage(file);
+      let imgUrl = await newsImgs.saveImage(file);
 
       return NextResponse.json({
         url: imgUrl,

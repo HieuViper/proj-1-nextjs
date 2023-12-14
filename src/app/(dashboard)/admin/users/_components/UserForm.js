@@ -396,11 +396,11 @@ const UserForm = (props) => {
 
                 const isLt5M =
                   file.size / 1024 / 1024 <=
-                  myConstant.image.FILE_LIMITED_SIZE;
+                  myConstant.news.image.FILE_LIMITED_SIZE;
                 // check the file size
                 if (!isLt5M) {
                   message.error(
-                    `Image must smaller than ${myConstant.image.FILE_LIMITED_SIZE}MB!`
+                    `Image must smaller than ${myConstant.news.image.FILE_LIMITED_SIZE}MB!`
                   );
                   reject(false);  //put some reason here
                 } else {

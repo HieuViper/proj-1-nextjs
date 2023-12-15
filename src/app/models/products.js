@@ -42,6 +42,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         categories: {
             type: DataTypes.STRING(200),
+
             collate: 'utf8mb4_unicode_520_ci',
             allowNull: true,
             defaultValue: 'default',

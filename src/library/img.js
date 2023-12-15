@@ -184,7 +184,7 @@ async function compressImage(fileType, imgBuffer, resizeWidth) {
 }
 
 //save image to folder and return image URL
-export async function saveImage( imageFile ) {
+export async function saveImage( imageFile, wantCompress = true ) {
   if ( !imageFile )
     throw new Error('No image file to save');
 
@@ -206,31 +206,34 @@ export async function saveImage( imageFile ) {
 
     let savedImage = await saveSpecificImage( imgBuffer, fileName, folderPath, folderName );
     result.url = savedImage.url;
-    //all the file dimension need to be saved
-    const fileSizeCompress = [150, 350, 700];
-    // Compression options
+    if( wantCompress == true ) {
 
-    for (let i = 0; i < fileSizeCompress.length; i++) {
+        //all the file dimension need to be saved
+        const fileSizeCompress = [150, 350, 700];
+        // Compression options
 
-      let fileNameArr = savedImage.fileName.split('.');
-      //get file name of the subfile
-      let subFileName = `${fileNameArr[0]}_${fileSizeCompress[i]}.${fileNameArr[1]}`;
-      console.log( 'subFileName:', subFileName );
-        //Create new file from compression
-      const outputBuffer = await compressImage (fileType, imgBuffer, fileSizeCompress[i]);
-      // save sub file to the disk
-      let subSavedImg = await saveSpecificImage( outputBuffer, subFileName, folderPath, folderName );
+        for (let i = 0; i < fileSizeCompress.length; i++) {
 
-      let buildSrcSet;
-      if( i == 0 ) {
-        buildSrcSet = subSavedImg.url + ` ${fileSizeCompress[i]}w`;
-      }
-      else {
-        buildSrcSet = ', ' + subSavedImg.url + ` ${fileSizeCompress[i]}w`;
-      }
-      result.srcset += buildSrcSet;
-      console.log('srcset:', result.srcset);
+          let fileNameArr = savedImage.fileName.split('.');
+          //get file name of the subfile
+          let subFileName = `${fileNameArr[0]}_${fileSizeCompress[i]}.${fileNameArr[1]}`;
+          console.log( 'subFileName:', subFileName );
+            //Create new file from compression
+          const outputBuffer = await compressImage (fileType, imgBuffer, fileSizeCompress[i]);
+          // save sub file to the disk
+          let subSavedImg = await saveSpecificImage( outputBuffer, subFileName, folderPath, folderName );
 
+          let buildSrcSet;
+          if( i == 0 ) {
+            buildSrcSet = subSavedImg.url + ` ${fileSizeCompress[i]}w`;
+          }
+          else {
+            buildSrcSet = ', ' + subSavedImg.url + ` ${fileSizeCompress[i]}w`;
+          }
+          result.srcset += buildSrcSet;
+          console.log('srcset:', result.srcset);
+
+        }
     }
     console.log('result after saving image:', result);
     return result;

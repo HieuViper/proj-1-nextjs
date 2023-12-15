@@ -26,6 +26,18 @@ module.exports = (sequelize, DataTypes) => {
             //     key: 'url'
             // }
         },
+        image_alt: {
+            type: DataTypes.STRING(200),
+            collate: 'utf8mb4_unicode_520_ci',
+            defaultValue: '',
+            allownNull: true,
+        },
+        image_caption: {
+            type: DataTypes.STRING(200),
+            collate: 'utf8mb4_unicode_520_ci',
+            defaultValue: '',
+            allownNull: true,
+        },
         first_name: {
             type: DataTypes.STRING(200),
             collate: 'utf8mb4_unicode_520_ci',

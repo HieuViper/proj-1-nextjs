@@ -8,13 +8,6 @@ export function productsLanguagesModel(sequelize) {
             collate: 'utf8mb4_unicode_520_ci',
             allowNull: true,
             defaultValue: 'undefined',
-            //unique: '',
-            //unique: true,
-            //field: 'real name of the column',
-            /*references: {
-                model: BarProp,
-                key: 'id'
-            }*/
             comment: 'Title can be null',
         },
         guarantee: {
@@ -35,22 +28,6 @@ export function productsLanguagesModel(sequelize) {
             allowNull: true,
             comment: 'Description',
         },
-        productId: {
-            type: DataTypes.BIGINT(20).UNSIGNED,
-            primaryKey: true,
-            references: {
-                model: 'products', // 'Movies' would also work
-                key: 'id'
-            }
-        },
-        LanguageCode: {
-            type: DataTypes.STRING(10),
-            primaryKey: true,
-            references: {
-                model: 'languages',
-                key: 'code'
-            }
-        }
     };
 
     const options = {

@@ -22,6 +22,8 @@ export async function POST(req, { params }) {
         user = JSON.parse(formData.get('user'));
         imageInfo = JSON.parse(formData.get('imageInfo'));
         imageFile = formData.get('imageFile');
+        console.log('user image:', user.image);
+        console.log();
     } catch ( error ) {
         return NextResponse.json( { msg: error.message }, { status: 400 });
     }

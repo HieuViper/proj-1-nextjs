@@ -17,6 +17,15 @@ const myConstant = {
             QUALITY: 70
         },
     },
+    users: {
+        image: {
+            PAGE_SIZE: 36,
+            COLUMNS: 6,
+            FILE_LIMITED_SIZE: 2,
+            FOLDER_UPLOAD: '/uploads/users',
+            QUALITY: 70
+        },
+    },
     post: {
         POST_STATUS_DRAFT: 'draft',
         POST_STATUS_PUBLISH: 'publish',

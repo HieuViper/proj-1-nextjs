@@ -29,6 +29,7 @@ export async function GET(req, res) {
       type: QueryTypes.SELECT,
     });
     const total = resultsTotal[0].total;
+    console.log('data:', data, 'total:', total);
     return NextResponse.json({ data: results, total: total });
   } catch (error) {
     console.log(error);

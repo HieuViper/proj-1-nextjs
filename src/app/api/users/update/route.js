@@ -4,6 +4,8 @@ import { funcUsers } from "@/library/funcUsers";
 import { newsImgs } from "@/library/newsImgs";
 import { img } from "@/library/img";
 import fs from "fs/promises";
+import { revalidatePath } from "next/cache";
+const myConstant = require('@/store/constant')
 
 export const dynamic = 'force-dynamic' // defaults to force-static
 
@@ -23,7 +25,8 @@ export async function POST(req, { params }) {
         imageInfo = JSON.parse(formData.get('imageInfo'));
         imageFile = formData.get('imageFile');
         console.log('user image:', user.image);
-        console.log();
+        console.log('image info', imageInfo);
+        console.log('image file:', imageFile);
     } catch ( error ) {
         return NextResponse.json( { msg: error.message }, { status: 400 });
     }
@@ -31,22 +34,24 @@ export async function POST(req, { params }) {
         let imageUrl = null;
         //save image File
         if ( imageFile ) {
-            imageUrl = await img.saveImage( imageFile, false );
+            imageUrl = await img.saveImage( imageFile, false, myConstant.users );
             console.log('saving image successfully');
-
-            user.image = imageUrl.url;  //set image for user
-            user.image_alt = imageInfo.alt;
-            user.image_caption = imageInfo.caption;
-            //Delete old image file on server
+            //delete old image
             fs.unlink("public" + user.image, (err) => {
                 if (err)
                   throw new Error( 'Cannot delete old image: ' + err.message );
               });
+            user.image = imageUrl.url;  //set image for user
+            user.image_alt = imageInfo.alt;
+            user.image_caption = imageInfo.caption;
+            //Delete old image file on server
+
         } else if ( imageInfo ){    //there is the old image, but no new upload image
             await newsImgs.updateImage( imageInfo, user.image );
         }
 
         const username = await funcUsers.updateAUser(user);
+        revalidatePath('/admin/users');
         return NextResponse.json( {}, { status: 200 });
     } catch ( error ) {
         return NextResponse.json( { msg: error.message }, { status: 500 });

@@ -28,9 +28,9 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false,
     }
   );
-  Product_languages.associate = function (db) {
-    // associations can be defined here
+  // Product_languages.associate = function (db) {
+  //   // associations can be defined here
 
-  };
+  // };
   return Product_languages;
 };

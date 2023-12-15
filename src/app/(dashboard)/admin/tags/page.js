@@ -17,6 +17,7 @@ async function TagsPage({ searchParams }) {
       `/api/tags?page=${page}&size=${size}&search=${search}&lang=${lang}`,
       "GET"
     );
+    console.log('rs at getAllTag: ', rs);
     return { tagData: rs.data, total: rs.total };
   }
   async function getTag(id) {
@@ -98,6 +99,7 @@ async function TagsPage({ searchParams }) {
     total: allTags.total,
     current: parseInt(page),
   };
+  console.log('allTags:', allTags);
   return (
     <>
       <TagList

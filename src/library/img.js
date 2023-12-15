@@ -51,7 +51,7 @@ export async function getMetaImgInfo( imageUrl ) {
 
 }
 
-// Function to check to make sure the folder exists, if not , make the folder
+// Function to check to make sure the folder exists, if not , make the folder. It only make the last folder
 const checkAndCreateFolder = async ( folderPath ) => {
   console.log(folderPath);
   try {
@@ -89,7 +89,7 @@ async function checkAndCreateFileName( fileName, folderPath ) {
 }
 
 //save one image on the specific foler path and specific image name
-async function saveSpecificImage( imageFileBuffer, name, folderPath, folderName ) {
+async function saveSpecificImage( imageFileBuffer, name, folderPath, folderName, toModule ) {
   try {
     let fileName = await checkAndCreateFileName( name, folderPath );
 
@@ -103,7 +103,7 @@ async function saveSpecificImage( imageFileBuffer, name, folderPath, folderName 
       imageFileBuffer
     );
 
-    return { url: `${myConstant.news.image.FOLDER_UPLOAD}/${folderName}/` + fileName,
+    return { url: `${toModule.image.FOLDER_UPLOAD}/${folderName}/` + fileName,
              fileName: fileName,
       };
   }
@@ -116,9 +116,9 @@ async function saveSpecificImage( imageFileBuffer, name, folderPath, folderName 
 //fileType: image type
 // imgBuffer: Buffer
 //resizeWidth: width of image after resizing
-async function compressImage(fileType, imgBuffer, resizeWidth) {
+async function compressImage(fileType, imgBuffer, resizeWidth, toModule) {
   const compressionOptions = {
-    quality: myConstant.news.image.QUALITY,
+    quality: toModule.image.QUALITY,
     chromaSubsampling: '4:4:4',
   };
 
@@ -184,13 +184,13 @@ async function compressImage(fileType, imgBuffer, resizeWidth) {
 }
 
 //save image to folder and return image URL
-export async function saveImage( imageFile, wantCompress = true ) {
+export async function saveImage( imageFile, wantCompress = true, toModule = myConstant.news ) {
   if ( !imageFile )
     throw new Error('No image file to save');
 
     //get Folder's Name to save the image
   let folderName = getFolderName( imageFile );
-  let folderPath = `public${myConstant.news.image.FOLDER_UPLOAD}/${folderName}`;
+  let folderPath = `public${toModule.image.FOLDER_UPLOAD}/${folderName}`;
   let fileName = imageFile.name.replaceAll(" ", "_");     //replace space in file name by '_'
   let fileType = imageFile.type;
   console.log('fileType of image:', fileType );
@@ -202,9 +202,9 @@ export async function saveImage( imageFile, wantCompress = true ) {
     // check folder, if it doesn't exit, create new folder
     await checkAndCreateFolder( folderPath );
     //save the origin image to the disk
-    let imgBuffer = Buffer.from( await imageFile.arrayBuffer() );
+    let imgBuffer =  Buffer.from( await imageFile.arrayBuffer() );
 
-    let savedImage = await saveSpecificImage( imgBuffer, fileName, folderPath, folderName );
+    let savedImage = await saveSpecificImage( imgBuffer, fileName, folderPath, folderName, toModule );
     result.url = savedImage.url;
     if( wantCompress == true ) {
 
@@ -219,7 +219,7 @@ export async function saveImage( imageFile, wantCompress = true ) {
           let subFileName = `${fileNameArr[0]}_${fileSizeCompress[i]}.${fileNameArr[1]}`;
           console.log( 'subFileName:', subFileName );
             //Create new file from compression
-          const outputBuffer = await compressImage (fileType, imgBuffer, fileSizeCompress[i]);
+          const outputBuffer = await compressImage (fileType, imgBuffer, fileSizeCompress[i], toModule);
           // save sub file to the disk
           let subSavedImg = await saveSpecificImage( outputBuffer, subFileName, folderPath, folderName );
 

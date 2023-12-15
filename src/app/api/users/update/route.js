@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { funcLogin } from "@/library/funcLogin";
 import { funcUsers } from "@/library/funcUsers";
 import { newsImgs } from "@/library/newsImgs";
+import { img } from "@/library/img";
+import fs from "fs/promises";
 
 export const dynamic = 'force-dynamic' // defaults to force-static
 
@@ -27,14 +29,17 @@ export async function POST(req, { params }) {
         let imageUrl = null;
         //save image File
         if ( imageFile ) {
-            imageUrl = await newsImgs.saveImage( imageFile );
+            imageUrl = await img.saveImage( imageFile, false );
             console.log('saving image successfully');
-            //add new Image to table
-            imageInfo.url = imageUrl;
-            imageInfo.author = loginInfo.user.username;
-            await newsImgs.addImage( imageInfo );
-            console.log("saving image to database successfully");
-            user.image = imageUrl;  //set image for user
+
+            user.image = imageUrl.url;  //set image for user
+            user.image_alt = imageInfo.alt;
+            user.image_caption = imageInfo.caption;
+            //Delete old image file on server
+            fs.unlink("public" + user.image, (err) => {
+                if (err)
+                  throw new Error( 'Cannot delete old image: ' + err.message );
+              });
         } else if ( imageInfo ){    //there is the old image, but no new upload image
             await newsImgs.updateImage( imageInfo, user.image );
         }

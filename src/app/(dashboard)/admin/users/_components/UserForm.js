@@ -131,7 +131,7 @@ const UserForm = (props) => {
             position: "top-center",
             duration: 5000,
           });
-          router.refresh();
+
           router.push('/admin/users');
         }
       //});

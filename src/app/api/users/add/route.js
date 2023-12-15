@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { funcLogin } from "@/library/funcLogin";
 import { funcUsers } from "@/library/funcUsers";
 import { newsImgs } from "@/library/newsImgs";
+import { img } from "@/library/img";
+import { revalidatePath } from "next/cache";
 
 export const dynamic = 'force-dynamic' // defaults to force-static
 
@@ -27,19 +29,17 @@ export async function POST(req) {
         let imageUrl = null;
         //save image File
         if ( imageFile ) {
-            imageUrl = await newsImgs.saveImage( imageFile );
+            imageUrl = await img.saveImage( imageFile, false );
             console.log('saving image successfully');
-            //add new Image to table
-            imageInfo.url = imageUrl;
-            imageInfo.author = loginInfo.user.username;
-            await newsImgs.addImage( imageInfo );
-            console.log("saving image to database successfully");
-            user.image = imageUrl;  //set image for user
+            user.image = imageUrl.url;  //set image for user
+            user.image_alt = imageInfo.alt;
+            user.image_caption = imageInfo.caption;
         } else {
             user.image = null;      //set image null when user didn't send image
         }
 
         await funcUsers.addAUser(user);
+        revalidatePath('/admin/users');
         return NextResponse.json( {}, { status: 200 });
     } catch ( error ) {
         return NextResponse.json( { msg: error.message }, { status: 500 });

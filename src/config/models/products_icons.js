@@ -1,7 +1,7 @@
 
 import { DataTypes } from "sequelize";
 
-export function iconsModel(sequelize) {
+export function products_iconsModel(sequelize) {
     const attributes = {
         keyIcon: {
             type: DataTypes.STRING(20),
@@ -19,10 +19,10 @@ export function iconsModel(sequelize) {
 
     const options = {
         //updatedAt: 'post_modified',
-        tableName: 'icons',
+        tableName: 'products_icons',
         //timestamps: false,
         //indexes: [{ unique: true, fields: ['someUnique'] }],
     };
 
-    return sequelize.define('icons', attributes, options);
+    return sequelize.define('products_icons', attributes, options);
 }

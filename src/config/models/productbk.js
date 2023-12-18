@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     });
     // db.ProductLanguages.belongsTo(db.Languages, {
     //   as: 'languages',
-    //   foreignKey: "languageId",
+    //   foreignKey: "languageCode",
     // });
   };
   return Products;

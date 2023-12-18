@@ -22,20 +22,34 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
             comment: 'feature image of the products',
         },
-        sub_image: {
+        subImage: {
             type: DataTypes.TEXT,  //form: [{url: 'url', alt: 'alt', caption: 'caption'},{},{}]  Nhờ anh Cảnh coi lại chổ này
-            get: function() {
-                const result = this.getDataValue("sub_image").split(';').map( ( item ) => {
-                    return JSON.parse( item );
-                })
+            get() {
+                // console.log('value of subImage:', this.getDataValue('subImage'));
+                const subImageValue = this.getDataValue('subImage');
+
+                // Check if the value is null or undefined
+                if (subImageValue == null) {
+                  return [];
+                }
+
+                // Split and parse the JSON if the value is not null or undefined
+                const result = subImageValue.split(';').map((item) => {
+                  return JSON.parse(item);
+                });
+
                 return result;
             },
-            set: function(value) {
+            set(value) {
+                if (value == null) {
+                    this.setDataValue('subImage', null);
+                    return;
+                }
                 const result = value.map( ( item ) => {
                     return JSON.stringify( item );
                 });
 
-                return this.setDataValue("sub_image", result.join(';'));
+                this.setDataValue('subImage', result.join(';'));
             },
             allowNull: true,
             comment: 'feature image of the products',
@@ -109,6 +123,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "productId",
     });
 
+    db.Languages.hasMany(db.Product_languages, {
+        as: 'product_languages',
+        foreignKey: "languageCode",
+    });
+    db.Product_languages.belongsTo(db.Languages, {
+            as: 'languages',
+            foreignKey: "languageCode",
+    });
 
 
   };

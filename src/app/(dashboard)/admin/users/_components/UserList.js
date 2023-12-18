@@ -231,14 +231,17 @@ const UserList = (props) => {
 
   //Function for testing, it is called when pressing the button call API
   async function testCalling() {
-    const { result, res } = await callAPI( await fetch('/api/login', {
-      method: 'PUT',
+    const { result, res } = await callAPI( await fetch('/api/products', {
+      method: 'GET',
       cache: 'no-store'
     }),
       ( msg ) => { setErrorMessage( msg ) },
       () => { router.push('/login') },
       () => { setLoginForm( true ) },
     );
+    if( res.ok  == true ) {
+      console.log('result:', result);
+    }
   }
 
   //send test mail to nguyenqghuy@gmail.com

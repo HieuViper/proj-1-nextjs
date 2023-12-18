@@ -6,11 +6,13 @@ const createLanguage = async () => {
 
   await db.Languages.bulkCreate([
     {
+      id: 1,
       code: "vi",
       name: "tiếng việt",
       description: "tiếng việt",
     },
     {
+      id: 2,
       code: "en",
       name: "english",
       description: "english",
@@ -48,13 +50,13 @@ const createNewsCate = async () => {
         news_categoryId: newsCate0.id,
         name: "Kinh tế",
         description: "Hoạt động kinh tế nổi bật trong vòng 24h qua ",
-        languageCode: "vi",
+        languageCode: 'vi',
       },
       {
         news_categoryId: newsCate0.id,
         name: "Economy",
         description: "Featured economic activities",
-        languageCode: "en",
+        languageCode: 'en',
       },
     ]);
     //second record of news category
@@ -68,13 +70,13 @@ const createNewsCate = async () => {
         news_categoryId: newsCate1.id,
         name: "Xã hội",
         description: "Các sự kiện xã hội trong nước",
-        languageCode: "vi",
+        languageCode: 'vi',
       },
       {
         news_categoryId: newsCate1.id,
         name: "Society",
         description: "The social events in the dosmetic country",
-        languageCode: "en",
+        languageCode: 'en',
       },
     ]);
 
@@ -89,13 +91,13 @@ const createNewsCate = async () => {
         news_categoryId: newsCate.id,
         name: "Bất động sản",
         description: "Thông tin các dự án mới đang được triển khai",
-        languageCode: "vi",
+        languageCode: 'vi',
       },
       {
         news_categoryId: newsCate.id,
         name: "Real Estate",
         description: "New starting projects's information ",
-        languageCode: "en",
+        languageCode: 'en',
       },
     ]);
 
@@ -110,13 +112,13 @@ const createNewsCate = async () => {
         news_categoryId: newsCate4.id,
         name: "Chứng khoán",
         description: "Thông tin tức thời trên thị trường chứng khoán",
-        languageCode: "vi",
+        languageCode: 'vi',
       },
       {
         newsCate4goryId: newsCate.id,
         name: "Stock market",
         description: "Instant news of stock market",
-        languageCode: "en",
+        languageCode: 'en',
       },
     ]);
   } catch (error) {
@@ -138,13 +140,13 @@ const createArticleCategories = async () => {
           article_categoryId: articleCate.id,
           name: "Tên cate " + articleCate.id,
           description: "mô tả của cate " + articleCate.id,
-          languageCode: "vi",
+          languageCode: 'vi',
         },
         {
           article_categoryId: articleCate.id,
           name: "Name cate " + articleCate.id,
           description: "description about cate " + articleCate.id,
-          languageCode: "en",
+          languageCode: 'en',
         },
       ]);
     } catch (error) {
@@ -167,13 +169,13 @@ const createTags = async () => {
           tagId: tag.id,
           name: "Tên tag " + tag.id,
           description: "mô tả của tag " + tag.id,
-          languageCode: "vi",
+          languageCode: 'vi',
         },
         {
           tagId: tag.id,
           name: "Name tag " + tag.id,
           description: "description about tag " + tag.id,
-          languageCode: "en",
+          languageCode: 'en',
         },
       ]);
     } catch (error) {
@@ -183,6 +185,70 @@ const createTags = async () => {
   console.log("Creating tags is done");
 };
 
+//Create manufacturers
+const createManufaturer = async () => {
+  for (let i = 1; i <= 5; i++) {
+    try {
+      let manu = await db.Manufacturers.create({
+        code: `manufaturer-${i}`,
+        website: `web-${i}.com`,
+        email: `email-${i}@.yahoo.com`,
+      });
+
+      await db.Manufacturer_languages.bulkCreate([
+        {
+          manufacturerId: manu.id,
+          name: "Tên manufaturer " + manu.id,
+          description: "mô tả của manufacturer " + manu.id,
+          languageCode: 'vi',
+        },
+        {
+          manufacturerId: manu.id,
+          name: "Name manufaturer " + manu.id,
+          description: "Description of manufacturer " + manu.id,
+          languageCode: 'en',
+        },
+      ]);
+    } catch (error) {
+      console.error("Error creating tag data:", error.message);
+    }
+  }
+  console.log("Creating manufacturer is done");
+};
+
+
+//Create products
+const createProducts = async () => {
+  for (let i = 1; i <= 5; i++) {
+    try {
+      let product = await db.Products.create({
+        product_code: `ProductCode-${i}`,
+        product_author: 'huy',
+        categories: `cat1`,
+        price: 200,
+      });
+
+      await db.Product_languages.bulkCreate([
+        {
+          productId: product.id,
+          name: "Tên Product " + product.id,
+          description: "mô tả của product " + product.id,
+          languageCode: 'vi',
+        },
+        {
+          productId: product.id,
+          name: "Name Product " + product.id,
+          description: "Description of product " + product.id,
+          languageCode: 'en',
+        },
+      ]);
+    } catch (error) {
+      console.error("Error creating tag data:", error.message);
+    }
+  }
+  console.log("Creating manufacturer is done");
+};
+
 export const createSampleData = async () => {
   console.log("start creating bulk data");
   await createLanguage();
@@ -190,6 +256,8 @@ export const createSampleData = async () => {
   await createNewsCate();
   await createArticleCategories();
   await createTags();
+  await createManufaturer();
+  await createProducts();
 
   for (let i = 1; i <= 100; i++) {
     //create sample for news, news_languages
@@ -233,14 +301,14 @@ export const createSampleData = async () => {
           title: "tiêu đề của tin " + news.id,
           excerpt: "mô tả ngắn của tin " + news.id,
           content: "Nội dung của tin " + news.id,
-          languageCode: "vi",
+          languageCode: 'vi',
         },
         {
           newsId: news.id,
           title: "Title of news " + news.id,
           excerpt: "Excerpt of news " + news.id,
           content: "Content of news " + news.id,
-          languageCode: "en",
+          languageCode: 'en',
         },
       ]);
       //create sample for articles
@@ -259,14 +327,14 @@ export const createSampleData = async () => {
           title: "tiêu đề của tin " + article.id,
           excerpt: "mô tả ngắn của tin " + article.id,
           content: "Nội dung của tin " + article.id,
-          languageCode: "vi",
+          languageCode: 'vi',
         },
         {
           articleId: article.id,
           title: "Title of news " + article.id,
           excerpt: "Excerpt of news " + article.id,
           content: "Content of news " + article.id,
-          languageCode: "en",
+          languageCode: 'en',
         },
       ]);
     } catch (error) {

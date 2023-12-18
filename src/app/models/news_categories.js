@@ -36,7 +36,15 @@ module.exports = (sequelize, DataTypes) => {
         as: 'news_categories',
         foreignKey: "news_categoryId",
     });
-
+    //News_category
+    db.Languages.hasMany(db.News_cate_langs, {
+      as: 'news_cate_langs',
+      foreignKey: "languageCode",
+    });
+    db.News_cate_langs.belongsTo(db.Languages, {
+          as: 'languages',
+          foreignKey: "languageCode",
+    });
   };
   return News_categories;
 };

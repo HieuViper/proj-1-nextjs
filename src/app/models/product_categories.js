@@ -36,6 +36,15 @@ module.exports = (sequelize, DataTypes) => {
         as: 'product_categories',
         foreignKey: "product_categoryId",
     });
+    //Product Category
+    db.Languages.hasMany(db.Product_cate_langs, {
+      as: 'product_cate_langs',
+      foreignKey: "languageCode",
+    });
+    db.Product_cate_langs.belongsTo(db.Languages, {
+          as: 'languages',
+          foreignKey: "languageCode",
+    });
   };
   return Product_categories;
 };

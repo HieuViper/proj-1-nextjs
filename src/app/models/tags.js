@@ -37,6 +37,17 @@ module.exports = (sequelize, DataTypes) => {
         as: 'tags',
         foreignKey: "tagId",
     });
+
+
+    //Tag
+    db.Languages.hasMany(db.Tag_langs, {
+      as: 'tag_langs',
+      foreignKey: "languageCode",
+    });
+    db.Tag_langs.belongsTo(db.Languages, {
+          as: 'languages',
+          foreignKey: "languageCode",
+    });
   };
   return Tags;
 };

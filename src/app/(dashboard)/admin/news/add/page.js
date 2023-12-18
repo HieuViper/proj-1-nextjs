@@ -1,18 +1,23 @@
 import { newsImgs } from "@/library/newsImgs";
-import { funcNews } from "@/library/funcNews";
+import { news } from "@/library/news";
 import { redirect } from "next/navigation";
 import { NewsForm } from "../_components/NewsForm";
 const myConstant = require('@/store/constant')
+import getConfig from "next/config";
+import { funcLogin } from "@/library/funcLogin";
 
 export const dynamic = "force-dynamic";
 
 async function AddNews() {
+  const loginInfo = funcLogin.checkAuthentication();
+  const isAuthorize = await funcLogin.checkAuthorize( loginInfo.user, 'news','add' );
+
   async function addNews(data, newsLangs) {
     "use server";
     let message = "";
     let id;
     try {
-      id = await funcNews.addANews(data, newsLangs);
+      id = await news.addANews(data, newsLangs);
       message = 1;
     } catch (error) {
       message = `Fail to add a news, try again or inform your admin: ${error.message}`;
@@ -36,9 +41,10 @@ async function AddNews() {
 
     return result;
   }
-  const cate = await funcNews.getCategories(myConstant.DEFAULT_LANGUAGE);
-  const tags = await funcNews.getTags(myConstant.DEFAULT_LANGUAGE);
-  const langTable = await funcNews.getLanguages();
+
+  const cate = await news.getCategories(myConstant.DEFAULT_LANGUAGE);
+  const tags = await news.getTags(myConstant.DEFAULT_LANGUAGE);
+  const langTable = await news.getLanguages();
   return (
     <div className="">
       <h1 className="text-2xl">Add new News</h1>
@@ -46,6 +52,9 @@ async function AddNews() {
         cate={JSON.stringify(cate)}
         tags={JSON.stringify(tags)}
         langTable={JSON.stringify(langTable)}
+        roles={ getConfig().serverRuntimeConfig.userRoles }
+        user={ loginInfo.user }
+        isAuthorize={ isAuthorize }
         {...{ addNews, addImage }}
       />
     </div>

@@ -16,9 +16,8 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import PasswordStrengthBar from "react-password-strength-bar";
-import { callAPI, handleNotAuthorized } from "@/library/client/callAPI";
-import { useLogin } from "@/store/login";
-import { revalidatePath } from "next/cache";
+import { callAPI, handleNotAuthorized } from "@/library/client/callAPI";    //use for security
+import { useLogin } from "@/store/login";                                   //use for security
 const myConstant = require('@/store/constant')
 
 const UserForm = (props) => {

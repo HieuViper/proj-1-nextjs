@@ -14,22 +14,6 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
             comment: 'Description',
         },
-        TagId: {
-            type: DataTypes.BIGINT(20).UNSIGNED,
-            primaryKey: true,
-            references: {
-                model: 'Tags',
-                key: 'id'
-            }
-        },
-        LanguageCode: {
-            type: DataTypes.STRING(10),
-            primaryKey: true,
-            references: {
-                model: 'Languages',
-                key: 'code'
-            }
-        }
     },
     {
         tableName: 'tag_langs',

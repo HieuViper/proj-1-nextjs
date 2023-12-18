@@ -28,12 +28,14 @@ module.exports = (sequelize, DataTypes) => {
   );
   News_categories.associate = function (db) {
     // associations can be defined here
-    News_categories.belongsToMany(db.Languages, {
-        through: db.News_cate_langs,
-      });
-      db.Languages.belongsToMany(News_categories, {
-        through: db.News_cate_langs,
-      });
+    News_categories.hasMany(db.News_cate_langs, {
+      as: 'news_cate_langs',
+      foreignKey: 'news_categoryId',
+    });
+    db.News_cate_langs.belongsTo(News_categories, {
+        as: 'news_categories',
+        foreignKey: "news_categoryId",
+    });
 
   };
   return News_categories;

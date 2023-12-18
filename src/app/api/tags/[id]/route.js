@@ -23,10 +23,10 @@ export async function PUT(req, context) {
     //update into tag_languages Table
     for (const element of tagLangs) {
       console.log("element:", element);
-      const { LanguageCode, TagId, ...tagLangRow } = element;
+      const { languageCode, tagId, ...tagLangRow } = element;
       await db.Tag_langs.update(tagLangRow, {
         where: {
-          [Op.and]: [{ TagId: id }, { LanguageCode: LanguageCode }],
+          [Op.and]: [{ tagId: id }, { languageCode: languageCode }],
         },
         transaction: t,
       });

@@ -21,7 +21,7 @@ export async function GET(req, { params }) {
       //return the result to client
       return NextResponse.json( { data: JSON.stringify(result.images),
                                   pagination: result.pagination,
-                                  totals: result.totals,
+                                  // totals: result.totals,
       } );
   }
   catch ( error ) {

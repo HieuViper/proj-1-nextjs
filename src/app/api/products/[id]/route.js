@@ -4,7 +4,7 @@ import models from '@/models';
 export async function POST(body,req) {
     const product = await body.json();
     let result = await models.Products.create(product);
-    
+
     const product_languages = product.product_languages;
     product_languages.map(async function (item) {
         var product_language = {
@@ -15,7 +15,7 @@ export async function POST(body,req) {
             languageId: item.languageId,
         };
         const rs = await models.ProductLanguages.create(product_language);
-        
+
     });
     return NextResponse.json({
         result: "success",
@@ -33,7 +33,7 @@ export async function DELETE(body, req) {
             return NextResponse.json({
                 result: "success",
                 message: "deleted success",
-            }); 
+            });
             }
         );
     })

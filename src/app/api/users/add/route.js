@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { funcLogin } from "@/library/funcLogin";
 import { funcUsers } from "@/library/funcUsers";
-import { newsImgs } from "@/library/newsImgs";
 import { img } from "@/library/img";
 import { revalidatePath } from "next/cache";
 
@@ -44,5 +43,4 @@ export async function POST(req) {
     } catch ( error ) {
         return NextResponse.json( { msg: error.message }, { status: 500 });
     }
-
 }

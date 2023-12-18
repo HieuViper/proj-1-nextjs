@@ -1,5 +1,5 @@
 const db = require("@/app/models");
-const myConstant = require('@/store/constant')
+const myConstant = require('@/store/constant');
 // import fs from "fs";
 import { promises as fsPromises } from "fs";
 import path from "path";
@@ -221,7 +221,7 @@ export async function saveImage( imageFile, wantCompress = true, toModule = myCo
             //Create new file from compression
           const outputBuffer = await compressImage (fileType, imgBuffer, fileSizeCompress[i], toModule);
           // save sub file to the disk
-          let subSavedImg = await saveSpecificImage( outputBuffer, subFileName, folderPath, folderName );
+          let subSavedImg = await saveSpecificImage( outputBuffer, subFileName, folderPath, folderName, toModule );
 
           let buildSrcSet;
           if( i == 0 ) {

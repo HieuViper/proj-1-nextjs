@@ -45,8 +45,8 @@ export async function POST(req) {
             pagination: null,
             totals: null,
         }
-        result.images = await newsImgs.getAllImages( query.page, query.size, '' );
-        result.totals = await newsImgs.getTotalNumOfImg( '' );
+        result.images = await newsImgs.getAllImages( query.page, query.size);
+        result.totals = await newsImgs.getTotalNumOfImg();
         result.pagination = {
             pageSize: parseInt(query.size),
             total: result.totals.itemsOfTable,
@@ -54,7 +54,7 @@ export async function POST(req) {
         };
         return NextResponse.json( { data: JSON.stringify(result.images),
                                     pagination: result.pagination,
-                                    totals: result.totals,
+                                    // totals: result.totals,
                                   }, { status: 200 });
     } catch ( error ) {
         return NextResponse.json( { msg: error.message }, { status: 500 });

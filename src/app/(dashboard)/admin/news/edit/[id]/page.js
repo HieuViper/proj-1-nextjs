@@ -1,20 +1,25 @@
 import { newsImgs } from "@/library/newsImgs";
-import { funcNews } from "@/library/funcNews";
+import { news } from "@/library/news";
 import { redirect } from "next/navigation";
 import { NewsForm } from "../../_components/NewsForm";
 const myConstant = require('@/store/constant')
+import getConfig from "next/config";
+import { funcLogin } from "@/library/funcLogin";
 
 export const dynamic = "force-dynamic";
 async function EditNews({ params, searchParams }) {
+  const loginInfo = funcLogin.checkAuthentication();
+  const isAuthorize = await funcLogin.checkAuthorize( loginInfo.user, 'news','edit' );
+
   async function dell(data, newsLangs, id) {
     "use server";
-    await funcNews.updateANews(data, newsLangs, id);
+    await news.updateANews(data, newsLangs, id);
     redirect("/admin/news");
   }
   async function editNews(data, newsLangs, id) {
     "use server";
     try {
-      await funcNews.updateANews(data, newsLangs, id);
+      await news.updateANews(data, newsLangs, id);
       return { message: 1 };
     } catch (error) {
       return {
@@ -48,11 +53,11 @@ async function EditNews({ params, searchParams }) {
 
     return result;
   }
-  const data = await funcNews.getNews(params.id);
+  const data = await news.getNews(params.id);
   const mainImage = await newsImgs.getImage(data[0]?.image ?? "");
-  const cate = await funcNews.getCategories( myConstant.DEFAULT_LANGUAGE );
-  const tags = await funcNews.getTags(myConstant.DEFAULT_LANGUAGE);
-  const langTable = await funcNews.getLanguages();
+  const cate = await news.getCategories( myConstant.DEFAULT_LANGUAGE );
+  const tags = await news.getTags(myConstant.DEFAULT_LANGUAGE);
+  const langTable = await news.getLanguages();
   return (
     <div className="">
       Edit new
@@ -62,6 +67,9 @@ async function EditNews({ params, searchParams }) {
         tags={JSON.stringify(tags)}
         langTable={JSON.stringify(langTable)}
         mainImage={JSON.stringify(mainImage)}
+        roles={ getConfig().serverRuntimeConfig.userRoles }
+        user={ loginInfo.user }
+        isAuthorize={ isAuthorize }
         {...{ dell, editNews, updateImage, addImage }}
       />
     </div>

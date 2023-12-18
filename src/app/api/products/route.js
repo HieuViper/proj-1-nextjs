@@ -14,7 +14,7 @@ export async function GET(req,{params}) {
             },
         }:{};
         const opLang =  searchParams.has("lang")?{
-            LanguageCode: searchParams.get("lang")
+            languageCode: searchParams.get("lang")
 
         }:{};
 

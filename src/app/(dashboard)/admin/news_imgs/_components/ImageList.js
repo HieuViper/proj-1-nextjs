@@ -33,9 +33,9 @@ const ImageList = (props) => {
   // console.log("🚀 ~ file: ImageList.js:11 ~ ImageList ~ metadata:", metadata);
   const [previewPic, setPreviewPic] = useState(null);
   const [search, setSearch] = useState("");
-  const [totals, setTotals] = useState({
-    itemsOfTable: 0,
-  });
+  // const [totals, setTotals] = useState({
+  //   itemsOfTable: 0,
+  // });
   const [choosenImg, setChoosenImg] = useState();
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');   //display the serious error
@@ -60,7 +60,7 @@ const ImageList = (props) => {
   function setInitStates( result ) {
     setImageList(JSON.parse(result.data));
     setPaginationServer(result.pagination);
-    setTotals(result.totals);
+    // setTotals(result.totals);
   }
 
   const onSearchChange = (e) => {

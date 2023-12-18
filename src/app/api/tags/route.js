@@ -18,13 +18,13 @@ export async function GET(req, res) {
     const searchQuery = getSearchQuery(search);
     let strqueryData;
     if (lang)
-      strqueryData = `SELECT * FROM tags_all WHERE LanguageCode='${lang}' ${searchQuery} ORDER BY id DESC LIMIT ${fromTags}, ${size}`;
+      strqueryData = `SELECT * FROM tags_all WHERE languageCode='${lang}' ${searchQuery} ORDER BY id DESC LIMIT ${fromTags}, ${size}`;
     const results = await db.sequelize.query(strqueryData, {
       type: QueryTypes.SELECT,
     });
 
     // get total tags
-    let sqlqueryTotal = `SELECT count(*) AS total FROM tags_all WHERE LanguageCode='${lang}' ${searchQuery} `;
+    let sqlqueryTotal = `SELECT count(*) AS total FROM tags_all WHERE languageCode='${lang}' ${searchQuery} `;
     let resultsTotal = await db.sequelize.query(sqlqueryTotal, {
       type: QueryTypes.SELECT,
     });
@@ -50,9 +50,9 @@ export async function POST(req, res) {
       const currentLoginUser = "huy"; //we add information of modifier huy
       console.log("data :", data);
       const tag = await db.Tags.create(data, { transaction: t });
-      //add TagId property to the tagLangs
+      //add tagId property to the tagLangs
       for (const element of tagLangs) {
-        element.TagId = tag.id;
+        element.tagId = tag.id;
       }
       //create records in tag_languages Table
       await db.Tag_langs.bulkCreate(tagLangs, {

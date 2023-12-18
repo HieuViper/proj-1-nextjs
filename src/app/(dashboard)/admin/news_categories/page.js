@@ -1,5 +1,5 @@
 import { funcLanguage } from "@/library/funcLanguages";
-import { funcNewsCategories } from "@/library/funcNewsCategories";
+import { newsCategories } from "@/library/newsCategories";
 import CategoryList from "./_components/NewsCatList";
 const myConstant = require('@/store/constant')
 
@@ -10,12 +10,12 @@ async function CategoriesPage() {
 
   async function getAllNewsCate(lang) {
     "use server";
-    const newsCategories = await funcNewsCategories.getAllNewsCategories(lang);
+    const newsCategories = await newsCategories.getAllNewsCategories(lang);
     return newsCategories;
   }
   async function getNewsCate(id) {
     "use server";
-    const newsCategories = await funcNewsCategories.getNewsCategories(id);
+    const newsCategories = await newsCategories.getNewsCategories(id);
     return newsCategories;
   }
   async function addNewsCate(data, newsLangs, lang) {
@@ -23,8 +23,8 @@ async function CategoriesPage() {
     let message = "";
     let id;
     try {
-      await funcNewsCategories.addNewsCategories(data, newsLangs);
-      const rs = await funcNewsCategories.getAllNewsCategories(lang);
+      await newsCategories.addNewsCategories(data, newsLangs);
+      const rs = await newsCategories.getAllNewsCategories(lang);
       return { message: 1, cateList: rs };
     } catch (error) {
       message = `Fail to add a news, try again or inform your admin: ${error.message}`;
@@ -35,8 +35,8 @@ async function CategoriesPage() {
   async function editNewsCate(data, newsLangs, id, lang) {
     "use server";
     try {
-      await funcNewsCategories.updateNewsCategories(data, newsLangs, id);
-      const rs = await funcNewsCategories.getAllNewsCategories(lang);
+      await newsCategories.updateNewsCategories(data, newsLangs, id);
+      const rs = await newsCategories.getAllNewsCategories(lang);
       return { message: 1, cateList: rs };
     } catch (error) {
       return {
@@ -46,21 +46,21 @@ async function CategoriesPage() {
   }
   async function delNewsCate(id) {
     "use server";
-    await funcNewsCategories.deleteNewsCategories(id);
+    await newsCategories.deleteNewsCategories(id);
   }
   async function delBulkNewsCate(arrId) {
     "use server";
-    await funcNewsCategories.deleteBulkNewsCategories(arrId);
+    await newsCategories.deleteBulkNewsCategories(arrId);
   }
   async function searchNewsCate(search, lang) {
     "use server";
-    const newsCategories = await funcNewsCategories.getSearchQuery(
+    const newsCategories = await newsCategories.getSearchQuery(
       search,
       lang
     );
     return newsCategories;
   }
-  const allNewsCategories = await funcNewsCategories.getAllNewsCategories(
+  const allNewsCategories = await newsCategories.getAllNewsCategories(
     myConstant.DEFAULT_LANGUAGE
   );
   const langTable = await funcLanguage.getLanguages();

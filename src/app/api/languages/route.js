@@ -20,21 +20,21 @@ export async function POST(req, res) {
 
     await db.Languages.create(body.data);
     if (body.data.active == 1) {
-      let sqlqueryNews = `INSERT INTO news_languages(title, excerpt, content, NewsId, LanguageCode)
+      let sqlqueryNews = `INSERT INTO news_languages(title, excerpt, content, newsId, languageCode)
       SELECT 'undefined', 'undefined', 'undefined', m.id, '${body.data.code}'
       FROM news m
       WHERE NOT EXISTS (
         SELECT 1
         FROM news_languages n
-        WHERE n.NewsId = m.id AND n.LanguageCode = '${body.data.code}'
+        WHERE n.newsId = m.id AND n.languageCode = '${body.data.code}'
       );`;
-      let sqlqueryArticle = `INSERT INTO article_languages(title, excerpt, content, ArticleId, LanguageCode)
+      let sqlqueryArticle = `INSERT INTO article_languages(title, excerpt, content, articleId, languageCode)
       SELECT 'undefined', 'undefined', 'undefined', m.id, '${body.data.code}'
       FROM articles m
       WHERE NOT EXISTS (
         SELECT 1
         FROM article_languages n
-        WHERE n.ArticleId = m.id AND n.LanguageCode = '${body.data.code}'
+        WHERE n.articleId = m.id AND n.languageCode = '${body.data.code}'
       );`;
       await db.sequelize.query(sqlqueryNews, { type: QueryTypes.INSERT });
       await db.sequelize.query(sqlqueryArticle, { type: QueryTypes.INSERT });

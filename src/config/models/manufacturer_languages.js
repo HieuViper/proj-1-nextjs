@@ -24,7 +24,7 @@ export function manufacturerLanguagesModel(sequelize) {
                 key: 'id'
             }
         },
-        LanguageCode: {
+        languageCode: {
             type: DataTypes.STRING(10),
             primaryKey: true,
             references: {

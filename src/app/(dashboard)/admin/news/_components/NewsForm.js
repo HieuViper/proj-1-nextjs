@@ -23,8 +23,10 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 // import Editor from "@/components/Editor";
 import dynamic from "next/dynamic";
+import { callAPI, handleNotAuthorized } from "@/library/client/callAPI";    //use for security
 import { useLogin } from "@/store/login";
 import ImageList from "@/components/NewsImgsList";
+import Modal from "antd/es/modal/Modal";
 const myConstant = require('@/store/constant')
 
 
@@ -35,17 +37,27 @@ export function NewsForm(props) {
   const params = useParams();
   const pathName = usePathname();
   const searchParams = useSearchParams();
+
   const [form] = Form.useForm();
+
   const [tags, setTags] = useState([]);
   const [langTable, setLangTable] = useState([]);
   const [postStatus, setPostStatus] = useState("");
   const [data, setData] = useState([]);
   const [catTree, setCatTree] = useState([]);
+  const [loadingStatus, setLoadingStatus] = useState( false );
+
+  const [imgList, setImgList] = useState( null );
+  const [imgPagination, setImgPagination] = useState();
+
   const [picURL, setPicURL] = useState(null);
-  const [previewPic, setPreviewPic] = useState(null);
+  const [uploadPic, setUploadPic] = useState(null);
   const { setLoginForm } = useLogin();    //use to set global state allowing enable the login form.
+  const [errorMessage, setErrorMessage] = useState('');
   const [isModalPicOpen, setIsModalPicOpen] = useState( false );
-  const [editor, setEditor] = useState(null);
+  const [editor, setEditor] = useState([]);
+
+
 
   const Editor2 = dynamic(() => import("@/components/Editor2"), { ssr: false });
   const authors = [
@@ -67,7 +79,7 @@ export function NewsForm(props) {
     // console.log('vao day');
     let rs;
     news.forEach((element) => {
-      if (element.LanguageCode == lang) {
+      if (element.languageCode == lang) {
         rs = element[property];
       }
     });
@@ -75,6 +87,13 @@ export function NewsForm(props) {
   }
 
   useEffect(() => {
+    if( props.isAuthorize == false ) {
+      handleNotAuthorized(
+        () => { router.push('/login') },
+        ( msg ) => { setErrorMessage( msg ) });
+    }
+
+    // setIsModa  lPicOpen( true );
     setCatTree(JSON.parse(props.cate));
     setTags(JSON.parse(props.tags));
     setLangTable(JSON.parse(props.langTable)); //set languageTable for news
@@ -103,7 +122,6 @@ export function NewsForm(props) {
       });
       //format data to be suitable for the form fields
       let data1 = { ...newsData[0], ...mainNewsContent }; //get the first row of news to join with the new properties
-      console.log("data1 :", data1);
 
       data1 = {
         ...data1,
@@ -113,21 +131,17 @@ export function NewsForm(props) {
       };
       form.setFieldsValue(data1); //the data for the all the fields of form is done formating
       setData(data1); //set state for news
-      setPicURL(data1.image ?? "");
+      setPicURL(data1.image ?? "");     //Save the old image
       setPostStatus(data1.post_status);
       notifyAddNewsSuccess();
-
+      //Category array of the editing news
       const resultItem = JSON.parse(props.cate).filter((item) =>
         data1.categories?.includes(item.category_code)
       );
       setCatArr(resultItem);
       form.setFieldValue("mainCategory", data1.categories[0]);
       //set value for caption and alt of main image
-      const mainImage = JSON.parse(props.mainImage);
-      console.log(
-        "🚀 ~ file: NewsForm.js:354 ~ useEffect ~ mainImage:",
-        mainImage
-      );
+      const mainImage = JSON.parse(props.mainImage);  //no need
       form.setFieldsValue({ caption: mainImage?.caption, alt: mainImage?.alt });
     }
   }, [props]);
@@ -150,66 +164,30 @@ export function NewsForm(props) {
     console.log(a);
     const result = a?.replace(/<img([^>]*)>/g, (match, group) => {
       group = group.replace(/\s*sizes="[^"]*"/, ""); // Remove sizes default attribute
-      return `<img${group} sizes="(min-width: 450px) 100vw, 25vw" loading="lazy"/>`;
+      return `<img${group} sizes="${myConstant.SIZES}" loading="lazy"/>`;
     });
     return result;
   };
 
-  const uploadPicToServer = async (event) => {
-    const body = new FormData();
-    body.append("file", previewPic);
-    let imageURL;
-    //call api to move image to folder upload
-    const response = await fetch("/api/news/image", {
-      method: "POST",
-      body,
-    }).then(async (rs) => {
-      const image = await rs.json();
-      console.log(
-        "🚀 ~ file: NewsForm.js:181 ~ uploadPicToServer ~ image:",
-        image
-      );
-      imageURL = image.url;
-
-      //add image to table image
-      const imageRs = await props.addImage({
-        url: image.url,
-        alt: form.getFieldValue("alt") ?? "",
-        caption: form.getFieldValue("caption") ?? "",
-        srcset: "",
-      });
-      console.log(
-        "🚀 ~ file: NewsForm.js:189 ~ uploadPicToServer ~ imageRs:",
-        imageRs
-      );
-    });
-    return imageURL;
-  };
-
-  //func to update alt and caption image
-  const updateInfoImage = async () => {
-    const rs = await props.updateImage(
-      {
-        alt: form.getFieldValue("alt") ?? "",
-        caption: form.getFieldValue("caption") ?? "",
-      },
-      JSON.parse(props.mainImage).url
-    );
-    console.log("🚀 ~ file: NewsForm.js:209 ~ updateInfoImage ~ rs:", rs);
-  };
 
   //Handle submit form data to server
   async function handleSubmit(value) {
-    // when user upload new foto
-    const imageURL = previewPic ? await uploadPicToServer() : picURL;
-    //when there is already has foto and user don't uplaod new foto, just edit alt or caption
-    picURL && !previewPic && updateInfoImage();
-    console.log(
-      "🚀 ~ file: NewsForm.js:200 ~ handleSubmit ~ imageURL:",
-      imageURL
-    );
+    let imageInfo = null;
+    // console.log("values:", values);
+    const body = new FormData();
+    body.append('imageFile', uploadPic);    //attach uploaded image
+    if( picURL || uploadPic ) {
+      imageInfo = {
+        alt: value.alt ?? "",
+        caption: value.caption ?? "",
+      }
+      // let { alt, caption, ...values2 } = values;
+      delete value.alt;
+      delete value.caption;
+    }
+    body.append('imageInfo', JSON.stringify(imageInfo));  //attach image information
     //Reformat value data make it be suitable
-    value.categories = value.categories.toString();
+    // value.categories = value.categories.toString();
     value.tags = value.tags?.toString() ?? "";
     console.log("news_position 2: ", form.getFieldValue("news_position"));
     value.news_position = form.getFieldValue("news_position") ?? false;
@@ -229,13 +207,14 @@ export function NewsForm(props) {
         excerpt: form.getFieldValue(`excerpt_${lang.code}`) ?? "",
         content:
           filterContentEditor(form.getFieldValue(`content_${lang.code}`)) ?? "",
-        LanguageCode: lang.code,
-        NewsId: params?.id,
+        languageCode: lang.code,
+        newsId: params?.id,
       };
     });
-
-    const stringCat = value.categories;
-    const arrStringCat = stringCat.split(",");
+    //move the main cat to the head of list
+    // const stringCat = value.categories;
+    // const arrStringCat = stringCat.split(",");
+    const arrStringCat = value.categories;
     const index = arrStringCat.indexOf(mainCat);
     if (index !== -1) {
       arrStringCat.splice(index, 1);
@@ -244,56 +223,120 @@ export function NewsForm(props) {
       value = { ...value, categories: result };
     }
 
-    value.image = imageURL; //set image property
-    console.log("value submit:", value);
-    const { alt, caption, ...newValue } = value; //remove alt and caption out of value variable to newValue
-    console.log(
-      "🚀 ~ file: NewsForm.js:180 ~ handleSubmit ~ newValue:",
-      newValue
-    );
-    console.log(newsLangs);
+    // value.image = imageURL; //set image property
+    // console.log("value submit:", value);
+    // const { alt, caption, ...newValue } = value; //remove alt and caption out of value variable to newValue
+    // console.log(
+    //   "🚀 ~ file: NewsForm.js:180 ~ handleSubmit ~ newValue:",
+    //   newValue
+    // );
+    // console.log(newsLangs);
 
     // editing news
     if (params?.id) {
-      if (value.post_status == myConstant.post.POST_STATUS_TRASH)
-        //await delNews(value, newsLangs, params.id);
-        await props.dell(newValue, newsLangs, params.id);
+      if (value.post_status == myConstant.post.POST_STATUS_TRASH) {
+        // await props.dell(newValue, newsLangs, params.id);
+
+        let { result, res } = await callAPI( await fetch(`/api/news/[id]`, {
+          method: 'DELETE',
+          cache: 'no-store',
+          body
+        }),
+        ( msg ) => { setErrorMessage( msg ) },
+        () => { router.push('/login') },
+        () => { setLoginForm( true ) },
+      );
+
+        //success update user
+        if ( res.ok == true ) {
+          let messageNotify = "Delete news successfully - ";
+          toast.success(messageNotify, {
+            position: "top-center",
+            duration: 5000,
+          });
+          router.push('/admin/news');
+        }
+      }
+
       else {
-        await props.editNews(newValue, newsLangs, params.id).then((message) => {
-          if (message.message == 1) {
-            //signal of success edit on server
-            setPostStatus(form.getFieldValue("post_status")); //set postStatus state to rerender action buttons
-            let messageNotify =
-              form.getFieldValue("post_status") ==
-              myConstant.post.POST_STATUS_DRAFT
-                ? "Save Draft Success"
-                : "Save Publish Success";
-            toast.success(messageNotify, {
-              position: "top-center",
-            });
-          } else {
-            //signal of faillure on server
-            let messageNotify =
-              "Cannot update news, please try again or inform admin";
-            toast.success(messageNotify, {
-              position: "top-center",
-            });
-          }
-        });
+        // await props.editNews(newValue, newsLangs, params.id).then((message) => {
+        //   if (message.message == 1) {
+        //     //signal of success edit on server
+        //     setPostStatus(form.getFieldValue("post_status")); //set postStatus state to rerender action buttons
+        //     let messageNotify =
+        //       form.getFieldValue("post_status") ==
+        //       myConstant.post.POST_STATUS_DRAFT
+        //         ? "Save Draft Success"
+        //         : "Save Publish Success";
+        //     toast.success(messageNotify, {
+        //       position: "top-center",
+        //     });
+        //   } else {
+        //     //signal of faillure on server
+        //     let messageNotify =
+        //       "Cannot update news, please try again or inform admin";
+        //     toast.success(messageNotify, {
+        //       position: "top-center",
+        //     });
+        //   }
+        // });
+        value.image = picURL;          //set the old image url back to user.image
+        value.id = params.id
+        body.append('news', JSON.stringify(value));          //attach user information
+        body.append('newsLangs', JSON.stringify( newsLangs ));
+        let { result, res } = await callAPI( await fetch(`/api/news/update`, {
+            method: 'POST',
+            cache: 'no-store',
+            body
+          }),
+          ( msg ) => { setErrorMessage( msg ) },
+          () => { router.push('/login') },
+          () => { setLoginForm( true ) },
+        );
+
+        //success update user
+        if ( res.ok == true ) {
+          let messageNotify = "Update news successfully - ";
+          toast.success(messageNotify, {
+            position: "top-center",
+            duration: 5000,
+          });
+        }
       }
     }
     //adding news
     else {
-      await props.addNews(newValue, newsLangs).then((message) => {
-        console.log("message from server:", message);
-        if (message && message != 1) {
-          let messageNotify =
-            "Cannot update news, please try again or inform admin" + message;
-          toast.success(messageNotify, {
-            position: "top-center",
-          });
-        }
-      });
+      // await props.addNews(newValue, newsLangs).then((message) => {
+      //   console.log("message from server:", message);
+      //   if (message && message != 1) {
+      //     let messageNotify =
+      //       "Cannot update news, please try again or inform admin" + message;
+      //     toast.success(messageNotify, {
+      //       position: "top-center",
+      //     });
+      //   }
+      // });
+      body.append('news', JSON.stringify(value));          //attach user information
+      body.append('newsLangs', JSON.stringify( newsLangs ));
+      let { result, res } = await callAPI( await fetch(`/api/news/add`, {
+          method: 'POST',
+          cache: 'no-store',
+          body
+        }),
+        ( msg ) => { setErrorMessage( msg ) },
+        () => { router.push('/login') },
+        () => { setLoginForm( true ) },
+      );
+
+      //success update user
+      if ( res.ok == true ) {
+        let messageNotify = "Add news successfully - ";
+        toast.success(messageNotify, {
+          position: "top-center",
+          duration: 5000,
+        });
+        router.push('/admin/news/edit');
+      }
     }
   }
 
@@ -315,25 +358,25 @@ export function NewsForm(props) {
   };
 
   //Notify success adding new from /admin/add
-  function notifyAddNewsSuccess() {
-    //get message redirected from add news route
-    if (searchParams.get("message")) {
-      const message = searchParams.get("message") ?? "";
-      if (message == 1) {
-        //signal of success edit on server
-        let messageNotify = "Add news successfully";
-        toast.success(messageNotify, {
-          position: "top-center",
-        });
-      } else {
-        //signal of faillure on server
-        let messageNotify = `Cannot add new news, please try again or inform admin: ${message}`;
-        toast.success(messageNotify, {
-          position: "top-center",
-        });
-      }
-    }
-  }
+  // function notifyAddNewsSuccess() {
+  //   //get message redirected from add news route
+  //   if (searchParams.get("message")) {
+  //     const message = searchParams.get("message") ?? "";
+  //     if (message == 1) {
+  //       //signal of success edit on server
+  //       let messageNotify = "Add news successfully";
+  //       toast.success(messageNotify, {
+  //         position: "top-center",
+  //       });
+  //     } else {
+  //       //signal of faillure on server
+  //       let messageNotify = `Cannot add new news, please try again or inform admin: ${message}`;
+  //       toast.success(messageNotify, {
+  //         position: "top-center",
+  //       });
+  //     }
+  //   }
+  // }
   const onChangePosition = (checked) => {
     form.setFieldValue("news_position", checked);
   };
@@ -414,14 +457,85 @@ export function NewsForm(props) {
       setMainCat("");
     }
   };
-  function printImg( editor ) {
-      const imageUtils = editor.plugins.get( 'ImageUtils' );
-      imageUtils.insertImage( { src: '/uploads/nov2023/4kpic.jpg',
-          srcset: '/uploads/nov2023/ava3_150.jpeg 150w, /uploads/nov2023/ava3_350.jpeg 350w, /uploads/nov2023/ava3_700.jpeg 700w',
-      } );
+  let globalEditor;
+  let savedSelection;
+  let currentElement;
+  async function printImg( editorParam ) {
+      console.log('Editor Param:', editorParam);
+      const selection = editorParam.model.document.selection;
+      // Save the current selection range
+      // savedSelection = selection.getRanges()[0];
+      const range = editorParam.model.document.selection.getFirstRange();
+      currentElement = range.getCommonAncestor();
+      console.log('Current Element in PrintImg:', currentElement);
+      globalEditor = editorParam;
+      console.log('global Editor:', globalEditor);
+      // setPickImg({
+      //   url: '/uploads/news/dec2023/ava18.jpeg',
+      //   srcset: ''
+      // });
+      // get Image List of newsImage
+      // setLoadingStatus ( true );
+      try {
+          let { result, res } = await callAPI( await fetch(`/api/news_imgs`, {
+              method: 'GET',
+              cache: 'no-store'
+            }),
+            ( msg ) => { setErrorMessage( msg ) },
+            () => { router.push('/login') },
+            () => { setLoginForm( true ) },
+          );
+          if ( res.status == 200 ) {
+            setImgList( result.data );
+            setImgPagination( result.pagination );
+            // setIsModalPicOpen( true );
+          }
+      }
+      catch (error) {
+        console.log('error in printImg:', error.message);
+      }
+      // // setEditor( editorParam.plugins.get( 'ImageUtils' ) );
+      // setLoadingStatus( false );
+      // const imageUtils = editorParam.plugins.get( 'ImageUtils' );
+      // imageUtils.insertImage( { src: '/uploads/news/dec2023/ava18.jpeg',
+      //     // srcset: '/uploads/nov2023/ava3_150.jpeg 150w, /uploads/nov2023/ava3_350.jpeg 350w, /uploads/nov2023/ava3_700.jpeg 700w',
+      // } );
+
+
+      onFinishAddPic();
   }
-  function onFinishAddPic( values ) {
+  async function onFinishAddPic( values ) {
       //get the item picture has picked from values
+      // editor.model.document.selection.setPosition(editor.model.document.selection.getFirstPosition());
+      // console.log('editor:', editor);
+      // // editor.focus();
+      globalEditor.focus();
+      globalEditor.editing.view.focus();
+      // const selection = globalEditor.model.document.selection;
+      // // selection.removeAllRanges();
+      // selection.addRange(savedSelection);
+      console.log('Current Element on Finish:', currentElement);
+
+      globalEditor.model.change( writer => {
+         const newPosition = writer.createPositionAt( currentElement, 'after' );
+         console.log('newPosition:', newPosition);
+         const newRange = writer.createRange( newPosition );
+         console.log('new range:', newRange);
+         writer.setSelection( newRange );
+      });
+      await globalEditor.execute( 'insertImage', {
+        source: [{ src: '/uploads/news/dec2023/ava18.jpeg', alt: 'First alt text',
+              srcset: '/uploads/nov2023/ava3_150.jpeg 150w, /uploads/nov2023/ava3_350.jpeg 350w, /uploads/nov2023/ava3_700.jpeg 700w'
+      },]
+
+      } );
+      // const imageUtils = globalEditor.plugins.get( 'ImageUtils' );
+      // setTimeout(async () => {
+      //   await imageUtils.insertImage( { src: '/uploads/news/dec2023/ava18.jpeg',
+      //   // srcset: '/uploads/nov2023/ava3_150.jpeg 150w, /uploads/nov2023/ava3_350.jpeg 350w, /uploads/nov2023/ava3_700.jpeg 700w',
+      //    } );
+      // }, 2000);
+
   }
 
   function handleCancelModalPic() {
@@ -474,8 +588,9 @@ export function NewsForm(props) {
           // ]}
         >
           {/* <Input /> */}
-          <Editor2 initialData='<h2>Hello everybody</h2>'
-                    {...{setLoginForm, printImg}}
+          <Editor2 data={ editor }
+                    onChange={( data )=>setEditor( data )}
+                    {...{ printImg }}
           />
         </Form.Item>
       </>
@@ -494,6 +609,9 @@ export function NewsForm(props) {
 
   return (
     <>
+      <div className="text-red-500 font-bold">
+        { errorMessage }
+      </div>
       <div className="flex justify-start">
         <Button type="dashed" icon={<SwapLeftOutlined />}>
           <Link href={`/admin/news`}>Back to NewsList</Link>
@@ -705,21 +823,19 @@ export function NewsForm(props) {
             fileList={[]}
             customRequest={(info) => {
               console.log(info);
-              setPreviewPic(info.file);
+              setUploadPic(info.file);
             }}
             showUploadList={false}
             beforeUpload={(file) => {
-              console.log(
-                "🚀 ~ file: NewsForm.js:498 ~ NewsForm ~ file:",
-                file
-              );
               return new Promise((resolve, reject) => {
                 // check the file type
                 const isImg =
                   file.type === "image/jpeg" ||
                   file.type === "image/jpg" ||
                   file.type === "image/png" ||
-                  file.type === "image/gif";
+                  file.type === "image/gif" ||
+                  file.type === "image/webp" ||
+                  file.type === "image/tiff";
                 if (!isImg) {
                   message.error("You can only upload images");
                   reject(false);  //put reason here
@@ -748,15 +864,15 @@ export function NewsForm(props) {
         </Form.Item>
 
         <div className="ml-32 mb-5">
-          {previewPic && (
+          {uploadPic && (
             <Image
-              src={`${URL.createObjectURL(previewPic)}`}
+              src={`${URL.createObjectURL(uploadPic)}`}
               width={160}
               className="rounded-lg shadow"
               alt={`${picURL}`}
             />
           )}
-          {picURL && !previewPic && (
+          {picURL && !uploadPic && (
             <Image
               src={`${picURL}`}
               width={160}
@@ -766,7 +882,7 @@ export function NewsForm(props) {
           )}
         </div>
 
-        {picURL || previewPic ? (
+        {picURL || uploadPic ? (
           <>
             <Form.Item name="caption" label="Caption">
               <Input />
@@ -812,7 +928,7 @@ export function NewsForm(props) {
             Cancel
           </Button>,
           <Button
-            // key="submit"
+            key="pick"
             // form="formImage"
             // htmlType="submit"
             // type="primary"
@@ -821,8 +937,12 @@ export function NewsForm(props) {
           </Button>,
         ]}
       >
-        <ImageList
-            {...{ onFinishAddPic, handleSubmitFailed }}
+        <ImageList roles = { props.roles }
+                   user = { props.user }
+                   data = { imgList }
+                   pagination = { imgPagination }
+                   editor = {'dd'}
+            {...{ setIsModalPicOpen }}
         />
       </Modal>
     </>

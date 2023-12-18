@@ -23,7 +23,7 @@ function getSearchQuery(search) {
     : `WHERE ( url LIKE '%${search}%' OR alt LIKE '%${search}%' OR caption LIKE '%${search}%' OR author LIKE '%${search}%')`;
 }
 
-export async function getAllImages( page, size, search ) {
+export async function getAllImages( page = 1, size, search = '') {
   try {
     const fromNews = (page - 1) * size; //determine the beginning news
     const searchQuery = getSearchQuery(search);
@@ -40,7 +40,7 @@ export async function getAllImages( page, size, search ) {
 }
 
 //get total item of news
-export async function getTotalNumOfImg( search ) {
+export async function getTotalNumOfImg( search  = '') {
   let totals = {
     itemsOfTable: 0,
   };

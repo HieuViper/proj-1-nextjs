@@ -100,12 +100,17 @@ module.exports = (sequelize, DataTypes) => {
   );
   Products.associate = function (db) {
     // associations can be defined here
-    Products.belongsToMany(db.Languages, { through: db.Product_languages });
-    db.Languages.belongsToMany(Products, { through: db.Product_languages });
-    db.Manufacturers.hasMany(Products, {
-        as: 'products',
-        foreignKey: 'manufacturerId',
+    Products.hasMany(db.Product_languages, {
+        as: 'product_languages',
+        foreignKey: 'productId',
       });
+    db.Product_languages.belongsTo(Products, {
+        as: 'products',
+        foreignKey: "productId",
+    });
+
+
+
   };
   return Products;
 };

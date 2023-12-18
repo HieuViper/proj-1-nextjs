@@ -51,7 +51,7 @@ export function ArticleForm(props) {
   function getArticleValue(property, article, lang) {
     let rs;
     article.forEach((element) => {
-      if (element.LanguageCode == lang) {
+      if (element.languageCode == lang) {
         rs = element[property];
       }
     });
@@ -237,8 +237,8 @@ export function ArticleForm(props) {
         title: form.getFieldValue(`title_${lang.code}`) ?? "",
         excerpt: form.getFieldValue(`excerpt_${lang.code}`) ?? "",
         content: form.getFieldValue(`excerpt_${lang.code}`) ?? "",
-        LanguageCode: lang.code,
-        ArticleId: params?.id,
+        languageCode: lang.code,
+        articleId: params?.id,
       };
     });
 

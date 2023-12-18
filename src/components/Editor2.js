@@ -2,7 +2,6 @@ import React from 'react';
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Editor from "ckeditor5-custom-build";
 // import DecoupledEditor from "@ckeditor/ckeditor5-build-decoupled-document";
-import imageCompression from "browser-image-compression";
 
 
 const editorConfiguration = {
@@ -12,10 +11,10 @@ const editorConfiguration = {
     enterMode: 2,
 };
 
-function Editor2( props ) {
+async function Editor2( props ) {
 
     //when editor is ready
-    function onEditorReady( editor ) {
+    async function onEditorReady( editor ) {
       //Display UI
       editor.ui
       .getEditableElement()
@@ -34,9 +33,10 @@ function Editor2( props ) {
 
       editor.on( 'showDialog', ( event ) => {
         console.log(' event: ', event.name);
+        console.log('selection position:',editor.model.document.selection.getFirstPosition());
+
         props.printImg( editor );
       });
-
 
     }
 
@@ -48,10 +48,11 @@ function Editor2( props ) {
             enterMode: 2,
             shouldNotGroupWhenFull: true
             }}
-        data={ props.initialData }
+        data={ props.data }
         onChange={ (event, editor ) => {
             const data = editor.getData();
-            console.log('event:', event.name);
+            props.onChange( data );
+            console.log('event on change:', event.name);
             console.log( { event, editor, data } );
         } }
 

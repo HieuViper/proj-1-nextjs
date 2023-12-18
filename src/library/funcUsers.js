@@ -113,7 +113,7 @@ export async function getTotalNumOfUsers( role, search ) {
 }
 
 
-//Delete bulk of news, articles based on NewsId
+//Delete bulk of news, articles based on newsId
 export async function deleteBulkUsers(keys, loginInfo) {
   try {
     const keysArr = keys.split(",");

@@ -12,7 +12,7 @@ export async function POST(body,req) {
             name:item.name,
             short:item.short,
             description:item.description,
-            languageId: item.languageId,
+            languageCode: item.languageCode,
         };
         const rs = await models.ProductLanguages.create(product_language);
 

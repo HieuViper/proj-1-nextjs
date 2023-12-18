@@ -14,7 +14,7 @@ export async function GET(req,{params}) {
             },
         }:{};
         const opLang =  searchParams.has("lang")?{
-            languageCode: searchParams.get("lang")
+            code: searchParams.get("lang")
 
         }:{};
 
@@ -33,30 +33,33 @@ export async function GET(req,{params}) {
             {
                 model: db.Product_languages,
                 as: 'product_languages',
-                include: [
-                {
-                    model: db.Languages,
-                    as: 'languages',
-                    where:opLang
-                },
-                ],
+                // include: [
+                // {
+                //     model: db.Languages,
+                //     as: 'languages',
+                //     where:opLang
+                // },
+                // ],
             },
             ],
             offset: parseInt(page) * parseInt(limit),
             limit: parseInt(limit),
             order: [["id", "DESC"]],
         });
+        // console.log('rows:', rows);
+
         return NextResponse.json({
-            // status:status,
+            //status:status,
             data: rows,
             pagging: {
-            lastPage: parseInt(count / parseInt(limit)),
-            currentPage: page+1,
-            limit: parseInt(limit),
-            total: count
+                lastPage: parseInt(count / parseInt(limit)),
+                currentPage: page+1,
+                limit: parseInt(limit),
+                total: count
         }});
     }
     catch (error) {
-        return NextResponse.json({ msg: 'error ' + error.message }, { status: 500 });
+        return NextResponse.json({ msg: 'error here: ' + error.message }, { status: 500 });
+        // throw new Error('error here: ' + error.message);
     }
 }

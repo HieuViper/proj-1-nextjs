@@ -52,7 +52,15 @@ module.exports = (sequelize, DataTypes) => {
         as: 'manufacturers',
         foreignKey: "manufacturerId",
     });
-
+    //manufacturer
+    db.Languages.hasMany(db.Manufacturer_languages, {
+      as: 'manufacturer_languages',
+      foreignKey: "languageCode",
+    });
+    db.Manufacturer_languages.belongsTo(db.Languages, {
+          as: 'languages',
+          foreignKey: "languageCode",
+    });
 
     db.Manufacturers.hasMany(db.Products, {
         as: 'products',

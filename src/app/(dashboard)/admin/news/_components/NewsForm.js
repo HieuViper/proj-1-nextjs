@@ -488,7 +488,7 @@ export function NewsForm(props) {
           if ( res.status == 200 ) {
             setImgList( result.data );
             setImgPagination( result.pagination );
-            // setIsModalPicOpen( true );
+            setIsModalPicOpen( true );
           }
       }
       catch (error) {
@@ -502,7 +502,7 @@ export function NewsForm(props) {
       // } );
 
 
-      onFinishAddPic();
+      // onFinishAddPic();
   }
   async function onFinishAddPic( values ) {
       //get the item picture has picked from values

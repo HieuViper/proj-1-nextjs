@@ -588,7 +588,7 @@ export function NewsForm(props) {
           // ]}
         >
           {/* <Input /> */}
-          <Editor2 data={ editor }
+          <Editor2 data='hello'
                     onChange={( data )=>setEditor( data )}
                     {...{ printImg }}
           />

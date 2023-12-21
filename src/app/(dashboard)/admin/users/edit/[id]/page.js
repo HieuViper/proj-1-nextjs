@@ -2,7 +2,7 @@ import { UserAddOutlined } from "@ant-design/icons";
 import { Button} from "antd";
 import Link from "next/link";
 import UserForm from "../../_components/UserForm";
-import { funcUsers } from "@/library/funcUsers";
+import { users } from "@/library/users";
 import { userRoles } from "@/library/userRoles";
 import { headers, cookies } from "next/headers";
 import { funcLogin } from "@/library/funcLogin";
@@ -13,7 +13,7 @@ const EditUserPage = async ({ params }) => {
   const isAuthorize = await funcLogin.checkAuthorize( loginInfo.user, 'users','edit' );
 
   let mainImage;
-  const user = await funcUsers.getUser(params.id);
+  const user = await users.getUser(params.id);
   if ( user.image )
     mainImage = await newsImgs.getImage(user.image);
 

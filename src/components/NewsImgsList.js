@@ -112,8 +112,8 @@ const ImageList = (props) => {
   const onFinishEdit = async (values) => {
     console.log("Success:", values);
     //alt and caption are changed, need to update to server
-    if( values.changeValue == true ) {
-      setLoadingStatus(true);
+    if( values.changeValue == 'true' ) {
+      // setLoadingStatus(true);
       let { result, res } = await callAPI( await fetch(`/api/news_imgs/update`, {
           method: 'PUT',
           cache: 'no-store',
@@ -132,10 +132,10 @@ const ImageList = (props) => {
       );
       if (res.ok == true ) {
         message.success("Update Successfully");
-        setInitStates( result );
+        // setInitStates( result );
         // setImageList(rs.data);
       }
-      setLoadingStatus( false );
+      // setLoadingStatus( false );
     }
     // console.log('values:', values);
     // console.log('editor:', props.editor);
@@ -144,6 +144,7 @@ const ImageList = (props) => {
     //                           srcset: values.srcset,
     // } );
     // close modal
+    props.onFinishAddPic(values);
     setIsModalEditOpen(false);
     props.setIsModalPicOpen( false );
   };
@@ -383,7 +384,7 @@ const ImageList = (props) => {
         <EditImgForm
           image = { choosenImg }
           metadata = { metadata }
-          editor = { props.editor }
+          // editor = { props.editor }
           {...{onFinishEdit, onFinishFailed}}
         />
       </Modal>

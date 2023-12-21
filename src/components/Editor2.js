@@ -11,7 +11,7 @@ const editorConfiguration = {
     enterMode: 2,
 };
 
-async function Editor2( props ) {
+function Editor2( { value, onChange, printImg, insPic  } ) {
 
     //when editor is ready
     async function onEditorReady( editor ) {
@@ -35,9 +35,11 @@ async function Editor2( props ) {
         console.log(' event: ', event.name);
         console.log('selection position:',editor.model.document.selection.getFirstPosition());
 
-        props.printImg( editor );
+        printImg( editor );
       });
-
+      editor.on( 'insPic', ( event ) => {
+        insPic( editor );
+      });
     }
 
     return (
@@ -48,12 +50,13 @@ async function Editor2( props ) {
             enterMode: 2,
             shouldNotGroupWhenFull: true
             }}
-        data={ props.data }
+        data={ value }
         onChange={ (event, editor ) => {
             const data = editor.getData();
-            props.onChange( data );
-            console.log('event on change:', event.name);
-            console.log( { event, editor, data } );
+            onChange( data );
+            // props.onChange( data );
+            // console.log('event on change:', event.name);
+            // console.log( { event, editor, data } );
         } }
 
         />

@@ -71,10 +71,10 @@ export function EditImgForm( props ) {
                     <Input disabled={true} />
                     </Form.Item>
                     <Form.Item label="Alternative Text" name="alt">
-                    <Input onChange={() => { formEdit.setFieldValue('changeValue', true ) }} />
+                    <Input onChange={() => { formEdit.setFieldValue('changeValue', 'true' ) }} />
                     </Form.Item>
                     <Form.Item label="Caption" name="caption">
-                    <Input  onChange={() => { formEdit.setFieldValue('changeValue', true ) }}/>
+                    <Input  onChange={() => { formEdit.setFieldValue('changeValue', 'true' ) }}/>
                     </Form.Item>
                     <Form.Item label="Source Set" name="srcset">
                     <Input disabled={true} />

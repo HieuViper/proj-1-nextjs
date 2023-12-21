@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { funcLogin } from "@/library/funcLogin";
-import { funcUsers } from "@/library/funcUsers";
+import { users } from "@/library/users";
 import { img } from "@/library/img";
 import { revalidatePath } from "next/cache";
 
@@ -37,7 +37,7 @@ export async function POST(req) {
             user.image = null;      //set image null when user didn't send image
         }
 
-        await funcUsers.addAUser(user);
+        await users.addAUser(user);
         revalidatePath('/admin/users');
         return NextResponse.json( {}, { status: 200 });
     } catch ( error ) {

@@ -6,6 +6,6 @@
  * @module upPic
  */
 import { Plugin } from 'ckeditor5/src/core';
-export default class upPic extends Plugin {
+export default class UpPic extends Plugin {
     init(): void;
 }

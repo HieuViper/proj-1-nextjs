@@ -27,49 +27,44 @@ import { callAPI, handleNotAuthorized } from "@/library/client/callAPI";    //us
 import { useLogin } from "@/store/login";
 import ImageList from "@/components/NewsImgsList";
 import Modal from "antd/es/modal/Modal";
+// import Editor2 from "@/components/Editor2";
 const myConstant = require('@/store/constant')
 
 
+const Editor2 = dynamic(() => import("@/components/Editor2"), { ssr: false });
 export function NewsForm(props) {
   const { TextArea } = Input;
   const { Option } = Select;
   const router = useRouter();
   const params = useParams();
-  const pathName = usePathname();
-  const searchParams = useSearchParams();
+  // const pathName = usePathname();
+  // const searchParams = useSearchParams();
 
   const [form] = Form.useForm();
 
-  const [tags, setTags] = useState([]);
-  const [langTable, setLangTable] = useState([]);
+  // const [tags, setTags] = useState([]);
+  // const [langTable, setLangTable] = useState([]);
   const [postStatus, setPostStatus] = useState("");
-  const [data, setData] = useState([]);
-  const [catTree, setCatTree] = useState([]);
-  const [loadingStatus, setLoadingStatus] = useState( false );
+  // const [data, setData] = useState([]);
+  // const [catTree, setCatTree] = useState([]);
+  // const [loadingStatus, setLoadingStatus] = useState( false );
 
   const [imgList, setImgList] = useState( null );
   const [imgPagination, setImgPagination] = useState();
 
   const [picURL, setPicURL] = useState(null);
   const [uploadPic, setUploadPic] = useState(null);
+  const [pickedItem, setPickedItem] = useState(null); // use to save the image info from Modal ShowImage
   const { setLoginForm } = useLogin();    //use to set global state allowing enable the login form.
   const [errorMessage, setErrorMessage] = useState('');
   const [isModalPicOpen, setIsModalPicOpen] = useState( false );
-  const [editor, setEditor] = useState([]);
 
 
 
-  const Editor2 = dynamic(() => import("@/components/Editor2"), { ssr: false });
-  const authors = [
-    {
-      value: "huy",
-      label: "Jack Huy",
-    },
-    {
-      value: "Cao",
-      label: "Peter Cao",
-    },
-  ];
+  const authors = JSON.parse(props.authors).map( ( item ) => ({
+    value: item.username,
+    label: item.display_name,
+  }));
 
   //get the the title, content, excerpt from news data
   //property: name of the column  you want to get the value
@@ -94,9 +89,9 @@ export function NewsForm(props) {
     }
 
     // setIsModa  lPicOpen( true );
-    setCatTree(JSON.parse(props.cate));
-    setTags(JSON.parse(props.tags));
-    setLangTable(JSON.parse(props.langTable)); //set languageTable for news
+    // setCatTree(JSON.parse(props.cate));
+    // setTags(JSON.parse(props.tags));
+    // setLangTable(JSON.parse(props.langTable)); //set languageTable for news
     if (params?.id) {
       //get the news, newsdata is an array it's each row is a language's news
       let newsData = JSON.parse(props.data);
@@ -130,11 +125,11 @@ export function NewsForm(props) {
         news_position: data1?.news_position == 1 ? true : false,
       };
       form.setFieldsValue(data1); //the data for the all the fields of form is done formating
-      setData(data1); //set state for news
+      // setData(data1); //set state for news
       setPicURL(data1.image ?? "");     //Save the old image
       setPostStatus(data1.post_status);
       notifyAddNewsSuccess();
-      //Category array of the editing news
+      //Category array of the editing news, it is used for setting source of the the Main category select
       const resultItem = JSON.parse(props.cate).filter((item) =>
         data1.categories?.includes(item.category_code)
       );
@@ -197,7 +192,7 @@ export function NewsForm(props) {
     }
     delete value["publish"];
     //Creating an array of records for inserting into news_lamguages table
-    const newsLangs = langTable.map((lang) => {
+    const newsLangs = JSON.parse(props.langTable).map((lang) => {
       delete value[`title_${lang.code}`]; //delete unsused properties
       delete value[`excerpt_${lang.code}`];
       delete value[`content_${lang.code}`];
@@ -432,16 +427,16 @@ export function NewsForm(props) {
         children: buildTreeData(data, item.id),
       }));
   }
-  const treeData = catTree && buildTreeData(catTree, null);
+  const treeData = JSON.parse(props.cate) && buildTreeData(JSON.parse(props.cate), null);
 
   const [mainCat, setMainCat] = useState();
   const [catSelect, setCatSelect] = useState(false);
   const [catArr, setCatArr] = useState([]);
 
   const onChangeCategory = (value) => {
-    value.length > 0 ? setCatSelect(false) : setCatSelect(true);
+    // value.length > 0 ? setCatSelect(false) : setCatSelect(true);
     console.log("value :", value);
-    const resultItem = catTree.filter((item) =>
+    const resultItem = JSON.parse(props.cate).filter((item) =>
       value?.includes(item.category_code)
     );
     setCatArr(resultItem);
@@ -461,21 +456,16 @@ export function NewsForm(props) {
   let savedSelection;
   let currentElement;
   async function printImg( editorParam ) {
-      console.log('Editor Param:', editorParam);
-      const selection = editorParam.model.document.selection;
-      // Save the current selection range
-      // savedSelection = selection.getRanges()[0];
-      const range = editorParam.model.document.selection.getFirstRange();
-      currentElement = range.getCommonAncestor();
-      console.log('Current Element in PrintImg:', currentElement);
-      globalEditor = editorParam;
-      console.log('global Editor:', globalEditor);
-      // setPickImg({
-      //   url: '/uploads/news/dec2023/ava18.jpeg',
-      //   srcset: ''
-      // });
-      // get Image List of newsImage
-      // setLoadingStatus ( true );
+      // setEditor( editorParam );
+      // console.log('Editor Param:', editorParam);
+      // const selection = editorParam.model.document.selection;
+
+      // const range = editorParam.model.document.selection.getFirstRange();
+      // currentElement = range.getCommonAncestor();
+      // console.log('Current Element in PrintImg:', currentElement);
+      // globalEditor = editorParam;
+      // console.log('global Editor:', globalEditor);
+
       try {
           let { result, res } = await callAPI( await fetch(`/api/news_imgs`, {
               method: 'GET',
@@ -505,30 +495,31 @@ export function NewsForm(props) {
       // onFinishAddPic();
   }
   async function onFinishAddPic( values ) {
+      setPickedItem( values );
       //get the item picture has picked from values
       // editor.model.document.selection.setPosition(editor.model.document.selection.getFirstPosition());
       // console.log('editor:', editor);
       // // editor.focus();
-      globalEditor.focus();
-      globalEditor.editing.view.focus();
-      // const selection = globalEditor.model.document.selection;
-      // // selection.removeAllRanges();
-      // selection.addRange(savedSelection);
-      console.log('Current Element on Finish:', currentElement);
+      // globalEditor.focus();
+      // globalEditor.editing.view.focus();
+      // // const selection = globalEditor.model.document.selection;
+      // // // selection.removeAllRanges();
+      // // selection.addRange(savedSelection);
+      // console.log('Current Element on Finish:', currentElement);
 
-      globalEditor.model.change( writer => {
-         const newPosition = writer.createPositionAt( currentElement, 'after' );
-         console.log('newPosition:', newPosition);
-         const newRange = writer.createRange( newPosition );
-         console.log('new range:', newRange);
-         writer.setSelection( newRange );
-      });
-      await globalEditor.execute( 'insertImage', {
-        source: [{ src: '/uploads/news/dec2023/ava18.jpeg', alt: 'First alt text',
-              srcset: '/uploads/nov2023/ava3_150.jpeg 150w, /uploads/nov2023/ava3_350.jpeg 350w, /uploads/nov2023/ava3_700.jpeg 700w'
-      },]
+      // globalEditor.model.change( writer => {
+      //    const newPosition = writer.createPositionAt( currentElement, 'after' );
+      //    console.log('newPosition:', newPosition);
+      //    const newRange = writer.createRange( newPosition );
+      //    console.log('new range:', newRange);
+      //    writer.setSelection( newRange );
+      // });
+      // await editor.execute( 'insertImage', {
+      //   source: [{ src: '/uploads/news/dec2023/ava18.jpeg', alt: 'First alt text',
+      //         srcset: '/uploads/nov2023/ava3_150.jpeg 150w, /uploads/nov2023/ava3_350.jpeg 350w, /uploads/nov2023/ava3_700.jpeg 700w'
+      // },]
 
-      } );
+      // } );
       // const imageUtils = globalEditor.plugins.get( 'ImageUtils' );
       // setTimeout(async () => {
       //   await imageUtils.insertImage( { src: '/uploads/news/dec2023/ava18.jpeg',
@@ -537,7 +528,13 @@ export function NewsForm(props) {
       // }, 2000);
 
   }
-
+  function insPic(editor) {
+    editor.execute( 'insertImage', {
+            source: [{ src: pickedItem.url, alt: pickedItem.alt,
+                  srcset: pickedItem.srcset
+          },]
+          } );
+  }
   function handleCancelModalPic() {
     setIsModalPicOpen( false );
   }
@@ -558,7 +555,7 @@ export function NewsForm(props) {
           {
             //only generate news_code when post status is not published
             lang == myConstant.DEFAULT_LANGUAGE &&
-            data?.post_status != myConstant.post.POST_STATUS_PUBLISH ? (
+            postStatus != myConstant.post.POST_STATUS_PUBLISH ? (
               <Input onChange={() => generateNewsCode()} />
             ) : (
               <Input />
@@ -588,18 +585,20 @@ export function NewsForm(props) {
           // ]}
         >
           {/* <Input /> */}
-          <Editor2 data='hello'
-                    onChange={( data )=>setEditor( data )}
-                    {...{ printImg }}
+          <Editor2
+            // data={content}
+                    // onChange={( data )=>setContent( data )}
+                    {...{ printImg, insPic }}
           />
         </Form.Item>
       </>
     );
   };
 
-  const itemTab = langTable?.map((item) => ({
+  const itemTab = JSON.parse(props.langTable)?.map((item) => ({
     key: item.code,
     label: item.name,
+    forceRender:true,
     children: (
       <>
         <TabComponent lang={item.code} />
@@ -733,7 +732,7 @@ export function NewsForm(props) {
         <Form.Item label="Slug" name="news_code">
           <Input
             disabled={
-              data?.post_status == myConstant.post.POST_STATUS_PUBLISH
+              postStatus == myConstant.post.POST_STATUS_PUBLISH
                 ? true
                 : false //disabled this field if the post already has newscode
             }
@@ -786,7 +785,7 @@ export function NewsForm(props) {
         </Form.Item>
         <Form.Item label="Main Category" name="mainCategory">
           <Select
-            disabled={catSelect}
+            // disabled={catSelect}
             onChange={onChangeMainCat}
             value={mainCat}
           >
@@ -807,8 +806,8 @@ export function NewsForm(props) {
               option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
             }
           >
-            {tags &&
-              tags.map((item, index) => (
+            {JSON.parse(props.tags) &&
+              JSON.parse(props.tags).map((item, index) => (
                 <Option key={index} value={item.tag_code}>
                   {item.name}
                 </Option>
@@ -926,23 +925,14 @@ export function NewsForm(props) {
         footer={[
           <Button key="back" onClick={handleCancelModalPic}>
             Cancel
-          </Button>,
-          <Button
-            key="pick"
-            // form="formImage"
-            // htmlType="submit"
-            // type="primary"
-          >
-            Pick Image
-          </Button>,
+          </Button>
         ]}
       >
         <ImageList roles = { props.roles }
                    user = { props.user }
                    data = { imgList }
                    pagination = { imgPagination }
-                   editor = {'dd'}
-            {...{ setIsModalPicOpen }}
+            {...{ setIsModalPicOpen, onFinishAddPic }}
         />
       </Modal>
     </>

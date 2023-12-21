@@ -12,7 +12,7 @@ import upPicCommand from './upPickCommand';
 // import { useLogin } from "../../store/login";
 
 
-export default class upPic extends Plugin {
+export default class UpPic extends Plugin {
 
     init() {
         console.log('upPic was initialized');
@@ -23,7 +23,7 @@ export default class upPic extends Plugin {
         editor.ui.componentFactory.add( 'upPic', () => {
             const button = new ButtonView();
             button.set( {
-                label: 'ImgInsert',
+                label: 'showDialog',
                 // icon: image,
                 withText: true,
                 tooltip: true

@@ -1,5 +1,5 @@
 import { funcArticleCategories } from "@/library/funcArticleCategories";
-import { funcLanguage } from "@/library/funcLanguages";
+import { languages } from "@/library/languages";
 import ArticleList from "./_components/ArticleCatList";
 const myConstant = require('@/store/constant')
 
@@ -60,7 +60,7 @@ async function ArticlePage() {
   const allArticleCat = await funcArticleCategories.getAllArticleCat(
     myConstant.DEFAULT_LANGUAGE
   );
-  const langTable = await funcLanguage.getLanguages();
+  const langTable = await languages.getLanguages();
 
   return (
     <>

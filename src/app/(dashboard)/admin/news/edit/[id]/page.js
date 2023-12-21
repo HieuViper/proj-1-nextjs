@@ -5,6 +5,8 @@ import { NewsForm } from "../../_components/NewsForm";
 const myConstant = require('@/store/constant')
 import getConfig from "next/config";
 import { funcLogin } from "@/library/funcLogin";
+import { users } from "@/library/users";
+import { languages } from "@/library/languages";
 
 export const dynamic = "force-dynamic";
 async function EditNews({ params, searchParams }) {
@@ -57,7 +59,8 @@ async function EditNews({ params, searchParams }) {
   const mainImage = await newsImgs.getImage(data[0]?.image ?? "");
   const cate = await news.getCategories( myConstant.DEFAULT_LANGUAGE );
   const tags = await news.getTags(myConstant.DEFAULT_LANGUAGE);
-  const langTable = await news.getLanguages();
+  const langTable = await languages.getLanguages();
+  const authors = await users.getAllUsers();
   return (
     <div className="">
       Edit new
@@ -67,6 +70,7 @@ async function EditNews({ params, searchParams }) {
         tags={JSON.stringify(tags)}
         langTable={JSON.stringify(langTable)}
         mainImage={JSON.stringify(mainImage)}
+        authors = {JSON.stringify( authors )}
         roles={ getConfig().serverRuntimeConfig.userRoles }
         user={ loginInfo.user }
         isAuthorize={ isAuthorize }

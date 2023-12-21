@@ -35,11 +35,11 @@ export const news = {
   // addNews,
   getCategories,
   getTags,
-  getLanguages,
   updateANews,
   addANews,
   newsList,
 };
+
 //GetNews for tab "All,published, trash"
 export async function getAllNews(
   post_status,
@@ -273,17 +273,17 @@ export async function getTags(lang) {
 }
 
 //Get All Languages
-export async function getLanguages() {
-  //console.log('db in language:', db);
-  try {
-    const results = await db.Languages.findAll({
-      order: db.sequelize.literal(`code='${myConstant.DEFAULT_LANGUAGE}' DESC`),
-    });
-    return results;
-  } catch (error) {
-    throw new Error("Fail to get languages: " + error.message);
-  }
-}
+// export async function getLanguages() {
+//   //console.log('db in language:', db);
+//   try {
+//     const results = await db.Languages.findAll({
+//       order: db.sequelize.literal(`code='${myConstant.DEFAULT_LANGUAGE}' DESC`),
+//     });
+//     return results;
+//   } catch (error) {
+//     throw new Error("Fail to get languages: " + error.message);
+//   }
+// }
 
 //Update new information of a News from Edit form
 //parameter: data: contain updated value for news Table

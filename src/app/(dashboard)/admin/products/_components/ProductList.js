@@ -15,6 +15,7 @@ import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
+import { callNon } from '@/library/api'
 
 const ProductList = (props) => {
     const [loadingDataTable, setLoadingDataTable] = useState(false)
@@ -40,83 +41,44 @@ const ProductList = (props) => {
 
     const handleChangePage = async (values) => {
         setPagination(values)
-        console.log('values :', values);
-        // call api get
-        let query = `?page=${pagination.current}&size=${pagination.pageSize}&search=${search}&lang=${lang}`;
-        let { result, res } = await callAPI(await fetch(`/api/products${query}`, {
-            method: 'GET',
-            cache: 'no-store',
-            // data: JSON.stringify(data)
-        }),
-            (msg) => { setErrorMessage(msg) },
-            () => { router.push('/login') },
-            () => { setLoginForm(true) },
-        );
-        if (res.status == 200) {
-            // setInitStates(result);
-            console.log('result change page :', result);
-        }
+        callProduct()
+        router.refresh()
     }
     let langOptions = langTable.map((lang) => {
         return { value: lang.code, label: lang.name };
     });
     const handleChangeLanguage = async (langValue) => {
         setLang(langValue);
-        let query = `?page=${pagination.current}&size=${pagination.pageSize}&search=${search}&lang=${lang}`;
-        let { result, res } = await callAPI(await fetch(`/api/products${query}`, {
-            method: 'GET',
-            cache: 'no-store',
-            // data: JSON.stringify(data)
-        }),
-            (msg) => { setErrorMessage(msg) },
-            () => { router.push('/login') },
-            () => { setLoginForm(true) },
-        );
-        if (res.status == 200) {
-            setDataTable(result.dataTable)
-            console.log('result change lang :', result);
-        }
+        callProduct()
+        router.refresh()
     }
     const handleSearch = async (e) => {
         setPagination(defaultPagination)
         setSearch(e)
-        // call api get
-        let query = `?page=${pagination.current}&size=${pagination.pageSize}&search=${search}&lang=${lang}`;
-        let { result, res } = await callAPI(await fetch(`/api/products${query}`, {
-            method: 'GET',
-            cache: 'no-store',
-        }),
-            (msg) => { setErrorMessage(msg) },
-            () => { router.push('/login') },
-            () => { setLoginForm(true) },
-        );
-        if (res.status == 200) {
-            // setInitStates(result);
-            setDataTable(result.dataTable)
-            console.log('result change search :', result);
-        }
+        callProduct()
+        router.refresh()
     }
     //  BULK DELETE
     const confirmBulkDelete = async () => {
         setLoadingBulkDelete(true);
-        const bulkdel = selectedRowKeys
+        const ids = selectedRowKeys
             .map((item) => `${item},`)
             .join("")
             .slice(0, -1);
-        let query = `?page=${pagination.current}&size=${pagination.pageSize}&search=${search}&lang=${lang}&bulkdel=${bulkdel}`;
-        let { result, res } = await callAPI(await fetch(`/api/products${query}`, {
+        // let query = `?page=${pagination.current}&limit=${pagination.pageSize}&search=${search}&lang=${lang}&bulkdel=${bulkdel}`;
+        let { result, res } = await callAPI(await fetch(`/api/products`, {
             method: 'DELETE',
             cache: 'no-store',
+            body: JSON.stringify({ ids: ids })
         }),
             (msg) => { setErrorMessage(msg) },
             () => { router.push('/login') },
             () => { setLoginForm(true) },
         );
         if (res.status == 200) {
-            // setInitStates(result);
-            setDataTable(result.dataTable)
-            console.log('result change bulk delete :', result);
+            router.refresh()
         }
+
         toast.success("Tasks deleted");
         setLoadingBulkDelete(false);
     };
@@ -140,9 +102,7 @@ const ProductList = (props) => {
             () => { setLoginForm(true) },
         );
         if (res.status == 200) {
-            // setInitStates(result);
-            setDataTable(result.dataTable)
-            console.log('result change delete :', result);
+            router.refresh()
         }
         toast.success("Task deleted");
     };
@@ -219,18 +179,41 @@ const ProductList = (props) => {
         },
 
     ];
-    for (let i = 0; i < 100; i++) {
-        dataTable.push({
-            key: i,
-            name: `Edward ${i}`,
-            main_image: "https://zadez.us/cdn/shop/products/G-151M_1800x1800.png?v=1638523572",
-            price: 32,
-            discount_price: 1 + i,
-            address: `London Park no. ${i}`,
-        });
+    const callProduct = async () => {
+        let query = `?page=${pagination.current}&limit=${pagination.pageSize}&search=${search}&lang=${lang}`;
+        let { result, res } = await callAPI(await fetch(`/api/products${query}`, {
+            method: 'GET',
+            cache: 'no-store',
+        }),
+            (msg) => { setErrorMessage(msg) },
+            () => { router.push('/login') },
+            () => { setLoginForm(true) },
+        );
+        if (res.status == 200) {
+            setDataTable(result.data)
+        }
     }
+    const formatProducts = (data) => {
+        return data.map(item => {
+            const language = item.product_languages[0];
 
-    useEffect(async () => {
+            return {
+                ...item,
+                name: language.name || '',
+                short: language.short || '',
+                description: language.description || ''
+            };
+        });
+    };
+
+    const products = formatProducts(dataTable);
+    const test = async () => {
+        let query = `?page=${pagination.current}&limit=${pagination.pageSize}&search=${search}&lang=${lang}`;
+        const test = await callNon(`/api/products${query}`, "GET");
+        console.log('test :', test);
+
+    }
+    useEffect(() => {
         //redirect to login page if user is not authorized
         // if (props.isAuthorize == false) {
         //     handleNotAuthorized(
@@ -238,26 +221,10 @@ const ProductList = (props) => {
         //         (msg) => { setErrorMessage(msg) }
         //     );
         // }
-        // let query = `?page=${pagination.current}&size=${pagination.pageSize}&search=${search}&lang=${lang}`;
-        // let { result, res } = await callAPI(await fetch(`/api/products${query}`, {
-        //     method: 'GET',
-        //     cache: 'no-store',
-        // }),
-        //     (msg) => { setErrorMessage(msg) },
-        //     () => { router.push('/login') },
-        //     () => { setLoginForm(true) },
-        // );
-        // if (res.status == 200) {
-        //     // setInitStates(result);
-        //     setDataTable(result.dataTable)
-        //     console.log('result change page :', result);
-        // }
+        callProduct()
         const { data } = props.langTable && JSON.parse(props.langTable)
         setLangTable(data)
-        // setLangTable(props?.langTable)
-
-
-    }, []);
+    }, [props]);
 
     return (
         <div>
@@ -281,7 +248,7 @@ const ProductList = (props) => {
                 </div>
                 <Search
                     placeholder="input search text"
-                    value={search}
+                    // value={search}
                     // disabled={loadingStatus}
                     // onChange={(e) => onSearchChange(e)}
                     onSearch={(e) => handleSearch(e)}
@@ -322,7 +289,7 @@ const ProductList = (props) => {
                 style={{ marginTop: 10 }}
                 rowSelection={rowSelection}
                 columns={columns}
-                dataSource={dataTable}
+                dataSource={products}
                 rowKey="id"
                 onChange={handleChangePage}
 

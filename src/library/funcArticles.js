@@ -58,7 +58,7 @@ export async function getAllArticle(
     const searchQuery = getSearchQuery(search);
     const orderQuery = orderby == "" ? "" : `ORDER BY ${orderby} ${order}`;
 
-    let sqlquery = `SELECT * FROM articles_all WHERE (${statusQuery} AND LanguageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}) ${orderQuery} LIMIT ${fromarticle}, ${size}`;
+    let sqlquery = `SELECT * FROM articles_all WHERE (${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}) ${orderQuery} LIMIT ${fromarticle}, ${size}`;
 
     const results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     return results;
@@ -94,7 +94,7 @@ export async function getTotalNumOfarticle(
       category == "" ? "" : `AND categories LIKE '%${category}%'`;
     const tagQuery = tag == "" ? "" : `AND tags like '%${tag}%'`;
 
-    let sqlquery = `SELECT count(*) AS total FROM articles_all WHERE ${statusQuery} AND LanguageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}`;
+    let sqlquery = `SELECT count(*) AS total FROM articles_all WHERE ${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}`;
     //let results = await pool.query(sqlquery, [post_type]);
     let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.itemsOfTable = results[0].total;
@@ -172,7 +172,7 @@ export async function trashArticle(key) {
   }
 }
 
-//Delete bulk of articles, articles based on ArticleId
+//Delete bulk of articles, articles based on articleId
 export async function deleteBulkArticle(keys, status) {
   try {
     const keysArr = keys.split(",");
@@ -249,7 +249,7 @@ export async function getCategories(lang) {
   try {
     let strquery;
     if (lang)
-      strquery = `SELECT * FROM article_cat_all WHERE LanguageCode='${lang}'`;
+      strquery = `SELECT * FROM article_cat_all WHERE languageCode='${lang}'`;
     else strquery = "SELECT * FROM article_cat_all";
     const results = await db.sequelize.query(strquery, { type: QueryTypes.SELECT });
 
@@ -285,9 +285,9 @@ export async function addAarticle(data, articleLangs) {
 
     const article = await db.Articles.create(data, { transaction: t });
 
-    //add ArticleId property to the articleLangs
+    //add articleId property to the articleLangs
     for (const element of articleLangs) {
-      element.ArticleId = article.id;
+      element.articleId = article.id;
     }
     console.log(articleLangs);
     //create records in article_languages Table
@@ -326,10 +326,10 @@ export async function updateAarticle(data, articleLangs, id) {
     //update into article_languages Table
     for (const element of articleLangs) {
       console.log("element:", element);
-      const { LanguageCode, ArticleId, ...articleLangRow } = element;
+      const { languageCode, articleId, ...articleLangRow } = element;
       await db.Article_languages.update(articleLangRow, {
         where: {
-          [Op.and]: [{ ArticleId: id }, { LanguageCode: LanguageCode }],
+          [Op.and]: [{ articleId: id }, { languageCode: languageCode }],
         },
         transaction: t,
       });

@@ -16,8 +16,8 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import PasswordStrengthBar from "react-password-strength-bar";
-import { callAPI, handleNotAuthorized } from "@/library/client/callAPI";
-import { useLogin } from "@/store/login";
+import { callAPI, handleNotAuthorized } from "@/library/client/callAPI";    //use for security
+import { useLogin } from "@/store/login";                                   //use for security
 const myConstant = require('@/store/constant')
 
 const UserForm = (props) => {
@@ -108,6 +108,7 @@ const UserForm = (props) => {
           position: "top-center",
           duration: 5000,
         });
+        router.push('/admin/users');
       }
     } else {
       //add new user
@@ -200,10 +201,7 @@ const UserForm = (props) => {
   }
 
   function goBackUserList(event) {
-    console.log("comer here link");
     event.preventDefault();
-    router.refresh();
-    // const decoratePath = new URL('http://localhost:3000/admin');
     router.push("/admin/users");
   }
 

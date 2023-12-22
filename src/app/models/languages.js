@@ -38,6 +38,12 @@ module.exports = (sequelize, DataTypes) => {
   );
   Languages.associate = function (db) {
     // associations can be defined here
+
+
+
+
+
+
   };
   return Languages;
 };

@@ -25,9 +25,10 @@ import dynamic from "next/dynamic";
 import { useLogin } from "@/store/login";
 import { callNon } from '@/library/api';
 import toast from 'react-hot-toast';
+import { callAPI } from '@/library/client/callAPI';
 const myConstant = require('@/store/constant')
 
-const ProductForm = () => {
+const ProductForm = (props) => {
     const { TextArea } = Input;
     const { Option } = Select;
     const router = useRouter();
@@ -38,71 +39,266 @@ const ProductForm = () => {
     const [langTable, setLangTable] = useState([{ name: "tiếng việt", code: "vi" }, { name: "english", code: "en" }])
     const [mainPicURL, setMainPicURL] = useState(null);
     const [previewMainPic, setPreviewMainPic] = useState(null);
+    console.log('previewMainPic :', previewMainPic);
     const [subPicURL, setSubPicURL] = useState(null);
     const [previewSubPic, setPreviewSubPic] = useState(null);
     const [images, setImages] = useState([]);
     const [listImage, setListImage] = useState([]);
-    const handleSubmit = async (value) => {
-        console.log('value :', value);
-        const product = {
-            code: value.code,
-            price: value.price,
-            discount_price: value.discount_price,
-            category: value.category,
-            driver: value.driver,
-            position: value.position,
-            mainImageURL: value.main_image,
-            images: value.listImage,
-            active: value.active,
-            status: value.status,
-            color: value.color,
-            // isWarranty: true,
-            // warrantyDay: 365,
+    const [errorMessage, setErrorMessage] = useState('');
 
-            product_languages: [
-                {
-                    name: value.name_vi,
-                    short: value.short_vi,
-                    description: value.description_vi,
-                    languageCode: 'vi'
-                },
-                {
-                    name: value.name_en,
-                    short: value.short_en,
-                    description: value.description_en,
-                    languageCode: 'en'
+    const test = {
+        list_image: [1, 2],
+        // id: 5,
+        product_code: " ProductCode-5",
+        main_image: null,
+        sub_image: null,
+        categories: "default",
+        price: null,
+        discount_price: null,
+        product_author: "",
+        modified_by: null,
+        product_position: 0,
+        active: null,
+        status: null,
+        color: null,
+        createdAt: "2023-12-18T09:07:22.000Z",
+        updatedAt: "2023-12-18T09:07:22.000Z",
+        manufacturerId: null,
+        product_languages: [
+            {
+                id: 9,
+                name: "test",
+                short: null,
+                description: "mô tả của product 5",
+                productId: 5,
+                languageCode: "vi",
+            },
+            {
+                id: 9,
+                name: "test",
+                short: null,
+                description: "mô tả của product 5",
+                productId: 5,
+                languageCode: "en",
+            }
+        ]
+    }
+    const test2 = {
+        "list_image": [1, 2
+        ],
+        // "id": 5,
+        "product_code": "ProductCode-5",
+        "main_image": null,
+        "sub_image": null,
+        "categories": "default",
+        "price": null,
+        "discount_price": null,
+        "product_author": "",
+        "modified_by": null,
+        "product_position": 0,
+        "active": null,
+        "status": null,
+        "color": null,
+        "createdAt": "2023-12-18T09:07:22.000Z",
+        "updatedAt": "2023-12-18T09:07:22.000Z",
+        "manufacturerId": null,
+        "product_languages": [
+            {
+                "id": 9,
+                "name": "Tên Product 5",
+                "short": null,
+                "description": "mô tả của product 5",
+                "productId": 5,
+                "languageCode": "vi",
+                "languages": {
+                    "code": "vi",
+                    "name": "tiếng việt",
+                    "description": "tiếng việt",
+                    "active": true
                 }
-            ]
-        }
-        setLoadingSubmit(true);
-        // try {
-        //     if (id) {
-        //         await editTag(value, tagLangs, id, lang).then((res) => {
-        //             toast.success("Update Product success ");
-        //             setLoadingSubmit(false);
-        //         });
-        //     } else {
-        //         // if (form.getFieldValue("tag_code").length <= 0) {
-        //         //     value = {
-        //         //         ...value,
-        //         //         tag_code: tagLangs[0].name
-        //         //             .trim()
-        //         //             .normalize("NFD")
-        //         //             .replace(/[\u0300-\u036f]/g, "")
-        //         //             .replace(/đ/g, "d")
-        //         //             .replace(/Đ/g, "D")
-        //         //             .replace(/\s/g, "-"),
-        //         //     };
-        //         // }
-        //         await addTag(value, tagLangs, lang).then((res) => {
-        //             toast.success("Create Product success");
-        //             setLoadingSubmit(false);
-        //             form.resetFields();
-        //         });
-        //     }
-        // } catch (error) {
-        //     toast.error(error);
+            }
+        ]
+    }
+    const test3 = {
+        list_image: [{}, {}],
+        product_code: "test16",
+        main_image: null,
+        sub_image: null,
+        categories: "default",
+        price: null,
+        discount_price: null,
+        product_author: "",
+        modified_by: null,
+        product_position: 0,
+        active: null,
+        status: null,
+        color: null,
+        createdAt: "2023-12-18T09:07:22.000Z",
+        updatedAt: "2023-12-18T09:07:22.000Z",
+        manufacturerId: null,
+        product_languages: [
+            {
+                id: 1,
+                name: "Tên Product 1",
+                short: null,
+                description: "mô tả của product 5",
+                productId: 5,
+                languageCode: "vi"
+            },
+            {
+                id: 2,
+                name: "Tên Product 1",
+                short: null,
+                description: "mô tả của product 5",
+                productId: 5,
+                languageCode: "en"
+            }
+        ]
+    }
+    const handleSubmit = async (value) => {
+        console.log('valueForm :', value);
+        const body = new FormData();
+        body.append('main_image', value.main_image);
+        body.append('sub_image', value.sub_image);
+        // const product = {
+        //     code: value.code,
+        //     price: value.price,
+        //     discount_price: value.discount_price,
+        //     category: value.category,
+        //     driver: value.driver,
+        //     position: value.position,
+        //     mainImageURL: value.main_image,
+        //     images: value.listImage,
+        //     active: value.active,
+        //     status: value.status,
+        //     color: value.color,
+        //     manufacturerId: null,
+        //     product_languages: [
+        //         {
+        //             name: value.name_vi,
+        //             short: value.short_vi,
+        //             description: value.description_vi,
+        //             languageCode: 'vi'
+        //         },
+        //         {
+        //             name: value.name_en,
+        //             short: value.short_en,
+        //             description: value.description_en,
+        //             languageCode: 'en'
+        //         }
+        //     ]
         // }
+        // setLoadingSubmit(true);
+        // let { result, res } = await callAPI(await fetch(`/api/products`, {
+        //     method: 'POST',
+        //     cache: 'no-store',
+        //     body: JSON.stringify(test3)
+        // }),
+        //     (msg) => { setErrorMessage(msg) },
+        //     () => { router.push('/login') },
+        //     () => { setLoginForm(true) },
+        // );
+
+        // if (res.status == 200) {
+        //     // router.push("/admin/products")
+        //     console.log('result ADD test :', result);
+        // }
+        body.append("product", JSON.stringify(test3))
+        console.log('body :', body);
+
+        try {
+            if (id) {
+                const product = {
+                    id: value.id,
+                    code: value.code,
+                    price: value.price,
+                    discount_price: value.discount_price,
+                    category: value.category,
+                    driver: value.driver,
+                    position: value.position,
+                    mainImageURL: value.main_image,
+                    images: value.listImage,
+                    active: value.active,
+                    status: value.status,
+                    color: value.color,
+                    manufacturerId: null,
+                    product_languages: [
+                        {
+                            name: value.name_vi,
+                            short: value.short_vi,
+                            description: value.description_vi,
+                            languageCode: 'vi'
+                        },
+                        {
+                            name: value.name_en,
+                            short: value.short_en,
+                            description: value.description_en,
+                            languageCode: 'en'
+                        }
+                    ]
+                }
+                setLoadingSubmit(true);
+                let { result, res } = await callAPI(await fetch(`/api/products/${id}`, {
+                    method: 'PUT',
+                    cache: 'no-store',
+                    body: JSON.stringify(product)
+                }),
+                    (msg) => { setErrorMessage(msg) },
+                    () => { router.push('/login') },
+                    () => { setLoginForm(product) },
+                );
+                if (res.status == 200) {
+                    toast.success("Update Product success ")
+                }
+                setLoadingSubmit(false);
+            } else {
+                const product = {
+                    code: value.code,
+                    price: value.price,
+                    discount_price: value.discount_price,
+                    category: value.category,
+                    driver: value.driver,
+                    position: value.position,
+                    mainImageURL: value.main_image,
+                    images: value.listImage,
+                    active: value.active,
+                    status: value.status,
+                    color: value.color,
+                    manufacturerId: null,
+                    product_languages: [
+                        {
+                            name: value.name_vi,
+                            short: value.short_vi,
+                            description: value.description_vi,
+                            languageCode: 'vi'
+                        },
+                        {
+                            name: value.name_en,
+                            short: value.short_en,
+                            description: value.description_en,
+                            languageCode: 'en'
+                        }
+                    ]
+                }
+                let { result, res } = await callAPI(await fetch(`/api/products`, {
+                    method: 'POST',
+                    cache: 'no-store',
+                    // body: JSON.stringify(product)
+                    body: body
+                }),
+                    (msg) => { setErrorMessage(msg) },
+                    () => { router.push('/login') },
+                    () => { setLoginForm(product) },
+                );
+                if (res.status == 200) {
+                    toast.success("Create Product success");
+                    form.resetFields();
+                }
+                setLoadingSubmit(false);
+            }
+        } catch (error) {
+            toast.error(error);
+        }
 
 
 
@@ -186,6 +382,8 @@ const ProductForm = () => {
             url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
         },
     ]);
+    console.log('fileList :', fileList);
+
     const onChangeListImage = ({ fileList: newFileList }) => {
         setFileList(newFileList);
     };
@@ -209,6 +407,9 @@ const ProductForm = () => {
         }
         return e?.fileList;
     };
+
+    // UPLOAD IMAGE TO SERVER
+
 
     // COLOR
     const optionsColor = [
@@ -264,30 +465,18 @@ const ProductForm = () => {
             </>
         ),
     }));
-    // useEffect(async () => {
-    //     //redirect to login page if user is not authorized
-    //     // if (props.isAuthorize == false) {
-    //     //     handleNotAuthorized(
-    //     //         () => { router.push('/login') },
-    //     //         (msg) => { setErrorMessage(msg) }
-    //     //     );
-    //     // }
-    //     // let { result, res } = await callAPI(await fetch(`/api/products${query}`, {
-    //     //     method: 'GET',
-    //     //     cache: 'no-store',
-    //     //     // data: JSON.stringify(data)
-    //     // }),
-    //     //     (msg) => { setErrorMessage(msg) },
-    //     //     () => { router.push('/login') },
-    //     //     () => { setLoginForm(true) },
-    //     // );
-    //     // if (res.status == 200) {
-    //     //     // setInitStates(result);
-    //     //     console.log('result change page :', result);
-    //     // }
-    //     const langTable = await callNon("/api/languages", "GET")
-    //     setLangTable(langTable)
-    // }, []);
+    useEffect(() => {
+        //redirect to login page if user is not authorized
+        if (props.isAuthorize == false) {
+            handleNotAuthorized(
+                () => { router.push('/login') },
+                (msg) => { setErrorMessage(msg) }
+            );
+        }
+        const { data } = JSON.parse(props.langTable)
+        setLangTable(data)
+    }, []);
+
     return (
         <div>
             <div className="flex justify-between mb-4">

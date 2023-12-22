@@ -1,8 +1,5 @@
 import UserForm from "../_components/UserForm";
 import getConfig from "next/config";
-import { funcUsers } from "@/library/funcUsers";
-import { redirect } from "next/navigation";
-import { headers, cookies } from "next/headers";
 import { funcLogin } from "@/library/funcLogin";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +19,6 @@ const AddUserPage = async () => {
       <UserForm roles={ getConfig().serverRuntimeConfig.userRoles }
                 user={ loginInfo.user }
                 isAuthorize={ isAuthorize }
-                //{...{ addUser }}
                 />
     </>
   );

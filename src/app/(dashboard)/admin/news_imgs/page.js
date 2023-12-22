@@ -21,7 +21,7 @@ const ImagePage = async () => {
       <ImageList
         data={JSON.stringify(result.images)}
         pagination={result.pagination}
-        totals={result.totals}
+        // totals={result.totals}
         user={ loginInfo.user }
         roles={ getConfig().serverRuntimeConfig.userRoles }
         isAuthorize={ isAuthorize }

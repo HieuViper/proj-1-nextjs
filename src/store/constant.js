@@ -19,8 +19,6 @@ const myConstant = {
     },
     users: {
         image: {
-            PAGE_SIZE: 36,
-            COLUMNS: 6,
             FILE_LIMITED_SIZE: 2,
             FOLDER_UPLOAD: '/uploads/users',
             QUALITY: 70
@@ -35,5 +33,6 @@ const myConstant = {
     },
     DEFAULT_LANGUAGE: 'vi',
     LOGIN_TIME: 3600,
+    SIZES: '(min-width: 450px) 100vw, 25vw',
 }
 module.exports = myConstant;

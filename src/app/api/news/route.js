@@ -1,5 +1,5 @@
 import { funcLogin } from "@/library/funcLogin";
-import { funcNews } from "@/library/funcNews";
+import { news } from "@/library/news";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic"; // defaults to force-static
@@ -13,7 +13,7 @@ export async function GET(req, { params }) {
   const searchParams = req.nextUrl.searchParams;
 
   try {
-    result = await funcNews.newsList(loginInfo, searchParams);
+    result = await news.newsList(loginInfo, searchParams);
     if (result.error)
       return NextResponse.json({ msg: result.msg }, { status: result.error });
 

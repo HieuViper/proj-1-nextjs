@@ -29,8 +29,25 @@ module.exports = (sequelize, DataTypes) => {
   );
   Tags.associate = function (db) {
     // associations can be defined here
-    Tags.belongsToMany(db.Languages, { through: db.Tag_langs });
-    db.Languages.belongsToMany(Tags, { through: db.Tag_langs });
+    Tags.hasMany(db.Tag_langs, {
+      as: 'tag_langs',
+      foreignKey: 'tagId',
+    });
+    db.Tag_langs.belongsTo(Tags, {
+        as: 'tags',
+        foreignKey: "tagId",
+    });
+
+
+    //Tag
+    db.Languages.hasMany(db.Tag_langs, {
+      as: 'tag_langs',
+      foreignKey: "languageCode",
+    });
+    db.Tag_langs.belongsTo(db.Languages, {
+          as: 'languages',
+          foreignKey: "languageCode",
+    });
   };
   return Tags;
 };

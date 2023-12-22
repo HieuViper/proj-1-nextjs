@@ -26,7 +26,7 @@ export async function GET(req, res) {
     const searchQuery = getSearchQuery(search);
     const orderQuery = orderby == "" ? "" : `ORDER BY ${orderby} ${order}`;
 
-    let sqlqueryArticle = `SELECT * FROM articles_all WHERE (${statusQuery} AND LanguageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}) ${orderQuery} LIMIT ${fromarticle}, ${size}`;
+    let sqlqueryArticle = `SELECT * FROM articles_all WHERE (${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}) ${orderQuery} LIMIT ${fromarticle}, ${size}`;
 
     const resultsArticle = await db.sequelize.query(sqlqueryArticle, {
       type: QueryTypes.SELECT,
@@ -51,7 +51,7 @@ export async function GET(req, res) {
         category == "" ? "" : `AND categories LIKE '%${category}%'`;
       const tagQuery = tag == "" ? "" : `AND tags like '%${tag}%'`;
 
-      let sqlquery = `SELECT count(*) AS total FROM articles_all WHERE ${statusQuery} AND LanguageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}`;
+      let sqlquery = `SELECT count(*) AS total FROM articles_all WHERE ${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}`;
       //let results = await pool.query(sqlquery, [post_type]);
       let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
       totals.itemsOfTable = results[0].total;
@@ -132,9 +132,9 @@ export async function POST(req, res) {
 
     const article = await db.Articles.create(data, { transaction: t });
 
-    //add ArticleId property to the articleLangs
+    //add articleId property to the articleLangs
     for (const element of articleLangs) {
-      element.ArticleId = article.id;
+      element.articleId = article.id;
     }
     console.log(articleLangs);
     //create records in article_languages Table

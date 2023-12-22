@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-async-client-component */
 
 import { useRouter } from 'next/navigation';
-import { funcNews } from '@/library/funcNews';
+import { news } from '@/library/news';
 import NewsList from './_components/NewsList';
 import { funcLogin } from '@/library/funcLogin';
 import getConfig from 'next/config';
@@ -13,9 +13,9 @@ async function NewsPage({ searchParams }) {
   const loginInfo = funcLogin.checkAuthentication();
   const isAuthorize = await funcLogin.checkAuthorize(loginInfo.user, 'news');
 
-  const result = await funcNews.newsList(loginInfo);
+  const result = await news.newsList(loginInfo);
   if ( result.error )
-    //console.log('Error from funcNews.newsList:', result.msg );
+    //console.log('Error from news.newsList:', result.msg );
     throw new Error( 'Error: ' + result.msg );
 
   return (

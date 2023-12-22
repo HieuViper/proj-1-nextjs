@@ -5,15 +5,17 @@ import { funcLogin } from '@/library/funcLogin';
 import getConfig from 'next/config';
 
 const ProductPage = async () => {
-    // const langTable = await callNon("/api/languages", "GET");
+    const langTable = await callNon("/api/languages", "GET");
     // const dataTable = await callNon("/api/products", "GET");
     const loginInfo = funcLogin.checkAuthentication();
     const isAuthorize = await funcLogin.checkAuthorize(loginInfo.user, 'products');
+    const products = await callNon("/api/products", "GET");
+
     return (
         <div>
             <ProductList
-                // langTable={langTable}
-                // dataTable={dataTable}
+                langTable={JSON.stringify(langTable)}
+                dataTable={products.data}
                 isAuthorize={isAuthorize}
                 user={loginInfo.user}
                 roles={getConfig().serverRuntimeConfig.userRoles}

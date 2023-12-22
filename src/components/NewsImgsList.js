@@ -33,9 +33,9 @@ const ImageList = (props) => {
   // console.log("🚀 ~ file: ImageList.js:11 ~ ImageList ~ metadata:", metadata);
   const [previewPic, setPreviewPic] = useState(null);
   const [search, setSearch] = useState("");
-  const [totals, setTotals] = useState({
-    itemsOfTable: 0,
-  });
+  // const [totals, setTotals] = useState({
+  //   itemsOfTable: 0,
+  // });
   const [choosenImg, setChoosenImg] = useState();
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');   //display the serious error
@@ -45,22 +45,22 @@ const ImageList = (props) => {
 
   useEffect(() => {
     //redirect to login page if user is not authorized
-    if( props.isAuthorize == false ) {
-     handleNotAuthorized(
-       () => { router.push('/login') },
-       ( msg ) => { setErrorMessage( msg ) }
-     );
-   }
+  //   if( props.isAuthorize == false ) {
+  //    handleNotAuthorized(
+  //      () => { router.push('/login') },
+  //      ( msg ) => { setErrorMessage( msg ) }
+  //    );
+  //  }
 
    setInitStates( props );
-   setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
+  //  setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
 
  }, [props]);
 
   function setInitStates( result ) {
     setImageList(JSON.parse(result.data));
     setPaginationServer(result.pagination);
-    setTotals(result.totals);
+    // setTotals(result.totals);
   }
 
   const onSearchChange = (e) => {
@@ -111,32 +111,41 @@ const ImageList = (props) => {
   // *****FOR EDIT MODAL
   const onFinishEdit = async (values) => {
     console.log("Success:", values);
-    setLoadingStatus(true);
-    // const rs = await props.updateImage(values, values.id);
-    let { result, res } = await callAPI( await fetch(`/api/news_imgs/update`, {
-      method: 'PUT',
-      cache: 'no-store',
-      body: JSON.stringify({
-        imageInfo: values,
-        query: {
-              page: paginationServer.current,
-              size: paginationServer.pageSize,
-              search: search,
-        }
-      })
-    }),
-    ( msg ) => { setErrorMessage( msg ) },
-    () => { router.push('/login') },
-    () => { setLoginForm( true ) },
-  );
-    if (res.ok == true ) {
-      message.success("Update Successfully");
-      setInitStates( result );
-      // setImageList(rs.data);
+    //alt and caption are changed, need to update to server
+    if( values.changeValue == true ) {
+      setLoadingStatus(true);
+      let { result, res } = await callAPI( await fetch(`/api/news_imgs/update`, {
+          method: 'PUT',
+          cache: 'no-store',
+          body: JSON.stringify({
+            imageInfo: values,
+            query: {
+                  page: paginationServer.current,
+                  size: paginationServer.pageSize,
+                  search: search,
+            }
+          })
+        }),
+        ( msg ) => { setErrorMessage( msg ) },
+        () => { router.push('/login') },
+        () => { setLoginForm( true ) },
+      );
+      if (res.ok == true ) {
+        message.success("Update Successfully");
+        setInitStates( result );
+        // setImageList(rs.data);
+      }
+      setLoadingStatus( false );
     }
-    setLoadingStatus( false );
+    // console.log('values:', values);
+    // console.log('editor:', props.editor);
+    // const imageUtils = props.editor.plugins.get( 'ImageUtils' );
+    // imageUtils.insertImage( { src: values.url,
+    //                           srcset: values.srcset,
+    // } );
     // close modal
     setIsModalEditOpen(false);
+    props.setIsModalPicOpen( false );
   };
 
 
@@ -242,6 +251,8 @@ const ImageList = (props) => {
     setIsModalEditOpen(false);
   };
 
+
+  //set Buttons for Edit image form
   let fButtonEditModal = [];
     fButtonEditModal.push(<Button key="back" onClick={handleCancelModalEdit}>
     Cancel
@@ -275,8 +286,9 @@ const ImageList = (props) => {
     htmlType="submit"
     type="primary"
   >
-    Save
+    Pick Image
   </Button> );
+
   // -----------
   // USE EFFECT
 
@@ -371,6 +383,7 @@ const ImageList = (props) => {
         <EditImgForm
           image = { choosenImg }
           metadata = { metadata }
+          editor = { props.editor }
           {...{onFinishEdit, onFinishFailed}}
         />
       </Modal>

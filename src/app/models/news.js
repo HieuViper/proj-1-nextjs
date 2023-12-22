@@ -106,8 +106,25 @@ module.exports = (sequelize, DataTypes) => {
 
       News.associate = function (db) {
         // associations can be defined here
-        News.belongsToMany(db.Languages, { through: db.News_languages });
-        db.Languages.belongsToMany(News, { through: db.News_languages });
+        // News.belongsToMany(db.Languages, { through: db.News_languages });
+        // db.Languages.belongsToMany(News, { through: db.News_languages });
+        News.hasMany(db.News_languages, {
+            as: 'news_languages',
+            foreignKey: 'newsId',
+          });
+        db.News_languages.belongsTo(News, {
+            as: 'news',
+            foreignKey: "newsId",
+        });
+        //News
+     db.Languages.hasMany(db.News_languages, {
+        as: 'news_languages',
+        foreignKey: "languageCode",
+      });
+      db.News_languages.belongsTo(db.Languages, {
+            as: 'languages',
+            foreignKey: "languageCode",
+      });
       };
       return News;
 

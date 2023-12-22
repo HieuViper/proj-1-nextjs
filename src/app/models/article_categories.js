@@ -23,11 +23,23 @@ module.exports = (sequelize, DataTypes) => {
   );
   Article_categories.associate = function (db) {
     // associations can be defined here
-    Article_categories.belongsToMany(db.Languages, {
-        through: db.Article_cate_langs,
-      });
-    db.Languages.belongsToMany(Article_categories, {
-    through: db.Article_cate_langs,
+    Article_categories.hasMany(db.Article_cate_langs, {
+      as: 'article_cate_langs',
+      foreignKey: 'article_categoryId',
+    });
+    db.Article_cate_langs.belongsTo(Article_categories, {
+        as: 'article_categories',
+        foreignKey: "article_categoryId",
+    });
+
+    //Article category
+    db.Languages.hasMany(db.Article_cate_langs, {
+      as: 'article_cate_langs',
+      foreignKey: "languageCode",
+    });
+    db.Article_cate_langs.belongsTo(db.Languages, {
+          as: 'languages',
+          foreignKey: "languageCode",
     });
   };
   return Article_categories;

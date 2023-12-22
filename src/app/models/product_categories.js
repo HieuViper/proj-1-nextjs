@@ -28,8 +28,23 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Product_categories.associate = function (db) {
-    Product_categories.belongsToMany(db.Languages, { through: db.Product_cate_langs });
-    db.Languages.belongsToMany(Product_categories, { through: db.Product_cate_langs });
+    Product_categories.hasMany(db.Product_cate_langs, {
+      as: 'product_cate_langs',
+      foreignKey: 'product_categoryId',
+    });
+    db.Product_cate_langs.belongsTo(Product_categories, {
+        as: 'product_categories',
+        foreignKey: "product_categoryId",
+    });
+    //Product Category
+    db.Languages.hasMany(db.Product_cate_langs, {
+      as: 'product_cate_langs',
+      foreignKey: "languageCode",
+    });
+    db.Product_cate_langs.belongsTo(db.Languages, {
+          as: 'languages',
+          foreignKey: "languageCode",
+    });
   };
   return Product_categories;
 };

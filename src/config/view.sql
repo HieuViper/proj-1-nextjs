@@ -46,8 +46,8 @@ SET time_zone = "+00:00";
 -- ,`title` varchar(300)
 -- ,`excerpt` text
 -- ,`content` text
--- ,`ArticleId` bigint(20) unsigned
--- ,`LanguageCode` varchar(10)
+-- ,`articleId` bigint(20) unsigned
+-- ,`languageCode` varchar(10)
 -- );
 
 -- --------------------------------------------------------
@@ -62,8 +62,8 @@ SET time_zone = "+00:00";
 -- ,`category_code` varchar(200)
 -- ,`name` varchar(200)
 -- ,`description` longtext
--- ,`ArticleCategoryId` bigint(20) unsigned
--- ,`LanguageCode` varchar(10)
+-- ,`article_categoryId` bigint(20) unsigned
+-- ,`languageCode` varchar(10)
 -- );
 
 -- --------------------------------------------------------
@@ -92,8 +92,8 @@ SET time_zone = "+00:00";
 -- ,`title` varchar(300)
 -- ,`excerpt` text
 -- ,`content` text
--- ,`NewsId` bigint(20) unsigned
--- ,`LanguageCode` varchar(10)
+-- ,`newsId` bigint(20) unsigned
+-- ,`languageCode` varchar(10)
 -- );
 
 -- --------------------------------------------------------
@@ -109,8 +109,8 @@ SET time_zone = "+00:00";
 -- ,`category_code` varchar(200)
 -- ,`name` varchar(200)
 -- ,`description` longtext
--- ,`NewsCategoryId` bigint(20) unsigned
--- ,`LanguageCode` varchar(10)
+-- ,`news_categoryId` bigint(20) unsigned
+-- ,`languageCode` varchar(10)
 -- );
 
 -- --------------------------------------------------------
@@ -125,8 +125,8 @@ SET time_zone = "+00:00";
 -- ,`tag_code` varchar(200)
 -- ,`name` varchar(200)
 -- ,`description` longtext
--- ,`TagId` bigint(20) unsigned
--- ,`LanguageCode` varchar(10)
+-- ,`tagId` bigint(20) unsigned
+-- ,`languageCode` varchar(10)
 -- );
 
 -- --------------------------------------------------------
@@ -137,7 +137,7 @@ SET time_zone = "+00:00";
 -- DROP TABLE IF EXISTS `articles_all`;
 
 DROP VIEW IF EXISTS `articles_all`;
-CREATE ALGORITHM=MERGE  SQL SECURITY DEFINER VIEW `articles_all`  AS SELECT `a`.`id` AS `id`, `a`.`image` AS `image`, `a`.`categories` AS `categories`, `a`.`post_author` AS `post_author`, `a`.`post_date` AS `post_date`, `a`.`post_status` AS `post_status`, `a`.`article_code` AS `article_code`, `a`.`modified_by` AS `modified_by`, `a`.`menu_id` AS `menu_id`, `a`.`article_position` AS `article_position`, `a`.`comment_status` AS `comment_status`, `a`.`comment_count` AS `comment_count`, `a`.`createdAt` AS `createdAt`, `a`.`post_modified` AS `post_modified`, `b`.`title` AS `title`, `b`.`excerpt` AS `excerpt`, `b`.`content` AS `content`, `b`.`ArticleId` AS `ArticleId`, `b`.`LanguageCode` AS `LanguageCode` FROM (`articles` `a` join `article_languages` `b`) WHERE `a`.`id` = `b`.`ArticleId` ;
+CREATE ALGORITHM=MERGE  SQL SECURITY DEFINER VIEW `articles_all`  AS SELECT `a`.`id` AS `id`, `a`.`image` AS `image`, `a`.`categories` AS `categories`, `a`.`post_author` AS `post_author`, `a`.`post_date` AS `post_date`, `a`.`post_status` AS `post_status`, `a`.`article_code` AS `article_code`, `a`.`modified_by` AS `modified_by`, `a`.`menu_id` AS `menu_id`, `a`.`article_position` AS `article_position`, `a`.`comment_status` AS `comment_status`, `a`.`comment_count` AS `comment_count`, `a`.`createdAt` AS `createdAt`, `a`.`post_modified` AS `post_modified`, `b`.`title` AS `title`, `b`.`excerpt` AS `excerpt`, `b`.`content` AS `content`, `b`.`articleId` AS `articleId`, `b`.`languageCode` AS `languageCode` FROM (`articles` `a` join `article_languages` `b`) WHERE `a`.`id` = `b`.`articleId` ;
 
 -- --------------------------------------------------------
 
@@ -147,7 +147,7 @@ CREATE ALGORITHM=MERGE  SQL SECURITY DEFINER VIEW `articles_all`  AS SELECT `a`.
 -- DROP TABLE IF EXISTS `article_cat_all`;
 
 DROP VIEW IF EXISTS `article_cat_all`;
-CREATE ALGORITHM=MERGE  SQL SECURITY DEFINER VIEW `article_cat_all`  AS SELECT `a`.`id` AS `id`, `a`.`category_code` AS `category_code`, `b`.`name` AS `name`, `b`.`description` AS `description`, `b`.`ArticleCategoryId` AS `ArticleCategoryId`, `b`.`LanguageCode` AS `LanguageCode` FROM (`article_categories` `a` join `article_cate_langs` `b`) WHERE `a`.`id` = `b`.`ArticleCategoryId` ;
+CREATE ALGORITHM=MERGE  SQL SECURITY DEFINER VIEW `article_cat_all`  AS SELECT `a`.`id` AS `id`, `a`.`category_code` AS `category_code`, `b`.`name` AS `name`, `b`.`description` AS `description`, `b`.`article_categoryId` AS `article_categoryId`, `b`.`languageCode` AS `languageCode` FROM (`article_categories` `a` join `article_cate_langs` `b`) WHERE `a`.`id` = `b`.`article_categoryId` ;
 
 -- --------------------------------------------------------
 
@@ -157,7 +157,7 @@ CREATE ALGORITHM=MERGE  SQL SECURITY DEFINER VIEW `article_cat_all`  AS SELECT `
 -- DROP TABLE IF EXISTS `news_all`;
 
 DROP VIEW IF EXISTS `news_all`;
-CREATE ALGORITHM=MERGE  SQL SECURITY DEFINER VIEW `news_all`  AS SELECT `a`.`id` AS `id`, `a`.`image` AS `image`, `a`.`categories` AS `categories`, `a`.`tags` AS `tags`, `a`.`post_author` AS `post_author`, `a`.`post_date` AS `post_date`, `a`.`post_status` AS `post_status`, `a`.`news_code` AS `news_code`, `a`.`modified_by` AS `modified_by`, `a`.`menu_id` AS `menu_id`, `a`.`news_position` AS `news_position`, `a`.`comment_status` AS `comment_status`, `a`.`comment_count` AS `comment_count`, `a`.`createdAt` AS `createdAt`, `a`.`post_modified` AS `post_modified`, `b`.`title` AS `title`, `b`.`excerpt` AS `excerpt`, `b`.`content` AS `content`, `b`.`NewsId` AS `NewsId`, `b`.`LanguageCode` AS `LanguageCode` FROM (`news` `a` join `news_languages` `b`) WHERE `a`.`id` = `b`.`NewsId` ;
+CREATE ALGORITHM=MERGE  SQL SECURITY DEFINER VIEW `news_all`  AS SELECT `a`.`id` AS `id`, `a`.`image` AS `image`, `a`.`categories` AS `categories`, `a`.`tags` AS `tags`, `a`.`post_author` AS `post_author`, `a`.`post_date` AS `post_date`, `a`.`post_status` AS `post_status`, `a`.`news_code` AS `news_code`, `a`.`modified_by` AS `modified_by`, `a`.`menu_id` AS `menu_id`, `a`.`news_position` AS `news_position`, `a`.`comment_status` AS `comment_status`, `a`.`comment_count` AS `comment_count`, `a`.`createdAt` AS `createdAt`, `a`.`post_modified` AS `post_modified`, `b`.`title` AS `title`, `b`.`excerpt` AS `excerpt`, `b`.`content` AS `content`, `b`.`newsId` AS `newsId`, `b`.`languageCode` AS `languageCode` FROM (`news` `a` join `news_languages` `b`) WHERE `a`.`id` = `b`.`newsId` ;
 
 -- --------------------------------------------------------
 
@@ -167,7 +167,7 @@ CREATE ALGORITHM=MERGE  SQL SECURITY DEFINER VIEW `news_all`  AS SELECT `a`.`id`
 -- DROP TABLE IF EXISTS `news_cat_all`;
 
 DROP VIEW IF EXISTS `news_cat_all`;
-CREATE ALGORITHM=MERGE  SQL SECURITY DEFINER VIEW `news_cat_all`  AS SELECT `a`.`id` AS `id`, `a`.`parent` AS `parent`, `a`.`category_code` AS `category_code`, `b`.`name` AS `name`, `b`.`description` AS `description`, `b`.`NewsCategoryId` AS `NewsCategoryId`, `b`.`LanguageCode` AS `LanguageCode` FROM (`news_categories` `a` join `news_cate_langs` `b`) WHERE `a`.`id` = `b`.`NewsCategoryId` ;
+CREATE ALGORITHM=MERGE  SQL SECURITY DEFINER VIEW `news_cat_all`  AS SELECT `a`.`id` AS `id`, `a`.`parent` AS `parent`, `a`.`category_code` AS `category_code`, `b`.`name` AS `name`, `b`.`description` AS `description`, `b`.`news_categoryId` AS `news_categoryId`, `b`.`languageCode` AS `languageCode` FROM (`news_categories` `a` join `news_cate_langs` `b`) WHERE `a`.`id` = `b`.`news_categoryId` ;
 
 -- --------------------------------------------------------
 
@@ -177,7 +177,7 @@ CREATE ALGORITHM=MERGE  SQL SECURITY DEFINER VIEW `news_cat_all`  AS SELECT `a`.
 -- DROP TABLE IF EXISTS `tags_all`;
 
 DROP VIEW IF EXISTS `tags_all`;
-CREATE ALGORITHM=MERGE  SQL SECURITY DEFINER VIEW `tags_all`  AS SELECT `a`.`id` AS `id`, `a`.`tag_code` AS `tag_code`, `b`.`name` AS `name`, `b`.`description` AS `description`, `b`.`TagId` AS `TagId`, `b`.`LanguageCode` AS `LanguageCode` FROM (`tags` `a` join `tag_langs` `b`) WHERE `a`.`id` = `b`.`TagId` ;
+CREATE ALGORITHM=MERGE  SQL SECURITY DEFINER VIEW `tags_all`  AS SELECT `a`.`id` AS `id`, `a`.`tag_code` AS `tag_code`, `b`.`name` AS `name`, `b`.`description` AS `description`, `b`.`tagId` AS `tagId`, `b`.`languageCode` AS `languageCode` FROM (`tags` `a` join `tag_langs` `b`) WHERE `a`.`id` = `b`.`tagId` ;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

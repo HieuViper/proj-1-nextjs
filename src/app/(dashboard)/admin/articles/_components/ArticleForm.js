@@ -51,7 +51,7 @@ export function ArticleForm(props) {
   function getArticleValue(property, article, lang) {
     let rs;
     article.forEach((element) => {
-      if (element.LanguageCode == lang) {
+      if (element.languageCode == lang) {
         rs = element[property];
       }
     });
@@ -140,7 +140,7 @@ export function ArticleForm(props) {
           {
             //only generate article_code when post status is not published
             lang == myConstant.DEFAULT_LANGUAGE &&
-            data?.post_status != myConstant.post.POST_STATUS_PUBLISH ? (
+              data?.post_status != myConstant.post.POST_STATUS_PUBLISH ? (
               <Input onChange={() => generateArticleCode()} />
             ) : (
               <Input />
@@ -237,8 +237,8 @@ export function ArticleForm(props) {
         title: form.getFieldValue(`title_${lang.code}`) ?? "",
         excerpt: form.getFieldValue(`excerpt_${lang.code}`) ?? "",
         content: form.getFieldValue(`excerpt_${lang.code}`) ?? "",
-        LanguageCode: lang.code,
-        ArticleId: params?.id,
+        languageCode: lang.code,
+        articleId: params?.id,
       };
     });
 
@@ -266,7 +266,7 @@ export function ArticleForm(props) {
               setPostStatus(form.getFieldValue("post_status")); //set postStatus state to rerender action buttons
               let messageNotify =
                 form.getFieldValue("post_status") ==
-                myConstant.post.POST_STATUS_DRAFT
+                  myConstant.post.POST_STATUS_DRAFT
                   ? "Save Draft Success"
                   : "Save Publish Success";
               toast.success(messageNotify, {
@@ -625,7 +625,7 @@ export function ArticleForm(props) {
         <Form.Item
           name="post_status"
           style={{ display: "none" }} // Hide the field using CSS
-          // or className="hidden-field" // Apply a CSS class to hide the field
+        // or className="hidden-field" // Apply a CSS class to hide the field
         >
           <Input />
         </Form.Item>
@@ -634,7 +634,7 @@ export function ArticleForm(props) {
           name="publish"
           style={{ display: "none" }} // Hide the field using CSS
           valuePropName="checked"
-          // or className="hidden-field" // Apply a CSS class to hide the field
+        // or className="hidden-field" // Apply a CSS class to hide the field
         >
           <Switch />
         </Form.Item>

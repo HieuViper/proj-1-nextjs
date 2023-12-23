@@ -30,15 +30,16 @@ import Modal from "antd/es/modal/Modal";
 // import Editor2 from "@/components/Editor2";
 const myConstant = require('@/store/constant')
 
-
 const Editor2 = dynamic(() => import("@/components/Editor2"), { ssr: false });
+
 export function NewsForm(props) {
+
   const { TextArea } = Input;
   const { Option } = Select;
   const router = useRouter();
   const params = useParams();
   // const pathName = usePathname();
-  // const searchParams = useSearchParams();
+  const searchParams = useSearchParams();
 
   const [form] = Form.useForm();
 
@@ -47,7 +48,7 @@ export function NewsForm(props) {
   const [postStatus, setPostStatus] = useState("");
   // const [data, setData] = useState([]);
   // const [catTree, setCatTree] = useState([]);
-  // const [loadingStatus, setLoadingStatus] = useState( false );
+  const [loadingStatus, setLoadingStatus] = useState( false );
 
   const [imgList, setImgList] = useState( null );
   const [imgPagination, setImgPagination] = useState();
@@ -88,10 +89,7 @@ export function NewsForm(props) {
         ( msg ) => { setErrorMessage( msg ) });
     }
 
-    // setIsModa  lPicOpen( true );
-    // setCatTree(JSON.parse(props.cate));
-    // setTags(JSON.parse(props.tags));
-    // setLangTable(JSON.parse(props.langTable)); //set languageTable for news
+
     if (params?.id) {
       //get the news, newsdata is an array it's each row is a language's news
       let newsData = JSON.parse(props.data);
@@ -125,9 +123,8 @@ export function NewsForm(props) {
         news_position: data1?.news_position == 1 ? true : false,
       };
       form.setFieldsValue(data1); //the data for the all the fields of form is done formating
-      // setData(data1); //set state for news
-      setPicURL(data1.image ?? "");     //Save the old image
-      setPostStatus(data1.post_status);
+      setPicURL(data1.image);     //Save the old image
+      setPostStatus( data1.post_status);
       notifyAddNewsSuccess();
       //Category array of the editing news, it is used for setting source of the the Main category select
       const resultItem = JSON.parse(props.cate).filter((item) =>
@@ -170,7 +167,7 @@ export function NewsForm(props) {
     let imageInfo = null;
     // console.log("values:", values);
     const body = new FormData();
-    body.append('imageFile', uploadPic);    //attach uploaded image
+    uploadPic && body.append('imageFile', uploadPic);    //attach uploaded image
     if( picURL || uploadPic ) {
       imageInfo = {
         alt: value.alt ?? "",
@@ -182,9 +179,9 @@ export function NewsForm(props) {
     }
     body.append('imageInfo', JSON.stringify(imageInfo));  //attach image information
     //Reformat value data make it be suitable
-    // value.categories = value.categories.toString();
+    value.categories = value.categories.toString();
     value.tags = value.tags?.toString() ?? "";
-    console.log("news_position 2: ", form.getFieldValue("news_position"));
+    // console.log("news_position 2: ", form.getFieldValue("news_position"));
     value.news_position = form.getFieldValue("news_position") ?? false;
     value.news_position = value.news_position ? 1 : 0;
     if (form.getFieldValue("publish")) {
@@ -198,10 +195,10 @@ export function NewsForm(props) {
       delete value[`content_${lang.code}`];
 
       return {
-        title: form.getFieldValue(`title_${lang.code}`) ?? "",
-        excerpt: form.getFieldValue(`excerpt_${lang.code}`) ?? "",
+        title: form.getFieldValue(`title_${lang.code}`) ?? "undefined",
+        excerpt: form.getFieldValue(`excerpt_${lang.code}`) ?? "undefined",
         content:
-          filterContentEditor(form.getFieldValue(`content_${lang.code}`)) ?? "",
+          filterContentEditor(form.getFieldValue(`content_${lang.code}`)) ?? "undefined",
         languageCode: lang.code,
         newsId: params?.id,
       };
@@ -218,31 +215,22 @@ export function NewsForm(props) {
       value = { ...value, categories: result };
     }
 
-    // value.image = imageURL; //set image property
-    // console.log("value submit:", value);
-    // const { alt, caption, ...newValue } = value; //remove alt and caption out of value variable to newValue
-    // console.log(
-    //   "🚀 ~ file: NewsForm.js:180 ~ handleSubmit ~ newValue:",
-    //   newValue
-    // );
-    // console.log(newsLangs);
 
     // editing news
     if (params?.id) {
       if (value.post_status == myConstant.post.POST_STATUS_TRASH) {
         // await props.dell(newValue, newsLangs, params.id);
 
-        let { result, res } = await callAPI( await fetch(`/api/news/[id]`, {
+        let { result, res } = await callAPI( await fetch(`/api/news/trash/${params.id}`, {
           method: 'DELETE',
           cache: 'no-store',
-          body
         }),
         ( msg ) => { setErrorMessage( msg ) },
         () => { router.push('/login') },
         () => { setLoginForm( true ) },
       );
 
-        //success update user
+        //success Delete news
         if ( res.ok == true ) {
           let messageNotify = "Delete news successfully - ";
           toast.success(messageNotify, {
@@ -254,29 +242,9 @@ export function NewsForm(props) {
       }
 
       else {
-        // await props.editNews(newValue, newsLangs, params.id).then((message) => {
-        //   if (message.message == 1) {
-        //     //signal of success edit on server
-        //     setPostStatus(form.getFieldValue("post_status")); //set postStatus state to rerender action buttons
-        //     let messageNotify =
-        //       form.getFieldValue("post_status") ==
-        //       myConstant.post.POST_STATUS_DRAFT
-        //         ? "Save Draft Success"
-        //         : "Save Publish Success";
-        //     toast.success(messageNotify, {
-        //       position: "top-center",
-        //     });
-        //   } else {
-        //     //signal of faillure on server
-        //     let messageNotify =
-        //       "Cannot update news, please try again or inform admin";
-        //     toast.success(messageNotify, {
-        //       position: "top-center",
-        //     });
-        //   }
-        // });
+
         value.image = picURL;          //set the old image url back to user.image
-        value.id = params.id
+        value.id = params.id;
         body.append('news', JSON.stringify(value));          //attach user information
         body.append('newsLangs', JSON.stringify( newsLangs ));
         let { result, res } = await callAPI( await fetch(`/api/news/update`, {
@@ -296,21 +264,13 @@ export function NewsForm(props) {
             position: "top-center",
             duration: 5000,
           });
+          setPicURL( result.url );
+          setPostStatus( result.post_status );
         }
       }
     }
     //adding news
     else {
-      // await props.addNews(newValue, newsLangs).then((message) => {
-      //   console.log("message from server:", message);
-      //   if (message && message != 1) {
-      //     let messageNotify =
-      //       "Cannot update news, please try again or inform admin" + message;
-      //     toast.success(messageNotify, {
-      //       position: "top-center",
-      //     });
-      //   }
-      // });
       body.append('news', JSON.stringify(value));          //attach user information
       body.append('newsLangs', JSON.stringify( newsLangs ));
       let { result, res } = await callAPI( await fetch(`/api/news/add`, {
@@ -330,13 +290,14 @@ export function NewsForm(props) {
           position: "top-center",
           duration: 5000,
         });
-        router.push('/admin/news/edit');
+        router.push(`/admin/news/edit/${result.id}?message=1`);
       }
     }
   }
 
   const handleSubmitFailed = (errorInfo) => {
     console.log("Failed to submit:", errorInfo);
+    setErrorMessage('Failed to submit : ' +  errorInfo.errorFields[0].errors[0]);
   };
   //i dont see this function is useful, we can delete it
   const handleChangeTab = (key) => {
@@ -353,25 +314,26 @@ export function NewsForm(props) {
   };
 
   //Notify success adding new from /admin/add
-  // function notifyAddNewsSuccess() {
-  //   //get message redirected from add news route
-  //   if (searchParams.get("message")) {
-  //     const message = searchParams.get("message") ?? "";
-  //     if (message == 1) {
-  //       //signal of success edit on server
-  //       let messageNotify = "Add news successfully";
-  //       toast.success(messageNotify, {
-  //         position: "top-center",
-  //       });
-  //     } else {
-  //       //signal of faillure on server
-  //       let messageNotify = `Cannot add new news, please try again or inform admin: ${message}`;
-  //       toast.success(messageNotify, {
-  //         position: "top-center",
-  //       });
-  //     }
-  //   }
-  // }
+  function notifyAddNewsSuccess() {
+    //get message redirected from add news route
+    if (searchParams.get("message")) {
+      const message = searchParams.get("message") ?? "";
+      if (message == 1) {
+        //signal of success edit on server
+        let messageNotify = "Add news successfully";
+        toast.success(messageNotify, {
+          position: "top-center",
+        });
+      } else {
+        //signal of faillure on server
+        let messageNotify = `Cannot add new news, please try again or inform admin: ${message}`;
+        toast.success(messageNotify, {
+          position: "top-center",
+        });
+      }
+    }
+  }
+
   const onChangePosition = (checked) => {
     form.setFieldValue("news_position", checked);
   };
@@ -429,12 +391,14 @@ export function NewsForm(props) {
   }
   const treeData = JSON.parse(props.cate) && buildTreeData(JSON.parse(props.cate), null);
 
-  const [mainCat, setMainCat] = useState();
-  const [catSelect, setCatSelect] = useState(false);
-  const [catArr, setCatArr] = useState([]);
+  const [mainCat, setMainCat] = useState();   //handle state of main category's value
+  const [catSelect, setCatSelect] = useState(false);  //enable, disable main category select component
+  const [catArr, setCatArr] = useState([]);   //content of main category select component
 
+  //handle category select change
+  //it will rebuild content of main category select component
   const onChangeCategory = (value) => {
-    // value.length > 0 ? setCatSelect(false) : setCatSelect(true);
+    value.length > 0 ? setCatSelect(false) : setCatSelect(true);
     console.log("value :", value);
     const resultItem = JSON.parse(props.cate).filter((item) =>
       value?.includes(item.category_code)
@@ -452,20 +416,8 @@ export function NewsForm(props) {
       setMainCat("");
     }
   };
-  let globalEditor;
-  let savedSelection;
-  let currentElement;
+  //used for user pressing button showdialog
   async function printImg( editorParam ) {
-      // setEditor( editorParam );
-      // console.log('Editor Param:', editorParam);
-      // const selection = editorParam.model.document.selection;
-
-      // const range = editorParam.model.document.selection.getFirstRange();
-      // currentElement = range.getCommonAncestor();
-      // console.log('Current Element in PrintImg:', currentElement);
-      // globalEditor = editorParam;
-      // console.log('global Editor:', globalEditor);
-
       try {
           let { result, res } = await callAPI( await fetch(`/api/news_imgs`, {
               method: 'GET',
@@ -494,40 +446,12 @@ export function NewsForm(props) {
 
       // onFinishAddPic();
   }
+
+  //the pickedPicture will be returned here
   async function onFinishAddPic( values ) {
       setPickedItem( values );
-      //get the item picture has picked from values
-      // editor.model.document.selection.setPosition(editor.model.document.selection.getFirstPosition());
-      // console.log('editor:', editor);
-      // // editor.focus();
-      // globalEditor.focus();
-      // globalEditor.editing.view.focus();
-      // // const selection = globalEditor.model.document.selection;
-      // // // selection.removeAllRanges();
-      // // selection.addRange(savedSelection);
-      // console.log('Current Element on Finish:', currentElement);
-
-      // globalEditor.model.change( writer => {
-      //    const newPosition = writer.createPositionAt( currentElement, 'after' );
-      //    console.log('newPosition:', newPosition);
-      //    const newRange = writer.createRange( newPosition );
-      //    console.log('new range:', newRange);
-      //    writer.setSelection( newRange );
-      // });
-      // await editor.execute( 'insertImage', {
-      //   source: [{ src: '/uploads/news/dec2023/ava18.jpeg', alt: 'First alt text',
-      //         srcset: '/uploads/nov2023/ava3_150.jpeg 150w, /uploads/nov2023/ava3_350.jpeg 350w, /uploads/nov2023/ava3_700.jpeg 700w'
-      // },]
-
-      // } );
-      // const imageUtils = globalEditor.plugins.get( 'ImageUtils' );
-      // setTimeout(async () => {
-      //   await imageUtils.insertImage( { src: '/uploads/news/dec2023/ava18.jpeg',
-      //   // srcset: '/uploads/nov2023/ava3_150.jpeg 150w, /uploads/nov2023/ava3_350.jpeg 350w, /uploads/nov2023/ava3_700.jpeg 700w',
-      //    } );
-      // }, 2000);
-
   }
+  //Insert Picture
   function insPic(editor) {
     editor.execute( 'insertImage', {
             source: [{ src: pickedItem.url, alt: pickedItem.alt,
@@ -584,10 +508,7 @@ export function NewsForm(props) {
           //   },
           // ]}
         >
-          {/* <Input /> */}
           <Editor2
-            // data={content}
-                    // onChange={( data )=>setContent( data )}
                     {...{ printImg, insPic }}
           />
         </Form.Item>
@@ -639,7 +560,7 @@ export function NewsForm(props) {
       >
         {
           //Handle display Action buttons
-          postStatus == "publish" ? (
+          postStatus == myConstant.post.POST_STATUS_PUBLISH ? (
             <div className="flex justify-around">
               <div className="flex">
                 <Form.Item className="p-2">
@@ -744,7 +665,7 @@ export function NewsForm(props) {
           name="post_author"
           rules={[
             {
-              required: true,
+              required: 'true',
               message: "Please select the author!",
             },
           ]}
@@ -760,12 +681,12 @@ export function NewsForm(props) {
         <Form.Item
           label="Category"
           name="categories"
-          // rules={[
-          //   {
-          //     required: true,
-          //     message: 'Please select your category!',
-          //   },
-          // ]}
+          rules={[
+            {
+              required: 'true',
+              message: 'Please select your category!',
+            },
+          ]}
         >
           <TreeSelect
             multiple
@@ -785,7 +706,7 @@ export function NewsForm(props) {
         </Form.Item>
         <Form.Item label="Main Category" name="mainCategory">
           <Select
-            // disabled={catSelect}
+            disabled={catSelect}
             onChange={onChangeMainCat}
             value={mainCat}
           >

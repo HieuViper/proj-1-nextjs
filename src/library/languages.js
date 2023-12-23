@@ -14,7 +14,9 @@ export const languages = {
 
 async function getLanguages() {
   try {
-    const results = await db.Languages.findAll({
+    const results = await db.Languages.findAll({Where: {
+      active: 1,
+    },
       order: db.sequelize.literal(`code='${myConstant.DEFAULT_LANGUAGE}' DESC`),
     });
     return results;

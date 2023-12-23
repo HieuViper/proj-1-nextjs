@@ -4,6 +4,7 @@ const db = require("@/app/models")
 import { Op, QueryTypes } from "sequelize";
 import { funcLogin } from "./funcLogin";
 import { log } from "console";
+import { languages } from "./languages";
 const myConstant = require('@/store/constant')
 
 //get Status query from parameter post_status
@@ -272,18 +273,7 @@ export async function getTags(lang) {
   }
 }
 
-//Get All Languages
-// export async function getLanguages() {
-//   //console.log('db in language:', db);
-//   try {
-//     const results = await db.Languages.findAll({
-//       order: db.sequelize.literal(`code='${myConstant.DEFAULT_LANGUAGE}' DESC`),
-//     });
-//     return results;
-//   } catch (error) {
-//     throw new Error("Fail to get languages: " + error.message);
-//   }
-// }
+
 
 //Update new information of a News from Edit form
 //parameter: data: contain updated value for news Table
@@ -293,8 +283,8 @@ export async function updateANews(data, newsLangs, id) {
   const t = await db.sequelize.transaction();
   try {
     //update into news Table
-    const currentLoginUser = "huy"; //we add information of modifier huy
-    data = { ...data, modified_by: currentLoginUser };
+    // const currentLoginUser = "huy"; //we add information of modifier huy
+    // data = { ...data, modified_by: currentLoginUser };
     if (data.post_date) data.post_date = db.sequelize.literal("now()"); //user has press publish button, set time for post_date
     console.log("data :", data);
     await db.News.update(data, {
@@ -316,6 +306,7 @@ export async function updateANews(data, newsLangs, id) {
     }
 
     await t.commit();
+
   } catch (error) {
     await t.rollback();
     throw new Error("Cannot update news:" + error.message);
@@ -329,7 +320,7 @@ export async function addANews(data, newsLangs) {
   const t = await db.sequelize.transaction();
   try {
     //update into news Table
-    const currentLoginUser = "huy"; //we add information of modifier huy
+    // const currentLoginUser = "huy"; //we add information of modifier huy
     if (data.post_date) data.post_date = db.sequelize.literal("now()"); //user has press publish button, set time for post_date
     console.log("data :", data);
     const news = await db.News.create(data, { transaction: t });
@@ -444,7 +435,7 @@ async function newsList( loginInfo, searchParams ) {
         total: result.totals.itemsOfTable,
         current: parseInt(page),
       };
-      result.languages = await news.getLanguages();
+      result.languages = await languages.getLanguages();
       return result;
   }
   catch( error ) {

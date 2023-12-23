@@ -28,7 +28,7 @@ export async function POST(req) {
         let imageUrl = null;
         //save image File
         if ( imageFile ) {
-            imageUrl = await img.saveImage( imageFile, false );
+            imageUrl = await img.saveImage( imageFile, false, myConstant.users );
             console.log('saving image successfully');
             user.image = imageUrl.url;  //set image for user
             user.image_alt = imageInfo.alt;

@@ -105,7 +105,7 @@ class Editor extends DecoupledEditor {
 				'|',
 				'link',
 				'blockQuote',
-				'imageUpload',
+				// 'imageUpload',
 				'insertTable',
 				'mediaEmbed',
 				'|',

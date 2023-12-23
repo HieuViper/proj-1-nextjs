@@ -20,7 +20,7 @@
     "axios": "^1.6.2",
     "bcrypt": "^5.1.1",
     "browser-image-compression": "^2.0.2",
-    "ckeditor5-custom-build": "file:src/ckeditor5",
+    "@ckeditor/ckeditor5-build-decoupled-document": "^40.0.0",
     "date-fns": "^2.30.0",
     "eslint": "8.49.0",
     "eslint-config-next": "13.5.1",

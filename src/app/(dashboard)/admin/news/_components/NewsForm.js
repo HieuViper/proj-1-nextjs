@@ -27,10 +27,10 @@ import { callAPI, handleNotAuthorized } from "@/library/client/callAPI";    //us
 import { useLogin } from "@/store/login";
 import ImageList from "@/components/NewsImgsList";
 import Modal from "antd/es/modal/Modal";
-// import Editor2 from "@/components/Editor2";
 const myConstant = require('@/store/constant')
+// import Editor2 from "@/components/Editor2";
 
-const Editor2 = dynamic(() => import("@/components/Editor2"), { ssr: false });
+
 
 export function NewsForm(props) {
 
@@ -60,12 +60,13 @@ export function NewsForm(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [isModalPicOpen, setIsModalPicOpen] = useState( false );
 
+  const [mainCat, setMainCat] = useState();   //handle state of main category's value
+  const [catSelect, setCatSelect] = useState(false);  //enable, disable main category select component
+  const [catArr, setCatArr] = useState([]);   //content of main category select component
+
+  const Editor = dynamic(() => import("@/components/Editor"), { ssr: false });
 
 
-  const authors = JSON.parse(props.authors).map( ( item ) => ({
-    value: item.username,
-    label: item.display_name,
-  }));
 
   //get the the title, content, excerpt from news data
   //property: name of the column  you want to get the value
@@ -89,7 +90,10 @@ export function NewsForm(props) {
         ( msg ) => { setErrorMessage( msg ) });
     }
 
-
+    const authors = JSON.parse(props.authors).map( ( item ) => ({
+      value: item.username,
+      label: item.display_name,
+    }));
     if (params?.id) {
       //get the news, newsdata is an array it's each row is a language's news
       let newsData = JSON.parse(props.data);
@@ -136,6 +140,7 @@ export function NewsForm(props) {
       const mainImage = JSON.parse(props.mainImage);  //no need
       form.setFieldsValue({ caption: mainImage?.caption, alt: mainImage?.alt });
     }
+
   }, [props]);
 
   //Generate newsCode for the post. It pick the Title of the default language
@@ -391,10 +396,6 @@ export function NewsForm(props) {
   }
   const treeData = JSON.parse(props.cate) && buildTreeData(JSON.parse(props.cate), null);
 
-  const [mainCat, setMainCat] = useState();   //handle state of main category's value
-  const [catSelect, setCatSelect] = useState(false);  //enable, disable main category select component
-  const [catArr, setCatArr] = useState([]);   //content of main category select component
-
   //handle category select change
   //it will rebuild content of main category select component
   const onChangeCategory = (value) => {
@@ -453,7 +454,8 @@ export function NewsForm(props) {
   }
   //Insert Picture
   function insPic(editor) {
-    editor.execute( 'insertImage', {
+
+    pickedItem && editor.execute( 'insertImage', {
             source: [{ src: pickedItem.url, alt: pickedItem.alt,
                   srcset: pickedItem.srcset
           },]
@@ -508,7 +510,7 @@ export function NewsForm(props) {
           //   },
           // ]}
         >
-          <Editor2
+          <Editor
                     {...{ printImg, insPic }}
           />
         </Form.Item>
@@ -674,7 +676,10 @@ export function NewsForm(props) {
             style={{
               width: 120,
             }}
-            options={authors}
+            options={JSON.parse(props.authors).map( ( item ) => ({
+              value: item.username,
+              label: item.display_name,
+            }))}
           />
         </Form.Item>
 

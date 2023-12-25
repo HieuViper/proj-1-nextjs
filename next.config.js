@@ -27,6 +27,7 @@ module.exports = withNextIntl({
           publish: true,
           moveTrash: true,
           recover: true,
+          switchDraft: true,
         },
         articles: {
           add: true,

@@ -55,7 +55,7 @@ export async function POST(req, { params }) {
 
         newsItem.modified_by = loginInfo.user.username;
         await news.updateANews(newsItem, newsLangs, newsItem.id);
-        // revalidatePath('/admin/users');
+        revalidatePath('/admin/news');
         return NextResponse.json( { url: newsItem.image, post_status: newsItem.post_status }, { status: 200 });
     } catch ( error ) {
         return NextResponse.json( { msg: error.message }, { status: 500 });

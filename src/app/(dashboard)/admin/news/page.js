@@ -15,7 +15,6 @@ async function NewsPage({ searchParams }) {
 
   const result = await news.newsList(loginInfo);
   if ( result.error )
-    //console.log('Error from news.newsList:', result.msg );
     throw new Error( 'Error: ' + result.msg );
 
   return (

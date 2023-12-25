@@ -30,8 +30,7 @@ import Modal from "antd/es/modal/Modal";
 const myConstant = require('@/store/constant')
 // import Editor2 from "@/components/Editor2";
 
-
-
+const Editor2 = dynamic(() => import("@/components/Editor2"), { ssr: false });
 export function NewsForm(props) {
 
   const { TextArea } = Input;
@@ -45,7 +44,7 @@ export function NewsForm(props) {
 
   // const [tags, setTags] = useState([]);
   // const [langTable, setLangTable] = useState([]);
-  const [postStatus, setPostStatus] = useState("");
+  const [postStatus, setPostStatus] = useState( props.data && JSON.parse(props.data)[0].post_status );
   // const [data, setData] = useState([]);
   // const [catTree, setCatTree] = useState([]);
   const [loadingStatus, setLoadingStatus] = useState( false );
@@ -53,7 +52,7 @@ export function NewsForm(props) {
   const [imgList, setImgList] = useState( null );
   const [imgPagination, setImgPagination] = useState();
 
-  const [picURL, setPicURL] = useState(null);
+  const [picURL, setPicURL] = useState( props.data && JSON.parse( props.data )[0].image);
   const [uploadPic, setUploadPic] = useState(null);
   const [pickedItem, setPickedItem] = useState(null); // use to save the image info from Modal ShowImage
   const { setLoginForm } = useLogin();    //use to set global state allowing enable the login form.
@@ -64,7 +63,6 @@ export function NewsForm(props) {
   const [catSelect, setCatSelect] = useState(false);  //enable, disable main category select component
   const [catArr, setCatArr] = useState([]);   //content of main category select component
 
-  const Editor = dynamic(() => import("@/components/Editor"), { ssr: false });
 
 
 
@@ -90,10 +88,6 @@ export function NewsForm(props) {
         ( msg ) => { setErrorMessage( msg ) });
     }
 
-    const authors = JSON.parse(props.authors).map( ( item ) => ({
-      value: item.username,
-      label: item.display_name,
-    }));
     if (params?.id) {
       //get the news, newsdata is an array it's each row is a language's news
       let newsData = JSON.parse(props.data);
@@ -127,18 +121,17 @@ export function NewsForm(props) {
         news_position: data1?.news_position == 1 ? true : false,
       };
       form.setFieldsValue(data1); //the data for the all the fields of form is done formating
-      setPicURL(data1.image);     //Save the old image
-      setPostStatus( data1.post_status);
       notifyAddNewsSuccess();
       //Category array of the editing news, it is used for setting source of the the Main category select
       const resultItem = JSON.parse(props.cate).filter((item) =>
         data1.categories?.includes(item.category_code)
       );
-      setCatArr(resultItem);
+      // setCatArr(resultItem);
       form.setFieldValue("mainCategory", data1.categories[0]);
       //set value for caption and alt of main image
       const mainImage = JSON.parse(props.mainImage);  //no need
       form.setFieldsValue({ caption: mainImage?.caption, alt: mainImage?.alt });
+
     }
 
   }, [props]);
@@ -224,16 +217,15 @@ export function NewsForm(props) {
     // editing news
     if (params?.id) {
       if (value.post_status == myConstant.post.POST_STATUS_TRASH) {
-        // await props.dell(newValue, newsLangs, params.id);
-
+        setLoadingStatus(true);
         let { result, res } = await callAPI( await fetch(`/api/news/trash/${params.id}`, {
-          method: 'DELETE',
-          cache: 'no-store',
-        }),
-        ( msg ) => { setErrorMessage( msg ) },
-        () => { router.push('/login') },
-        () => { setLoginForm( true ) },
-      );
+            method: 'DELETE',
+            cache: 'no-store',
+          }),
+          ( msg ) => { setErrorMessage( msg ) },
+          () => { router.push('/login') },
+          () => { setLoginForm( true ) },
+        );
 
         //success Delete news
         if ( res.ok == true ) {
@@ -244,10 +236,11 @@ export function NewsForm(props) {
           });
           router.push('/admin/news');
         }
+        setLoadingStatus( false );
       }
 
       else {
-
+        setLoadingStatus( true );
         value.image = picURL;          //set the old image url back to user.image
         value.id = params.id;
         body.append('news', JSON.stringify(value));          //attach user information
@@ -272,10 +265,12 @@ export function NewsForm(props) {
           setPicURL( result.url );
           setPostStatus( result.post_status );
         }
+        setLoadingStatus( false );
       }
     }
     //adding news
     else {
+      setLoadingStatus( true );
       body.append('news', JSON.stringify(value));          //attach user information
       body.append('newsLangs', JSON.stringify( newsLangs ));
       let { result, res } = await callAPI( await fetch(`/api/news/add`, {
@@ -297,6 +292,7 @@ export function NewsForm(props) {
         });
         router.push(`/admin/news/edit/${result.id}?message=1`);
       }
+      setLoadingStatus( false );
     }
   }
 
@@ -419,6 +415,7 @@ export function NewsForm(props) {
   };
   //used for user pressing button showdialog
   async function printImg( editorParam ) {
+    setLoadingStatus( true );
       try {
           let { result, res } = await callAPI( await fetch(`/api/news_imgs`, {
               method: 'GET',
@@ -437,8 +434,9 @@ export function NewsForm(props) {
       catch (error) {
         console.log('error in printImg:', error.message);
       }
+      setLoadingStatus( false );
       // // setEditor( editorParam.plugins.get( 'ImageUtils' ) );
-      // setLoadingStatus( false );
+      //
       // const imageUtils = editorParam.plugins.get( 'ImageUtils' );
       // imageUtils.insertImage( { src: '/uploads/news/dec2023/ava18.jpeg',
       //     // srcset: '/uploads/nov2023/ava3_150.jpeg 150w, /uploads/nov2023/ava3_350.jpeg 350w, /uploads/nov2023/ava3_700.jpeg 700w',
@@ -510,7 +508,7 @@ export function NewsForm(props) {
           //   },
           // ]}
         >
-          <Editor
+          <Editor2
                     {...{ printImg, insPic }}
           />
         </Form.Item>
@@ -565,6 +563,7 @@ export function NewsForm(props) {
           postStatus == myConstant.post.POST_STATUS_PUBLISH ? (
             <div className="flex justify-around">
               <div className="flex">
+              { props.roles[props.user.role]?.news.switchDraft == true && (
                 <Form.Item className="p-2">
                   <Button
                     type="primary"
@@ -577,6 +576,8 @@ export function NewsForm(props) {
                     Switch to Draft
                   </Button>
                 </Form.Item>
+              )}
+              { props.roles[props.user.role]?.news.moveTrash == true && (
                 <Form.Item className="p-2">
                   <Button
                     danger
@@ -588,7 +589,9 @@ export function NewsForm(props) {
                     Move to trash
                   </Button>
                 </Form.Item>
+              )}
               </div>
+              { props.roles[props.user.role]?.news.edit == true && (
               <Form.Item className="p-2">
                 <Button
                   type="primary"
@@ -598,6 +601,7 @@ export function NewsForm(props) {
                   Update
                 </Button>
               </Form.Item>
+              )}
             </div>
           ) : (
             <div
@@ -605,7 +609,7 @@ export function NewsForm(props) {
                 params.id ? "justify-around" : "justify-end"
               }`}
             >
-              {params.id && (
+              {( params.id && props.roles[props.user.role]?.news.moveTrash == true ) && (
                 <Form.Item className="p-2">
                   <Button
                     danger
@@ -619,6 +623,7 @@ export function NewsForm(props) {
                 </Form.Item>
               )}
               <div className="flex">
+              { props.roles[props.user.role]?.news.edit == true && (
                 <Form.Item className="p-2">
                   <Button
                     type="dashed"
@@ -630,6 +635,8 @@ export function NewsForm(props) {
                     Save Draft
                   </Button>
                 </Form.Item>
+              )}
+              { props.roles[props.user.role]?.news.publish == true && (
                 <Form.Item className="p-2">
                   <Button
                     type="primary"
@@ -641,6 +648,7 @@ export function NewsForm(props) {
                     Publish
                   </Button>
                 </Form.Item>
+              )}
               </div>
             </div>
           )
@@ -858,6 +866,13 @@ export function NewsForm(props) {
                    user = { props.user }
                    data = { imgList }
                    pagination = { imgPagination }
+                   module='news_imgs'
+                   api= {{
+                    search: '/api/news_imgs',
+                    update: '/api/news_imgs/update',
+                    add: '/api/news_imgs/add',
+                    info: '/api/news_imgs/info'
+                   }}
             {...{ setIsModalPicOpen, onFinishAddPic }}
         />
       </Modal>

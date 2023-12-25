@@ -1,28 +1,65 @@
 //'use server';
 // const db = require("@/app/models");
 const db = require("@/app/models")
-import { Op, QueryTypes } from "sequelize";
+import Sequelize, { Op, QueryTypes } from "sequelize";
 import { funcLogin } from "./funcLogin";
 import { log } from "console";
 import { languages } from "./languages";
+import { undefined } from "zod";
 const myConstant = require('@/store/constant')
 
 //get Status query from parameter post_status
 function getStatusQuery(post_status) {
   switch (post_status) {
     case "":
-      return `post_status!='${myConstant.post.POST_STATUS_TRASH}'`;
+      // return `post_status!='${myConstant.post.POST_STATUS_TRASH}'`;
+      return { post_status: {
+                  [Op.ne]: myConstant.post.POST_STATUS_TRASH,
+                }
+              };
     case myConstant.post.POST_STATUS_PRIORITY:
-      return `news_position=1`;
+      // return `news_position=1`;
+      return {
+          news_position: 1
+      };
     default:
-      return `post_status='${post_status}'`;
+      // return `post_status='${post_status}'`;
+      return {
+        post_status: post_status
+      }
   }
 }
 //get search query from search parameter
 function getSearchQuery(search) {
-  return search == ""
-    ? ""
-    : `AND (title LIKE '%${search}%' OR content LIKE '%${search}%' OR categories LIKE '%${search}%')`;
+  // return search == ""
+  //   ? ""
+  //   : `AND (title LIKE '%${search}%' OR content LIKE '%${search}%' OR categories LIKE '%${search}%')`;
+  let result = {
+    news: {},
+    news_languages: {}
+  };
+  if ( search != '' ) {
+    result.news = {
+      categories: {
+        [Op.like]: `%${search}%`
+      }
+    };
+    result.news_languages = {
+        [Op.or]: [
+          {
+            title: {
+              [Op.like]: `%${search}%`
+            }
+          },
+          {
+            content: {
+              [Op.like]: `%${search}%`
+            }
+          },
+        ]
+    }
+  }
+  return result;
 }
 export const news = {
   getAllNews,
@@ -32,8 +69,6 @@ export const news = {
   recoverNews,
   deleteNews,
   getNews,
-  // editNews,
-  // addNews,
   getCategories,
   getTags,
   updateANews,
@@ -54,24 +89,128 @@ export async function getAllNews(
   tag,
   lang
 ) {
+  let result = {
+    news: null,
+    totals: {
+      itemsOfTable: 0,
+      all: 0,
+      draft: 0,
+      publish: 0,
+      trash: 0,
+      priority: 0,
+    }
+  };
+
   try {
-    const fromNews = (page - 1) * size; //determine the beginning news
-    const authorQuery = author == "" ? "" : `AND post_author='${author}'`;
-    const catQuery =
-      category == "" ? "" : `AND categories LIKE '%${category}%'`;
-    const tagQuery = tag == "" ? "" : `AND tags like '%${tag}%'`;
+    // const fromNews = (page - 1) * size; //determine the beginning news
+    const authorQuery = author == '' ? {}
+                                            :
+                                            {
+                                              post_author: author
+                                            };
+    // const catQuery =
+    //   category == "" ? "" : `AND categories LIKE '%${category}%'`;
+    const catQuery = category == '' ? {}
+                                           : {
+                                              categories: {
+                                                [Op.like]: `%${category}%`
+                                              }
+                                            }
+    // const tagQuery = tag == "" ? "" : `AND tags like '%${tag}%'`;
+    const tagQuery = tag == '' ? {}
+                                      : {
+                                          tags: {
+                                            [Op.like]: `%${tag}%`
+                                          }
+                                      }
     const statusQuery = getStatusQuery(post_status);
     const searchQuery = getSearchQuery(search);
-    const orderQuery = orderby == "" ? "" : `ORDER BY ${orderby} ${order}`;
+    // const orderQuery = orderby == "" ? "" : `ORDER BY ${orderby} ${order}`;
 
-    let sqlquery = `SELECT * FROM news_all WHERE (${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}) ${orderQuery} LIMIT ${fromNews}, ${size}`;
+    // let sqlquery = `SELECT * FROM news_all WHERE (${statusQuery} AND languageCode='${lang}' ${searchQuery} ${authorQuery} ${catQuery} ${tagQuery}) ${orderQuery} LIMIT ${fromNews}, ${size}`;
+    // const results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
 
-    const results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
+    let { count, rows } = await db.News.findAndCountAll({
+        where: {
+          [Op.and]: [
+            statusQuery,
+            // { languageCode: lang },
+            searchQuery.news,
+            authorQuery,
+            catQuery,
+            tagQuery
+          ]
+        },
+        attributes: [
+            'id', 'post_author', 'categories', 'tags', 'post_date', 'post_modified', 'post_status', 'news_code'
+        ],
+        include: [
+        {
+            model: db.News_languages,
+            as: 'news_languages',
+            where: {
+              [Op.and]: [
+                { languageCode: lang },
+                searchQuery.news_languages,
+              ]
+            },
+            attributes: [
+              'title'
+            ]
+        },
+        ],
+        offset: parseInt(page - 1) * parseInt( size ),
+        limit: parseInt( size ),
+        order: [[orderby, order]],
+    });
+    result.news = rows;
+    result.totals.itemsOfTable = count;
 
-    return results;
+     //get total number of news in All Status
+      let rsAll = await db.News.findAndCountAll(
+        {
+          where: {
+            post_status: {
+              [Op.ne] : myConstant.post.POST_STATUS_TRASH
+            }
+          },
+      }
+      );
+      result.totals.all  = rsAll.count;
+    //Get total number of news in detail status
+    let rows3 = await db.News.findAll({
+        attributes: [
+          'post_status',
+          [Sequelize.fn("COUNT", Sequelize.col("post_status")), "total"]
+        ],
+        group: 'post_status'
+    });
+    for ( const item of rows3 ) {
+      switch ( item.post_status ) {
+        case myConstant.post.POST_STATUS_DRAFT:
+          result.totals.draft = item.dataValues.total;
+          break;
+        case myConstant.post.POST_STATUS_TRASH:
+          result.totals.trash = item.dataValues.total;
+          break;
+        case myConstant.post.POST_STATUS_PUBLISH:
+          result.totals.publish = item.dataValues.total;
+          break;
+        default:
+          throw new Error( 'Post_status in database is not right. Review all post_status in database' );
+      }
+    }
+    //get total number of news in priority status
+    let rsPri = await db.News.findAndCountAll({
+      where: {
+        news_position: 1
+      },
+    });
+    result.totals.priority = rsPri.count;
   } catch (error) {
     throw new Error("Fail to get news from databas: " + error.message);
   }
+  return result;
 }
 
 //get total item of news
@@ -148,7 +287,7 @@ export async function getTotalNumOfNews(
     );
   }
   try {
-    //get total number of news in priority status
+
     let sqlquery = `SELECT count(*) AS total FROM news WHERE news_position=1`;
     let results = await db.sequelize.query(sqlquery, { type: QueryTypes.SELECT });
     totals.priority = results[0].total;
@@ -350,19 +489,19 @@ export async function addANews(data, newsLangs) {
 //           searchParams: contain the query from URL of the request
 async function newsList( loginInfo, searchParams ) {
 
-  const trash = searchParams?.get('trash') ?? "";
-  const keys = searchParams?.get('keys') ?? "";
-  const recover = searchParams?.get('recover') ?? "";
-  const del = searchParams?.get('del') ?? "";
-  const status = searchParams?.get('status') ?? "";
-  const search = searchParams?.get('search') ?? "";
+  const trash = searchParams?.get('trash') ?? '';
+  const keys = searchParams?.get('keys') ?? '';
+  const recover = searchParams?.get('recover') ?? '';
+  const del = searchParams?.get('del') ?? '';
+  const status = searchParams?.get('status') ?? '';
+  const search = searchParams?.get('search') ?? '';
   const page = searchParams?.get('page') ?? 1;
   const size = searchParams?.get('size') ?? myConstant.post.PAGE_SIZE;
-  let orderby = searchParams?.get('orderby') ?? "";
-  let order = searchParams?.get('order') ?? "";
-  const author = searchParams?.get('author') ?? "";
-  const category = searchParams?.get('category') ?? "";
-  const tag = searchParams?.get('tag') ?? "";
+  let orderby = searchParams?.get('orderby') ?? '';
+  let order = searchParams?.get('order') ?? '';
+  const author = searchParams?.get('author') ?? '';
+  const category = searchParams?.get('category') ?? '';
+  const tag = searchParams?.get('tag') ?? '';
   const lang = searchParams?.get('lang') ?? myConstant.DEFAULT_LANGUAGE;
 
   let result = {
@@ -383,7 +522,7 @@ async function newsList( loginInfo, searchParams ) {
             return result;
         }
         if ( keys != '' )
-            await news.deleteBulkNews(keys);
+            await news.deleteBulkNews(keys, status);
         if ( del != '' )
             await news.deleteNews(del);
       }
@@ -403,14 +542,14 @@ async function newsList( loginInfo, searchParams ) {
             result.error = 403;
             return result;
         }
-        await news.recoverNews(recover);
+        await news.recoverNews( recover );
       }
       //if no search params. Set default order for searching
-      if ( !searchParams || searchParams?.keys().length == 0) {
+      if ( !searchParams || searchParams?.keys().length == 0 ) {
         orderby = "post_modified";
         order = "desc";
       }
-      result.news = await news.getAllNews(
+      let newsRs = await news.getAllNews(
         status,
         page,
         size,
@@ -422,14 +561,16 @@ async function newsList( loginInfo, searchParams ) {
         tag,
         lang
       );
-      result.totals = await news.getTotalNumOfNews(
-        status,
-        search,
-        author,
-        category,
-        tag,
-        lang
-      );
+      result.news = newsRs.news;
+      result.totals = newsRs.totals;
+      // result.totals = await news.getTotalNumOfNews(
+      //   status,
+      //   search,
+      //   author,
+      //   category,
+      //   tag,
+      //   lang
+      // );
       result.pagination = {
         pageSize: parseInt(size),
         total: result.totals.itemsOfTable,

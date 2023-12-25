@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { funcLogin } from "@/library/funcLogin";
-import { funcUsers } from "@/library/funcUsers";
+import { users } from "@/library/users";
 import { newsImgs } from "@/library/newsImgs";
 import { img } from "@/library/img";
 import fs from "fs/promises";
@@ -47,10 +47,12 @@ export async function POST(req, { params }) {
             //Delete old image file on server
 
         } else if ( imageInfo ){    //there is the old image, but no new upload image
-            await newsImgs.updateImage( imageInfo, user.image );
+            // await newsImgs.updateImage( imageInfo, user.image );
+            user.image_alt = imageInfo.alt;
+            user.image_caption = imageInfo.caption;
         }
 
-        const username = await funcUsers.updateAUser(user);
+        const username = await users.updateAUser(user);
         revalidatePath('/admin/users');
         return NextResponse.json( {}, { status: 200 });
     } catch ( error ) {

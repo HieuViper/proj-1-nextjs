@@ -24,6 +24,13 @@ const myConstant = {
             QUALITY: 70
         },
     },
+    products: {
+        PAGE_SIZE: 36,
+        COLUMNS: 6,
+        FILE_LIMITED_SIZE: 2,
+        FOLDER_UPLOAD: '/uploads/products',
+        QUALITY: 70
+    },
     post: {
         POST_STATUS_DRAFT: 'draft',
         POST_STATUS_PUBLISH: 'publish',

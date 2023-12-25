@@ -1,5 +1,5 @@
 import UserList from "./_components/UserList";
-import { funcUsers } from "@/library/funcUsers";
+import { users } from "@/library/users";
 import { headers, cookies } from "next/headers";
 import { funcLogin } from "@/library/funcLogin";
 import getConfig from "next/config";
@@ -13,7 +13,7 @@ const UserPage = async ({ searchParams }) => {
   const isAuthorize = await funcLogin.checkAuthorize(loginInfo.user, 'users');
 
   console.log('isLogin At Page users:', loginInfo.isLogin);
-  const result = await funcUsers.userList(loginInfo);
+  const result = await users.userList(loginInfo);
   if ( result.error )
     throw new Error( 'Error: ' + result.msg );
 

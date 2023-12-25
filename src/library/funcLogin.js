@@ -3,7 +3,7 @@ import { request } from "http";
 import { NOW, Op, QueryTypes } from "sequelize";
 import { userRoles } from "./userRoles";
 import bcrypt from 'bcrypt';
-import { funcUsers } from "./funcUsers";
+import { users } from "./users";
 import getConfig from "next/config";
 import jwt from 'jsonwebtoken';
 import { log } from "console";
@@ -61,9 +61,9 @@ export async function checkLogin(username, password) {
   let token;
   try {
     if ( is_valid_email( username ) ) {
-      user = await funcUsers.getUserByEmail( username );
+      user = await users.getUserByEmail( username );
     } else {
-      user = await funcUsers.getUser( username )
+      user = await users.getUser( username )
     }
     if ( user ) {
       // console.log('user information:', user);

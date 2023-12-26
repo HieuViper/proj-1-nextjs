@@ -5,17 +5,17 @@ import db from "@/app/models";
 export async function POST(body, req) {
     try {
         const product = await body.json();
-        let result = await db.Products.create(product);
-        const product_languages = product.product_languages;
-        product_languages.map(async function (item) {
-            var product_language = {
-                productId: result.id,
+        let result = await db.Product_categories.create(product);
+        const product_cate_langs = product.product_cate_langs;
+        product_cate_langs.map(async function (item) {
+            var product_cate_lang = {
+                product_categoryId: result.id,
                 name: item.name,
-                short: item.short,
+                // short: item.short,
                 description: item.description,
                 languageCode: item.languageCode,
             };
-            const rs = await db.Product_languages.create(product_language);
+            const rs = await db.Product_cate_langs.create(product_cate_lang);
 
         });
         return NextResponse.json({
@@ -32,15 +32,15 @@ export async function POST(body, req) {
 
 export async function DELETE(body, req) {
     const id = req.params.id;
-    db.Product_languages.destroy({ where: { productId: id } })
-    db.Products.destroy({ where: { id: id } })
+    db.Product_cate_langs.destroy({ where: { productId: id } })
+    db.Product_categories.destroy({ where: { id: id } })
     return NextResponse.json({
         result: "success",
         message: "deleted success",
     });
-    //     db.Products.destroy({ where: { id: id } })
+    //     db.Product_categories.destroy({ where: { id: id } })
     //         .then((result) => {
-    //             db.Product_languages.destroy({ where: { productId: id } }).then(
+    //             db.Product_cate_langs.destroy({ where: { productId: id } }).then(
     //                 (result) => {
     //                     return NextResponse.json({
     //                         result: "success",
@@ -63,12 +63,12 @@ export async function GET(req, { params }) {
             code: searchParams.get("lang")
 
         } : {};
-        let product = await db.Products.findOne({
+        let product = await db.Product_categories.findOne({
             where: { id: params.id },
             include: [
                 {
-                    model: db.Product_languages,
-                    as: 'product_languages',
+                    model: db.Product_cate_langs,
+                    as: 'product_cate_langs',
                     include: [
                         {
                             model: db.Languages,
@@ -95,7 +95,7 @@ export async function PUT(body, req) {
         const productId = req.params.id; // Assuming productId is passed in the request parameters
         const productData = await body.json();
 
-        const existingProduct = await db.Products.findByPk(productId);
+        const existingProduct = await db.Product_categories.findByPk(productId);
         if (!existingProduct) {
             return NextResponse.json({ msg: 'Product not found' }, { status: 404 });
         }
@@ -115,9 +115,9 @@ export async function PUT(body, req) {
 // export async function PUT(body, req) {
 //     try {
 //         const product = await body.json();
-//         let result = await db.Products.create(product);
+//         let result = await db.Product_categories.create(product);
 
-//         const product_languages = product.product_languages.map(item => ({
+//         const product_cate_langs = product.product_cate_langs.map(item => ({
 //             productId: result.id,
 //             name: item.name,
 //             short: item.short,
@@ -125,14 +125,14 @@ export async function PUT(body, req) {
 //             languageCode: item.languageCode,
 //         }));
 
-//         const createdLanguages = await db.Product_languages.bulkCreate(product_languages);
+//         const createdLanguages = await db.Product_cate_langs.bulkCreate(product_cate_langs);
 
 //         return NextResponse.json({
 //             result: "success",
-//             message: "Products created successfully",
+//             message: "Product_categories created successfully",
 //             data: {
 //                 product: result,
-//                 product_languages: createdLanguages
+//                 product_cate_langs: createdLanguages
 //             }
 //         });
 //     } catch (error) {

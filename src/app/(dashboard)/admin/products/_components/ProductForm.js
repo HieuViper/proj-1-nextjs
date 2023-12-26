@@ -26,6 +26,7 @@ import { useLogin } from "@/store/login";
 import { callNon } from '@/library/api';
 import toast from 'react-hot-toast';
 import { callAPI } from '@/library/client/callAPI';
+import axios from 'axios';
 const myConstant = require('@/store/constant')
 
 const ProductForm = (props) => {
@@ -45,182 +46,39 @@ const ProductForm = (props) => {
     const [images, setImages] = useState([]);
     const [listImage, setListImage] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
-
-    const test = {
-        list_image: [1, 2],
-        // id: 5,
-        product_code: " ProductCode-5",
-        main_image: null,
-        sub_image: null,
-        categories: "default",
-        price: null,
-        discount_price: null,
-        product_author: "",
-        modified_by: null,
-        product_position: 0,
-        active: null,
-        status: null,
-        color: null,
-        createdAt: "2023-12-18T09:07:22.000Z",
-        updatedAt: "2023-12-18T09:07:22.000Z",
-        manufacturerId: null,
-        product_languages: [
-            {
-                id: 9,
-                name: "test",
-                short: null,
-                description: "mô tả của product 5",
-                productId: 5,
-                languageCode: "vi",
-            },
-            {
-                id: 9,
-                name: "test",
-                short: null,
-                description: "mô tả của product 5",
-                productId: 5,
-                languageCode: "en",
-            }
-        ]
-    }
-    const test2 = {
-        "list_image": [1, 2
-        ],
-        // "id": 5,
-        "product_code": "ProductCode-5",
-        "main_image": null,
-        "sub_image": null,
-        "categories": "default",
-        "price": null,
-        "discount_price": null,
-        "product_author": "",
-        "modified_by": null,
-        "product_position": 0,
-        "active": null,
-        "status": null,
-        "color": null,
-        "createdAt": "2023-12-18T09:07:22.000Z",
-        "updatedAt": "2023-12-18T09:07:22.000Z",
-        "manufacturerId": null,
-        "product_languages": [
-            {
-                "id": 9,
-                "name": "Tên Product 5",
-                "short": null,
-                "description": "mô tả của product 5",
-                "productId": 5,
-                "languageCode": "vi",
-                "languages": {
-                    "code": "vi",
-                    "name": "tiếng việt",
-                    "description": "tiếng việt",
-                    "active": true
-                }
-            }
-        ]
-    }
-    const test3 = {
-        list_image: [{}, {}],
-        product_code: "test16",
-        main_image: null,
-        sub_image: null,
-        categories: "default",
-        price: null,
-        discount_price: null,
-        product_author: "",
-        modified_by: null,
-        product_position: 0,
-        active: null,
-        status: null,
-        color: null,
-        createdAt: "2023-12-18T09:07:22.000Z",
-        updatedAt: "2023-12-18T09:07:22.000Z",
-        manufacturerId: null,
-        product_languages: [
-            {
-                id: 1,
-                name: "Tên Product 1",
-                short: null,
-                description: "mô tả của product 5",
-                productId: 5,
-                languageCode: "vi"
-            },
-            {
-                id: 2,
-                name: "Tên Product 1",
-                short: null,
-                description: "mô tả của product 5",
-                productId: 5,
-                languageCode: "en"
-            }
-        ]
-    }
+    const [initialFileList, setinitialFileList] = useState([{}])
+    const [fileList, setFileList] = useState(initialFileList);
     const handleSubmit = async (value) => {
+        setLoadingSubmit(true);
         console.log('valueForm :', value);
-        const body = new FormData();
-        body.append('main_image', value.main_image);
-        body.append('sub_image', value.sub_image);
-        // const product = {
-        //     code: value.code,
-        //     price: value.price,
-        //     discount_price: value.discount_price,
-        //     category: value.category,
-        //     driver: value.driver,
-        //     position: value.position,
-        //     mainImageURL: value.main_image,
-        //     images: value.listImage,
-        //     active: value.active,
-        //     status: value.status,
-        //     color: value.color,
-        //     manufacturerId: null,
-        //     product_languages: [
-        //         {
-        //             name: value.name_vi,
-        //             short: value.short_vi,
-        //             description: value.description_vi,
-        //             languageCode: 'vi'
-        //         },
-        //         {
-        //             name: value.name_en,
-        //             short: value.short_en,
-        //             description: value.description_en,
-        //             languageCode: 'en'
-        //         }
-        //     ]
-        // }
-        // setLoadingSubmit(true);
-        // let { result, res } = await callAPI(await fetch(`/api/products`, {
-        //     method: 'POST',
-        //     cache: 'no-store',
-        //     body: JSON.stringify(test3)
-        // }),
-        //     (msg) => { setErrorMessage(msg) },
-        //     () => { router.push('/login') },
-        //     () => { setLoginForm(true) },
-        // );
-
-        // if (res.status == 200) {
-        //     // router.push("/admin/products")
-        //     console.log('result ADD test :', result);
-        // }
-        body.append("product", JSON.stringify(test3))
-        console.log('body :', body);
-
+        const formMainImage = new FormData();
+        formMainImage.append('file', previewMainPic);
+        const formSubImage = new FormData();
+        formSubImage.append('file', previewSubPic);
+        const mainImage = previewMainPic && await axios.post('/api/products/image', formMainImage, {});
+        const subImage = previewSubPic && await axios.post('/api/products/image', formSubImage, {});
+        const listImage = await uploadListImage()
+        console.log('listImage :', listImage);
+        // const newListImage = initialFileList.concat(listImage.images)
+        // console.log('newListImage :', newListImage);
         try {
             if (id) {
                 const product = {
-                    id: value.id,
-                    code: value.code,
+                    id: id,
+                    product_code: value.product_code,
                     price: value.price,
                     discount_price: value.discount_price,
-                    category: value.category,
+                    categories: 1,
                     driver: value.driver,
-                    position: value.position,
-                    mainImageURL: value.main_image,
-                    images: value.listImage,
+                    product_position: value.product_position,
                     active: value.active,
                     status: value.status,
                     color: value.color,
+                    main_image: mainImage?.data?.url || value.main_image || "",
+                    sub_image: subImage?.data?.url || value.sub_image || "",
+                    list_image: listImage || {},
+                    modified_by: null,
+                    product_author: "",
                     manufacturerId: null,
                     product_languages: [
                         {
@@ -237,7 +95,7 @@ const ProductForm = (props) => {
                         }
                     ]
                 }
-                setLoadingSubmit(true);
+                console.log('product edit :', product);
                 let { result, res } = await callAPI(await fetch(`/api/products/${id}`, {
                     method: 'PUT',
                     cache: 'no-store',
@@ -245,7 +103,7 @@ const ProductForm = (props) => {
                 }),
                     (msg) => { setErrorMessage(msg) },
                     () => { router.push('/login') },
-                    () => { setLoginForm(product) },
+                    () => { setLoginForm(true) },
                 );
                 if (res.status == 200) {
                     toast.success("Update Product success ")
@@ -253,17 +111,20 @@ const ProductForm = (props) => {
                 setLoadingSubmit(false);
             } else {
                 const product = {
-                    code: value.code,
+                    product_code: value.product_code,
                     price: value.price,
                     discount_price: value.discount_price,
-                    category: value.category,
+                    categories: 1,
                     driver: value.driver,
-                    position: value.position,
-                    mainImageURL: value.main_image,
-                    images: value.listImage,
+                    product_position: value.product_position,
                     active: value.active,
                     status: value.status,
                     color: value.color,
+                    main_image: mainImage.data.url || "",
+                    sub_image: subImage.data.url || "",
+                    list_image: listImage || {},
+                    modified_by: null,
+                    product_author: "",
                     manufacturerId: null,
                     product_languages: [
                         {
@@ -280,19 +141,20 @@ const ProductForm = (props) => {
                         }
                     ]
                 }
+                console.log('product :', product);
                 let { result, res } = await callAPI(await fetch(`/api/products`, {
                     method: 'POST',
                     cache: 'no-store',
-                    // body: JSON.stringify(product)
-                    body: body
+                    body: JSON.stringify(product)
+                    // body: body
                 }),
                     (msg) => { setErrorMessage(msg) },
                     () => { router.push('/login') },
-                    () => { setLoginForm(product) },
+                    () => { setLoginForm(true) },
                 );
                 if (res.status == 200) {
                     toast.success("Create Product success");
-                    form.resetFields();
+                    // form.resetFields();
                 }
                 setLoadingSubmit(false);
             }
@@ -300,52 +162,6 @@ const ProductForm = (props) => {
             toast.error(error);
         }
 
-
-
-        // const tagLangs = langTable.map((lang) => {
-        //     delete value[`name_${lang.code}`]; //delete unsused properties
-        //     delete value[`description_${lang.code}`];
-        //     return {
-        //         name: form.getFieldValue(`name_${lang.code}`) ?? "",
-        //         description: form.getFieldValue(`description_${lang.code}`) ?? "",
-        //         LanguageCode: lang.code,
-        //         TagId: id,
-        //     };
-        // });
-        // setLoading(true);
-        // try {
-        //     if (id) {
-        //         await editTag(value, tagLangs, id, lang).then((res) => {
-        //             setTags(res.tagList.data);
-        //             handleModal();
-        //             toast.success("Update Tag success ");
-        //             setLoading(false);
-        //         });
-        //     } else {
-        //         if (form.getFieldValue("tag_code").length <= 0) {
-        //             value = {
-        //                 ...value,
-        //                 tag_code: tagLangs[0].name
-        //                     .trim()
-        //                     .normalize("NFD")
-        //                     .replace(/[\u0300-\u036f]/g, "")
-        //                     .replace(/đ/g, "d")
-        //                     .replace(/Đ/g, "D")
-        //                     .replace(/\s/g, "-"),
-        //             };
-        //         }
-
-        //         console.log("value :", value);
-        //         await addTag(value, tagLangs, lang).then((res) => {
-        //             setTags(res.tagList.data);
-        //             toast.success("Create Tag success");
-        //             setLoading(false);
-        //             form.resetFields();
-        //         });
-        //     }
-        // } catch (error) {
-        //     toast.error(error);
-        // }
     };
     const handleSubmitFailed = (errorInfo) => {
         console.log("Failed:", errorInfo);
@@ -362,29 +178,18 @@ const ProductForm = (props) => {
         if (Array.isArray(e)) {
             return e;
         }
-
         return e && e.file;
     };
 
 
     // LIST IMAGE
-    const [fileList, setFileList] = useState([
-        {
-            uid: '-1',
-            name: 'image.png',
-            status: 'done',
-            url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-        },
-        {
-            uid: '-2',
-            name: 'image.png',
-            status: 'done',
-            url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-        },
-    ]);
     console.log('fileList :', fileList);
-
     const onChangeListImage = ({ fileList: newFileList }) => {
+        setFileList(newFileList);
+    };
+    const handleFileRemove = (file) => {
+        const newFileList = fileList.filter((item) => item.uid !== file.uid);
+        // Update fileList state after removing the file
         setFileList(newFileList);
     };
     const onPreview = async (file) => {
@@ -409,7 +214,33 @@ const ProductForm = (props) => {
     };
 
     // UPLOAD IMAGE TO SERVER
+    const handleFileAdd = (file) => {
+        // Add the new file to the existing fileList
+        const newFileList = [...fileList, file];
+        setFileList(newFileList);
+    };
+    const uploadListImage = async () => {
+        const newFiles = fileList && fileList.filter((file) => !initialFileList.some((initialFile) => initialFile?.name === file?.name));
+        console.log('newFiles :', newFiles);
+        const initFiles = fileList && fileList.filter(file => initialFileList.some(initialFile => initialFile?.name === file?.name));
+        console.log('initFiles :', initFiles);
+        if (newFiles && newFiles.length > 0) {
+            const formData = new FormData();
+            for (let i = 0; i < newFiles.length; i += 1) {
+                formData.append('files', newFiles[i].originFileObj);
+                fileList
+            }
 
+            const response = await axios.post('/api/products/images', formData, {});
+            console.log('Image uploaded:', response?.data);
+            const newListImage = initFiles.concat(response?.data.images)
+            // setFileList(newListImage)
+            // console.log('newListImage :', newListImage);
+            return newListImage
+        } else {
+            return initFiles
+        }
+    }
 
     // COLOR
     const optionsColor = [
@@ -420,9 +251,7 @@ const ProductForm = (props) => {
         { value: 'black', label: 'Black' },
         { value: 'white', label: 'White' },
         { value: 'grey', label: 'Grey' },
-
     ];
-
 
     // TABS
     const TabComponent = ({ lang }) => {
@@ -465,16 +294,36 @@ const ProductForm = (props) => {
             </>
         ),
     }));
+
     useEffect(() => {
         //redirect to login page if user is not authorized
-        if (props.isAuthorize == false) {
-            handleNotAuthorized(
-                () => { router.push('/login') },
-                (msg) => { setErrorMessage(msg) }
-            );
+        // if (props.isAuthorize == false) {
+        //     handleNotAuthorized(
+        //         () => { router.push('/login') },
+        //         (msg) => { setErrorMessage(msg) }
+        //     );
+        // }
+        // const { data } = JSON.parse(props.langTable)
+        // setLangTable(data)
+        if (id) {
+            const { data } = props?.product
+            console.log('data :', data);
+            const langArr = data?.product_languages.map(lang => lang.languages);
+            setLangTable(langArr)
+            // const product_languages = data.product_languages
+            const product_languages = data?.product_languages.reduce((acc, item) => {
+                acc[`name_${item.languageCode}`] = item.name;
+                acc[`short_${item.languageCode}`] = item.short;
+                acc[`description_${item.languageCode}`] = item.description;
+                return acc;
+            }, {});
+            const dataFields = Object.assign(data, product_languages)
+            form.setFieldsValue(dataFields)
+            setMainPicURL(data.main_image)
+            setSubPicURL(data.sub_image)
+            setFileList(data.list_image)
+            setinitialFileList(data.list_image)
         }
-        const { data } = JSON.parse(props.langTable)
-        setLangTable(data)
     }, []);
 
     return (
@@ -548,10 +397,10 @@ const ProductForm = (props) => {
                             <Input placeholder="Input Discount Price" />
                         </Form.Item>
                         <Form.Item
-                            label={<span className="font-medium">Category </span>}
-                            name="category"
+                            label={<span className="font-medium">Categories </span>}
+                            name="categories"
                         >
-                            <Select placeholder="Select Category" >
+                            <Select placeholder="Select Categories" >
 
                             </Select>
                         </Form.Item>
@@ -602,46 +451,28 @@ const ProductForm = (props) => {
                     </div>
                 </div>
                 {/* IMAGE */}
-                <div id='image' className='grid grid-cols-2 gap-2'>
+                <div id='image' className='flex justify-center gap-40'>
                     <div id="main-image" className="flex flex-col justify-center items-center " >
-                        <div className='grid grid-cols-3'>
-                            <div className='col-span-1'>
-                                {previewMainPic && (
-                                    <Image
-                                        src={`${URL.createObjectURL(previewMainPic)}`}
-                                        width={180}
-                                        className="rounded-lg shadow"
-                                        alt={`${mainPicURL}`}
-                                    />
-                                )}
-                                {mainPicURL && !previewMainPic && (
-                                    <Image
-                                        src={`${mainPicURL}`}
-                                        width={180}
-                                        className="rounded-lg shadow"
-                                        alt={`${mainPicURL}`}
-                                    />
-                                )}
-                            </div>
-                            {mainPicURL || previewMainPic ? (
-                                <div className='col-span-2 flex flex-col justify-center'>
-                                    <Form.Item name="capMainPic" label="Caption"
-                                        labelCol={{
-                                            span: 5,
-                                        }}
-                                    >
-                                        <Input />
-                                    </Form.Item>
-                                    <Form.Item name="altMainPic" label="Alt" labelCol={{
-                                        span: 5,
-                                    }}>
-                                        <Input />
-                                    </Form.Item>
-                                </div>
-                            ) : (
-                                <></>
+                        <div>
+                            {previewMainPic && (
+                                <Image
+                                    src={`${URL.createObjectURL(previewMainPic)}`}
+                                    width={180}
+                                    className="rounded-lg shadow"
+                                    alt={`${mainPicURL}`}
+                                />
+                            )}
+                            {mainPicURL && !previewMainPic && (
+                                <Image
+                                    src={`${mainPicURL}`}
+                                    width={180}
+                                    className="rounded-lg shadow"
+                                    alt={`${mainPicURL}`}
+                                />
                             )}
                         </div>
+
+
                         <div className='py-1 font-medium'> Main Image</div>
                         <div className='flex' >
                             <Form.Item
@@ -703,40 +534,22 @@ const ProductForm = (props) => {
 
                     </div>
                     <div id="sub-image" className="flex flex-col justify-center items-center" >
-                        <div className='grid grid-cols-3'>
-                            <div className='col-span-1'>
-                                {previewSubPic && (
-                                    <Image
-                                        src={`${URL.createObjectURL(previewSubPic)}`}
-                                        width={180}
-                                        className="rounded-lg shadow"
-                                        alt={`${subPicURL}`}
-                                    />
-                                )}
-                                {subPicURL && !previewSubPic && (
-                                    <Image
-                                        src={`${subPicURL}`}
-                                        width={180}
-                                        className="rounded-lg shadow"
-                                        alt={`${subPicURL}`}
-                                    />
-                                )}
-                            </div>
-                            {subPicURL || previewSubPic ? (
-                                <div className='col-span-2 flex flex-col justify-center'>
-                                    <Form.Item name="capSubPic" label="Caption" labelCol={{
-                                        span: 5,
-                                    }}>
-                                        <Input />
-                                    </Form.Item>
-                                    <Form.Item name="altSubPic" label="Alt" labelCol={{
-                                        span: 5,
-                                    }}>
-                                        <Input />
-                                    </Form.Item>
-                                </div>
-                            ) : (
-                                <></>
+                        <div >
+                            {previewSubPic && (
+                                <Image
+                                    src={`${URL.createObjectURL(previewSubPic)}`}
+                                    width={180}
+                                    className="rounded-lg shadow"
+                                    alt={`${subPicURL}`}
+                                />
+                            )}
+                            {subPicURL && !previewSubPic && (
+                                <Image
+                                    src={`${subPicURL}`}
+                                    width={180}
+                                    className="rounded-lg shadow"
+                                    alt={`${subPicURL}`}
+                                />
                             )}
                         </div>
                         <div className='py-1 font-medium'> Sub Image</div>

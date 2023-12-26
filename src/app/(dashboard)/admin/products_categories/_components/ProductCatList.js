@@ -13,17 +13,7 @@ const ProductCatList = (props) => {
     const router = useRouter();
     // const [dataTable, setDataTable] = useState([])
     const [langTable, setLangTable] = useState([]);
-    const [categories, setCategories] = useState([{
-        id: 1,
-        // name: `Edward ${1}`,
-        category_code: 1,
-        parent: null
-    }, {
-        id: 2,
-        // name: `Edward ${2}`,
-        category_code: 2,
-        parent: 1
-    }]);
+    const [categories, setCategories] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [loadingDelete, setLoadingDelete] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -35,20 +25,24 @@ const ProductCatList = (props) => {
 
     // SEARCH CATE
     const handleSearch = async (search) => {
-        let query = `?search=${search}&lang=${lang}`;
-        let { result, res } = await callAPI(await fetch(`/api/products_categories${query}`, {
-            method: 'GET',
-            cache: 'no-store',
-        }),
-            (msg) => { setErrorMessage(msg) },
-            () => { router.push('/login') },
-            () => { setLoginForm(true) },
-        );
-        if (res.status == 200) {
-            // setCategories(result)
-            console.log('result search page :', result);
-        }
+        setSearch(search)
+        // let query = `?search=${search}&lang=${lang}`;
+        // let { result, res } = await callAPI(await fetch(`/api/products_categories${query}`, {
+        //     method: 'GET',
+        //     cache: 'no-store',
+        // }),
+        //     (msg) => { setErrorMessage(msg) },
+        //     () => { router.push('/login') },
+        //     () => { setLoginForm(true) },
+        // );
+        // if (res.status == 200) {
+        //     // setCategories(result)
+        //     console.log('result search page :', result);
+        // }
         // setCategories(rs)
+        let query = `?search=${search}&lang=${lang}`;
+        const rs = await callNon(`/api/products_categories${query}`, "GET");
+        console.log('rs search:', rs);
     };
 
     //  GET ALL CATE
@@ -131,21 +125,27 @@ const ProductCatList = (props) => {
     });
     //
     const checkAutor = async () => {
-
     }
-    useEffect(() => {
-        // setLangTable(JSON.parse(props.langTable));
-        // setCategories(JSON.parse(props.dataTable));
 
+    const formatForTable = (data) => {
+        return data.map(item => {
+            const language = item.product_cate_langs[0];
+            return {
+                ...item,
+                name: language.name || '',
+                description: language.description || ''
+            };
+        });
+    };
+    useEffect(() => {
         // if (props.isAuthorize == false) {
         //     handleNotAuthorized(
         //         () => { router.push('/login') },
         //         (msg) => { setErrorMessage(msg) }
         //     );
         // }
-
-
-        // getAllCategories(lang)
+        const product_cat = props.product_cat
+        setCategories(formatForTable(product_cat))
         const { data } = props.langTable && JSON.parse(props.langTable)
         setLangTable(data)
         // setLoading(false)

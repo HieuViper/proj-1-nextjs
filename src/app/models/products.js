@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
             },
             list_image: {
                 type: DataTypes.TEXT,  //form: [{url: 'url', alt: 'alt', caption: 'caption'},{},{}]  Nhờ anh Cảnh coi lại chổ này
+                allowNull: true,
                 get() {
                     // console.log('value of subImage:', this.getDataValue('subImage'));
                     const listImage = this.getDataValue('list_image');
@@ -59,26 +60,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
                 comment: 'feature image of the products',
             },
-            // alt_main: {
-            //     type: DataTypes.STRING(200),
-            //     allowNull: true,
-            //     comment: 'feature image of the products',
-            // },
-            // cap_main: {
-            //     type: DataTypes.STRING(200),
-            //     allowNull: true,
-            //     comment: 'feature image of the products',
-            // },
-            // alt_sub: {
-            //     type: DataTypes.STRING(200),
-            //     allowNull: true,
-            //     comment: 'feature image of the products',
-            // },
-            // cap_sub: {
-            //     type: DataTypes.STRING(200),
-            //     allowNull: true,
-            //     comment: 'feature image of the products',
-            // },
+
             // list_image: {
             //     type: DataTypes.TEXT,  //form: [{url: 'url', alt: 'alt', caption: 'caption'},{},{}]  Nhờ anh Cảnh coi lại chổ này
             //     get: function () {
@@ -150,8 +132,9 @@ module.exports = (sequelize, DataTypes) => {
                 comment: 'it has the value 1 that means the news is prioritied',
             },
             active: DataTypes.BOOLEAN,
-            status: DataTypes.INTEGER,
-            color: DataTypes.INTEGER,
+            status: DataTypes.STRING(100),
+            color: DataTypes.STRING(100),
+            driver: DataTypes.STRING(200),
             modified_by: {
                 type: DataTypes.STRING(200),
                 collate: 'utf8mb4_unicode_520_ci',

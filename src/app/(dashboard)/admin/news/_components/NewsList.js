@@ -28,23 +28,13 @@ export default function NewsList(props) {
     order: "descend",
     columnKey: "date",
   };
-  const [paginationServer, setPaginationServer] = useState({
-    pageSize: 10,
-    total: 0,
-    current: 1,
-  });
+  const [paginationServer, setPaginationServer] = useState(props.pagination);
 
-  const [totals, setTotals] = useState({
-    itemsOfTable: 0,
-    all: 0,
-    draft: 0,
-    publish: 0,
-    trash: 0,
-    priority: 0,
-  });
+  const [totals, setTotals] = useState(props.totals);
+  console.log('totals:', props.totals);
   const [sortedInfo, setSortedInfo] = useState(initSort);
-  const [news, setNews] = useState();
-  const [langTable, setLangTable] = useState([]);
+  const [news, setNews] = useState(JSON.parse(props.dataTable));
+  const [langTable, setLangTable] = useState(JSON.parse(props.langTable));
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(searchParams.get("status") ?? "");
@@ -67,15 +57,14 @@ export default function NewsList(props) {
       );
     }
 
-    setInitStates( props );
-    setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
-    setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
+    // setInitStates( props );
+    // setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
+    // setLoading( false );        //loading is similar to loadingstatus but it is used to display loading message on the button 'bulk delete'
 
   }, [props]);
 
   function setInitStates( result ) {
-    // const newsData = JSON.parse(props.dataTable);
-    // const langData = JSON.parse(props.langTable);
+    console.log(JSON.parse(result.dataTable));
     setLangTable(JSON.parse(result.langTable));
     setNews(JSON.parse(result.dataTable));
     setPaginationServer(result.pagination);
@@ -381,7 +370,7 @@ export default function NewsList(props) {
         return (
           <>
             <div className="text-base font-medium pb-2">
-              {record.title}
+              {record.news_languages[0].title}
               {record.post_status == "draft" &&
                 searchParams.get("status") == "" && (
                   <span className="text-xs"> (Draft)</span>

@@ -73,7 +73,7 @@ const UserForm = (props) => {
     let imageInfo = null;
     console.log("values:", values);
     const body = new FormData();
-    body.append('imageFile', uploadPic);    //attach uploaded image
+    uploadPic && body.append('imageFile', uploadPic);    //attach uploaded image
     if( picURL || uploadPic ) {
       imageInfo = {
         alt: values.alt ?? "",

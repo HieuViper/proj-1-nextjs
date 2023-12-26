@@ -5,7 +5,8 @@
 
 import { DecoupledEditor } from '@ckeditor/ckeditor5-editor-decoupled';
 
-import upPic from './upPic';
+import UpPic from './upPic';
+import InsPic from './insPic';
 
 import { Alignment } from '@ckeditor/ckeditor5-alignment';
 import { Autoformat } from '@ckeditor/ckeditor5-autoformat';
@@ -41,7 +42,8 @@ import { TextTransformation } from '@ckeditor/ckeditor5-typing';
 
 class Editor extends DecoupledEditor {
 	public static override builtinPlugins = [
-		upPic,
+		UpPic,
+		InsPic,
 		Alignment,
 		Autoformat,
 		BlockQuote,
@@ -79,6 +81,7 @@ class Editor extends DecoupledEditor {
 		toolbar: {
 			items: [
 				'upPic',
+				'insPic',
 				'heading',
 				'|',
 				'fontSize',
@@ -102,7 +105,7 @@ class Editor extends DecoupledEditor {
 				'|',
 				'link',
 				'blockQuote',
-				'imageUpload',
+				// 'imageUpload',
 				'insertTable',
 				'mediaEmbed',
 				'|',

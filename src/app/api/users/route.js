@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { funcLogin } from "@/library/funcLogin";
-import { funcUsers } from "@/library/funcUsers";
+import { users } from "@/library/users";
 
 export const dynamic = 'force-dynamic' // defaults to force-static
 // export const fetchCache = 'force-no-store'
@@ -15,7 +15,7 @@ export async function GET(req, { params }) {
     // const { searchParams } = new URL(req.url)
     const searchParams = req.nextUrl.searchParams;
     try{
-        result = await funcUsers.userList( loginInfo, searchParams );
+        result = await users.userList( loginInfo, searchParams );
         if ( result.error )
           return NextResponse.json( { msg: result.msg }, { status: result.error } );
 

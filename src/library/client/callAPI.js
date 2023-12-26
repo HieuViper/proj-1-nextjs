@@ -35,8 +35,8 @@ export async function handleNotAuthorized( funcForward, fSetErr ) {
                 fSetErr( 'Method is not allowed' );
                 break;
             case 500:
-                console.log('hereee');
-                //fSetErr( 'Internal Server Error: ' + result?.msg );
+                // console.log('hereee');
+                fSetErr( 'Internal Server Error: ' + result?.msg );
                 break;
             default:
                 fSetErr( 'Error:' + result?.msg );

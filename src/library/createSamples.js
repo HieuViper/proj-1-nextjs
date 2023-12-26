@@ -29,6 +29,7 @@ export const createUsers = async () => {
       username: "admin",
       password: "$2b$10$rPaOOP0Qz/5tEfm5BqFfwOzrDAVBfpjiB2radK82ybwnylPUqXKZa", //admin
       nick_name: "admin",
+      display_name: "admin",
       role: "Administrator",
       createdAt: db.sequelize.literal("now()"),
       updatedAt: db.sequelize.literal("now()"),

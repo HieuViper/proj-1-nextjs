@@ -19,13 +19,9 @@ import { AddImgForm } from "./AddImgForm";
 
 const ImageList = (props) => {
   const router = useRouter();
-  const [paginationServer, setPaginationServer] = useState({
-    pageSize: 10,
-    total: 0,
-    current: 1,
-  });
+  const [paginationServer, setPaginationServer] = useState( props.pagination && props.pagination );
 
-  const [imageList, setImageList] = useState([]);
+  const [imageList, setImageList] = useState( props.data && JSON.parse( props.data ) );
   // console.log("🚀 ~ file: ImageList.js:19 ~ ImageList ~ imageList:", imageList);
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
   const [isModalAddOpen, setIsModalAddOpen] = useState(false);
@@ -44,15 +40,8 @@ const ImageList = (props) => {
 
 
   useEffect(() => {
-    //redirect to login page if user is not authorized
-  //   if( props.isAuthorize == false ) {
-  //    handleNotAuthorized(
-  //      () => { router.push('/login') },
-  //      ( msg ) => { setErrorMessage( msg ) }
-  //    );
-  //  }
 
-   setInitStates( props );
+  //  setInitStates( props );
   //  setLoadingStatus( false );  //when request is sending, and wait for the response, loadingstatus is set true. That disabled all the link, components
 
  }, [props]);
@@ -92,7 +81,7 @@ const ImageList = (props) => {
 
     console.log(pageSize + '  ' + page);
     let query = `?page=${page}&size=${pageSize}&search=${search}`;
-    let { result, res } = await callAPI( await fetch(`/api/news_imgs${query}`, {
+    let { result, res } = await callAPI( await fetch(`${props.api.search}${query}`, {
         method: 'GET',
         cache: 'no-store'
       }),
@@ -112,9 +101,9 @@ const ImageList = (props) => {
   const onFinishEdit = async (values) => {
     console.log("Success:", values);
     //alt and caption are changed, need to update to server
-    if( values.changeValue == true ) {
+    if( values.changeValue == 'true' ) {
       setLoadingStatus(true);
-      let { result, res } = await callAPI( await fetch(`/api/news_imgs/update`, {
+      let { result, res } = await callAPI( await fetch(`${props.api.update}`, {
           method: 'PUT',
           cache: 'no-store',
           body: JSON.stringify({
@@ -132,18 +121,14 @@ const ImageList = (props) => {
       );
       if (res.ok == true ) {
         message.success("Update Successfully");
-        setInitStates( result );
+        // setInitStates( result );
         // setImageList(rs.data);
       }
       setLoadingStatus( false );
     }
-    // console.log('values:', values);
-    // console.log('editor:', props.editor);
-    // const imageUtils = props.editor.plugins.get( 'ImageUtils' );
-    // imageUtils.insertImage( { src: values.url,
-    //                           srcset: values.srcset,
-    // } );
+
     // close modal
+    props.onFinishAddPic(values);
     setIsModalEditOpen(false);
     props.setIsModalPicOpen( false );
   };
@@ -168,7 +153,7 @@ const ImageList = (props) => {
         size: paginationServer.pageSize,
         page: 1,
       } ));
-      let { result, res } = await callAPI( await fetch(`/api/news_imgs/add`, {
+      let { result, res } = await callAPI( await fetch(`${props.api.add}`, {
         method: 'POST',
         cache: 'no-store',
         body
@@ -200,7 +185,7 @@ const ImageList = (props) => {
     console.log("🚀 ~ file: ImageList.js:103 ~ showModalEdit ~ item:", item);
     setLoadingStatus( true );
 
-    let { result, res } = await callAPI( await fetch(`/api/news_imgs/info`, {
+    let { result, res } = await callAPI( await fetch(`${props.api.info}`, {
         method: 'POST',
         cache: 'no-store',
         body: JSON.stringify( { imgUrl: item.url } )
@@ -235,7 +220,7 @@ const ImageList = (props) => {
     setLoadingStatus( true );
     // console.log("🚀 ~ file: ImageList.js:125 ~ handleDeleteImage ~ rs:", rs);
     let query = `?page=${paginationServer.current}&size=${paginationServer.pageSize}&search=${search}&del=${id}`;
-    let { result, res } = await callAPI( await fetch(`/api/news_imgs${query}`, {
+    let { result, res } = await callAPI( await fetch(`${props.api.search}${query}`, {
         method: 'GET',
         cache: 'no-store'
       }),
@@ -257,7 +242,7 @@ const ImageList = (props) => {
     fButtonEditModal.push(<Button key="back" onClick={handleCancelModalEdit}>
     Cancel
   </Button>);
-  if( props.roles[props.user.role]?.news_imgs?.delete === true  ) {
+  if( props.roles[props.user.role]?.[props.module]?.delete === true  ) {
     fButtonEditModal.push( <Popconfirm
       key="delete"
       title="Delete the Image Permanently"
@@ -383,7 +368,7 @@ const ImageList = (props) => {
         <EditImgForm
           image = { choosenImg }
           metadata = { metadata }
-          editor = { props.editor }
+          // editor = { props.editor }
           {...{onFinishEdit, onFinishFailed}}
         />
       </Modal>
